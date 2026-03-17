@@ -49,28 +49,22 @@ class Control:
     def is_mouse_over(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
     
-    def resize(self, new_width_ratio, new_height_ratio):
+    def resize_only(self, new_width_ratio, new_height_ratio):
         if not self.is_resizable:
             return
         self.rect.width = int(self.rect.width * new_width_ratio)
         self.rect.height = int(self.rect.height * new_height_ratio)
-        self.size = (self.rect.width, self.rect.height)        
-        children_sizes = self.resize_children(new_width_ratio, new_height_ratio)
-        if self.grid_coordinates != None:
-           self.reposition_in_grid(new_width_ratio, new_height_ratio)
-        return self.size, children_sizes
+        self.size = (self.rect.width, self.rect.height)
 
-    def reposition_in_grid(self, new_width_ratio, new_height_ratio):
-        row, col = self.grid_coordinates
-        horizontal_spacing, vertical_spacing = self.grid_spacing
-        if col == 0:# first column, has no left spacing, we just use width ratio to calculate new x
-            self.rect.x = int(self.rect.x * new_width_ratio)
-        else: # for other columns, we calculate new x based on column index, width ratio and spacing ratio
-            self.rect.x += int(col * (self.size[0] + horizontal_spacing) * new_width_ratio)
-        if row == 0: # first row, has no top spacing, we just use height ratio to calculate new y
-            self.rect.y = int(self.rect.y * new_height_ratio)
-        else: # for other rows, we calculate new y based on row index, height ratio and spacing ratio
-            self.rect.y += int(row * (self.size[1] + vertical_spacing) * new_height_ratio)
+    def reset_position(self, new_width_ratio, new_height_ratio):
+        self.rect.x = int(self.rect.x * new_width_ratio)
+        self.rect.y = int(self.rect.y * new_height_ratio)
+        self.position = (self.rect.x, self.rect.y)
+
+    def resize(self, new_width_ratio, new_height_ratio):
+        self.resize_only(new_width_ratio, new_height_ratio)        
+        children_sizes = self.resize_children(new_width_ratio, new_height_ratio)      
+        return self.size, children_sizes
 
     def resize_children(self, new_width_ratio, new_height_ratio):
         # resize and return new size of children controls if they are resizable
@@ -79,3 +73,13 @@ class Control:
             child.resize(new_width_ratio, new_height_ratio)
             children_sizes[child.name] = child.size
         return children_sizes
+    
+    def draw(self):
+        # base control doesn't have a visual representation, it's just a container for other controls, so we don't draw anything here
+        if not self.visible:
+            return
+        
+    def hide(self):
+        self.visible = False
+        for child in self.children:
+            child.hide()

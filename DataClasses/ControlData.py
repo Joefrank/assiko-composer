@@ -8,4 +8,9 @@ class ControlType(Enum):
     TOOLBARITEM = auto()
     CONTAINER = auto()
     WINDOW = auto()
+    BUTTON = auto()
+    STAGGERED_BUTTON_SYMBOL = auto()
+    
+
+
 

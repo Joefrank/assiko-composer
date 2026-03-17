@@ -29,3 +29,11 @@ class ScreenHelper:
     @staticmethod
     def is_keyboard_event(event):
         return event.type in KEYBOARD_EVENTS
+    
+    @staticmethod
+    def create_font(font_spec):
+        name, size = font_spec
+        try:
+            return pygame.font.Font(name, size)
+        except Exception as e:
+            return pygame.font.SysFont(name if isinstance(name, str) else None, size)

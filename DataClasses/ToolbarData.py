@@ -2,14 +2,16 @@ from dataclasses import dataclass
 
 import pygame
 
+from DataClasses.ButtonData import ButtonType
 from DataClasses.Config import ScreenConfig
+from DataClasses.ControlData import ControlType
 from Model.Position import TextPosition
 
 @dataclass
 class ToolbarDimensions:
     BUTTON_WIDTH = 40
     BUTTON_HEIGHT = 30
-    BUTTON_MARGIN = 10
+    BUTTON_MARGIN = 5
     BUTTON_BORDER_RADIUS = 6
     TOP_OFFSET_RATIO = 0.1
     TOOLBAR_HEIGHT_RATIO = 0.06
@@ -37,8 +39,9 @@ class PlayToolbar:
     BUTTON_HOVER_TEXT_COLOR = (255, 255, 255)
     BUTTON_HOVER_BG_COLOR = (100, 100, 100)
     BUTTON_TEXT_CENTER: TextPosition = TextPosition.CENTER
-    DRAGGABLE_BUTTONS = False
+    DRAGGABLE_BUTTONS = False # TODO: rename to draggable_symbols, as it makes more sense
     SUPPORTED_EVENTS = [pygame.MOUSEMOTION]
+    BUTTON_TYPE = ButtonType.BUTTON
 
 @dataclass
 class NotesToolbar:
@@ -62,6 +65,7 @@ class NotesToolbar:
     BUTTON_TEXT_CENTER: TextPosition = TextPosition.BOTTOM_CENTER
     DRAGGABLE_BUTTONS = True
     SUPPORTED_EVENTS = [pygame.MOUSEMOTION]
+    BUTTON_TYPE = ButtonType.BUTTON
 
 @dataclass
 class RestToolbar:
@@ -86,10 +90,108 @@ class RestToolbar:
     BUTTON_TEXT_CENTER: TextPosition = TextPosition.CENTER
     DRAGGABLE_BUTTONS = True
     SUPPORTED_EVENTS = [pygame.MOUSEMOTION]
+    BUTTON_TYPE = ButtonType.BUTTON
+
+@dataclass
+class AccidentalsToolbar:
+    NAME: str = "AccidentalsToolbar"
+    ICONS = [
+        ("\uE262", "SHARP"),  # SHARP
+        ("\uE260", "FLAT"),  # FLAT
+        ("\uE261", "NATURAL"),   # NATURAL
+        ("\uE263", "DOUBLE_SHARP"),   # DOUBLE_SHARP
+        ("\uE264", "DOUBLE_FLAT")   # DOUBLE_FLAT
+    ]
+    FONT = (ScreenConfig.FontConfig.BRAVURA_FONT_PATH, 25)
+    BG_COLOR = (220, 220, 220, 100)
+    BG_HIGHLIGHT = (220, 220, 250)
+    BUTTON_TEXT_COLOR = (25, 25, 25)
+    BUTTON_BG_COLOR = (255, 200, 200)
+    BUTTON_HOVER_TEXT_COLOR = (255, 255, 255)
+    BUTTON_HOVER_BG_COLOR = (200, 180, 180)
+    BUTTON_TEXT_CENTER: TextPosition = TextPosition.CENTER
+    DRAGGABLE_BUTTONS = True
+    SUPPORTED_EVENTS = [pygame.MOUSEMOTION]
+    BUTTON_TYPE = ButtonType.BUTTON
+
+@dataclass
+class TimeSignatureToolbar:
+    NAME: str = "TimeSignatureToolbar"
+    ICONS =[
+                # (chr(0xF5FA),"2x2"), 
+                # (chr(0xF5FB),"2x4"),
+                # (chr(0xF5FC),"3x2"),
+                # (chr(0xF5FD),"3x4"),
+                # (chr(0xF5FE),"4x4"),
+                ((chr(0xE086), chr(0xE088)),"6x8"),
+                ((chr(0xE089), chr(0xE088)),"9x8"),
+                ((chr(0xE081) + chr(0xE082), chr(0xE088)),"12x8")
+            ]
+    FONT = (ScreenConfig.FontConfig.BRAVURA_FONT_PATH, 20)
+    BG_COLOR = (220, 220, 220, 100)
+    BG_HIGHLIGHT = (220, 220, 250)
+    BUTTON_TEXT_COLOR = (25, 25, 25)
+    BUTTON_BG_COLOR = (255, 200, 200)
+    BUTTON_HOVER_TEXT_COLOR = (255, 255, 255)
+    BUTTON_HOVER_BG_COLOR = (200, 180, 180)
+    BUTTON_TEXT_CENTER: TextPosition = TextPosition.BOTTOM_CENTER
+    DRAGGABLE_BUTTONS = True
+    SUPPORTED_EVENTS = [pygame.MOUSEMOTION]
+    BUTTON_TYPE = ButtonType.TIME_SIGNATURE_BUTTON
+
+@dataclass
+class ClefToolbar:
+    NAME: str = "ClefToolbar"
+    ICONS =[
+                ("\uE050", "G_CLEF"),
+                ("\uE062", "F_CLEF"),
+                ("\uE05C", "C_CLEF")                
+            ]
+    FONT = (ScreenConfig.FontConfig.BRAVURA_FONT_PATH, 18)
+    BG_COLOR = (220, 220, 220, 100)
+    BG_HIGHLIGHT = (220, 220, 250)
+    BUTTON_TEXT_COLOR = (25, 25, 25)
+    BUTTON_BG_COLOR = (255, 200, 200)
+    BUTTON_HOVER_TEXT_COLOR = (255, 255, 255)
+    BUTTON_HOVER_BG_COLOR = (200, 180, 180)
+    BUTTON_TEXT_CENTER: TextPosition = TextPosition.CENTER
+    DRAGGABLE_BUTTONS = True
+    SUPPORTED_EVENTS = [pygame.MOUSEMOTION]
+    BUTTON_TYPE = ButtonType.BUTTON
+
+@dataclass
+class KeySignatureToolbar:
+    NAME: str = "KeySignatureToolbar"
+    ICONS =[
+                (("\uE262",1), "G MAJOR"),
+                (("\uE262",2), "D MAJOR"),
+                (("\uE262",3), "A MAJOR"),
+                (("\uE262",4), "E MAJOR"),
+                (("\uE262",5), "B MAJOR"),
+                (("\uE262",6), "F# MAJOR"),
+                (("\uE262",7), "C# MAJOR"),           
+            ]
+    FONT = (ScreenConfig.FontConfig.BRAVURA_FONT_PATH, 18)
+    BG_COLOR = (220, 220, 220, 100)
+    BG_HIGHLIGHT = (220, 220, 250)
+    BUTTON_TEXT_COLOR = (25, 25, 25)
+    BUTTON_BG_COLOR = (255, 200, 200)
+    BUTTON_HOVER_TEXT_COLOR = (255, 255, 255)
+    BUTTON_HOVER_BG_COLOR = (200, 180, 180)
+    BUTTON_TEXT_CENTER: TextPosition = TextPosition.CENTER
+    DRAGGABLE_BUTTONS = True
+    BUTTON_TYPE = ButtonType.STAGGERED_SYMBOL_BUTTON
+    SUPPORTED_EVENTS = [pygame.MOUSEMOTION]
+
+
+TOOLBAR_MATRIX = [
+    [NotesToolbar, AccidentalsToolbar, PlayToolbar, KeySignatureToolbar],
+    [RestToolbar, TimeSignatureToolbar, ClefToolbar, AccidentalsToolbar]
+]
 
 @dataclass
 class ToolbarGridConfig:
-    GRID_SPACING = (10, 10)
+    GRID_SPACING = (5, 5)
     GRID_ROWS = 2
-    GRID_COLS = 3
+    GRID_COLS = 4
     GRID_NAME = "Horizontal_ToolbarGrid"

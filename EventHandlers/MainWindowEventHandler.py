@@ -22,7 +22,10 @@ class MainWindowEventHandler:
         subscription = next((s for s in self.event_subscriptions if s.event_type == event_type), None)
         #check that subscription exists for the event type and also that subscriber is not already subscribed to avoid duplicates 
         if subscription and subscriber not in subscription.subscribers:     
-            subscription.subscribe(subscriber)      
+            subscription.subscribe(subscriber) 
+        # check that event doesn't already exist in supported_events then add it.
+        if event_type not in subscriber.supported_events:
+            subscriber.supported_events.append(event_type)     
 
     def handle_events(self) -> None:
         """Process all pygame events."""

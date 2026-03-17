@@ -20,7 +20,7 @@ class MainWindowBuilder:
         self.main_window:Window = None
         self.main_box:ScrollableContainer = None
         self.menu_bar:MenuBar = None
-        self.all_toolbars = []
+        self.toolbar_grid = None
         self.window_canvass:pygame.Surface = None # main screen       
 
     def build(self):
@@ -50,23 +50,15 @@ class MainWindowBuilder:
    
     """This builds all toolbars and assigns them to main_window."""
     def build_toolbars(self):
-        self.all_toolbars = ToolbarBuilder(self.main_window, self.event_handler).build()
-        
-        # Define toolbars to add in order
-        toolbar_names = [PlayToolbar.NAME, NotesToolbar.NAME, RestToolbar.NAME]
-        
-        # Find and add each toolbar
-        for toolbar_name in toolbar_names:
-            toolbar = next((t for n, t in self.all_toolbars if n == toolbar_name), None)
-            if toolbar:
-                self.main_window.add_child(toolbar)
-        
+        self.toolbar_grid = ToolbarBuilder(self.main_window, self.event_handler).build()
+        self.main_window.add_child(self.toolbar_grid)        
         return self
 
     """Builds all containers that are direct children of main_window."""
     def build_containers(self):
         self.main_box = ContainerBuilder(self.main_window, self.event_handler).build()
         self.main_window.add_child(self.main_box)
+       # self.main_box.hide()
         return self
 
     """Builds the main menu.Should be called last when rendering because of z-index"""

@@ -10,8 +10,9 @@ from Model.Size import Size
 
 
 class MenuBuilder:
-    def __init__(self, window_dimensions:Size, event_handler:MainWindowEventHandler):
-        self.window_dimensions = window_dimensions
+    def __init__(self, main_window, event_handler:MainWindowEventHandler):
+        self.main_window = main_window
+        self.window_dimensions = self.main_window.get_size()
         self.event_handler = event_handler
         self.menu_bar = None
         self.MENU_BAR_HEIGHT = self.window_dimensions.height * MenuDimensions.MENU_BAR_HEIGHT_RATIO
@@ -23,7 +24,7 @@ class MenuBuilder:
 
     def build_menu_bar(self):        
         self.menu_bar = MenuBar(self.window_dimensions.width, self.MENU_BAR_HEIGHT, MenuDimensions.MENU_ITEM_SPACING, 
-                                MenuColorConfig.MENUBAR_BG)
+                                MenuColorConfig.MENUBAR_BG, self.main_window.get_canvass())
         self.menu_bar.add_supported_events([pygame.MOUSEBUTTONDOWN])   
 
     def build(self):

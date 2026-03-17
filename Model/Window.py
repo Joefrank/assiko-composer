@@ -37,7 +37,7 @@ class Window(Control):
         ordered_children = sorted(self.children, key=lambda c: c.z_index)
         for child in ordered_children:
             if child.visible:
-                child.draw(self.screen)      
+                child.draw()      
   
     # --------------------------------------------------
     # Load Background Tile

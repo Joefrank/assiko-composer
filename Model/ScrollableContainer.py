@@ -34,14 +34,14 @@ class ScrollableContainer(Container):
 
         self.last_interaction = 0
         self.hovered = False
-
+        self.is_resizable = True
+        
         self.content = pygame.Surface(content_size)
         self.content.fill(self.BG_COLOR)
         self.left_margin = rect[0]
         self.top_margin = rect[1] 
         self.width_percent_of_window = 80
-        self.height_percent_of_window = 7   
-        self.screen = None 
+        self.height_percent_of_window = 7 
         self.set_z_index(ControlZIndex.LEVEL1)
 
     # -----------------------
@@ -141,13 +141,12 @@ class ScrollableContainer(Container):
     # -----------------------
     # Draw
     # -----------------------
-    def draw(self, screen):
+    def draw(self):
         # Clip content cleanly (no border)
-        clip = screen.get_clip()
-        screen.set_clip(self.rect)
-        self.screen = screen
-        screen.fill(self.BG_COLOR, self.rect)
-        screen.blit(
+        clip = self.screen.get_clip()
+        self.screen.set_clip(self.rect)
+        self.screen.fill(self.BG_COLOR, self.rect)
+        self.screen.blit(
             self.content,
             self.rect.topleft,
             area=pygame.Rect(
@@ -158,7 +157,7 @@ class ScrollableContainer(Container):
             )
         )
 
-        screen.set_clip(clip)
+        self.screen.set_clip(clip)
 
         alpha = self.scrollbar_alpha()
         if alpha <= 0:
@@ -174,7 +173,7 @@ class ScrollableContainer(Container):
                 surf.get_rect(),
                 border_radius=6
             )
-            screen.blit(surf, thumb.topleft)
+            self.screen.blit(surf, thumb.topleft)
 
         if self.enable_x and self.content_w > self.rect.width:
             thumb = self.hthumb_rect()
@@ -185,7 +184,7 @@ class ScrollableContainer(Container):
                 surf.get_rect(),
                 border_radius=6
             )
-            screen.blit(surf, thumb.topleft)
+            self.screen.blit(surf, thumb.topleft)
 
     # -----------------------
     # Resize this box
@@ -201,3 +200,11 @@ class ScrollableContainer(Container):
     #                             screen_height - top_margin - 50)
     #     self.clamp()
         #self.draw(self.screen)
+
+    def resize(self, width_ratio, height_ratio):
+        """Resize the visible viewport based on new window size."""
+        #print(f"Before resize: rect={self.rect}")
+        super().resize_only(width_ratio, height_ratio)
+        super().reset_position(width_ratio, height_ratio)
+        #print(f"After resize: rect={self.rect}")
+        self.clamp()

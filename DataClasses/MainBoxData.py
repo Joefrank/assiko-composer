@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 @dataclass
 class MainBoxConfig:
-    TOP_OFFSET_RATIO = 0.2
+    TOP_OFFSET_RATIO = 0.26  # based on MENU_BAR_HEIGHT_RATIO + TOOLBAR_HEIGHT_RATIO * 2
     HEIGHT_RATIO = 0.7
     WIDTH_RATIO = 0.8
     NAME = "MainScoreBox"

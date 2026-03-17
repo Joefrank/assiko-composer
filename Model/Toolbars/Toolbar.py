@@ -7,6 +7,7 @@ from Model.Button import Button
 from Model.Container import Container
 from Model.DragAndDrop.DraggableNote import DraggableNoteButton
 from Model.Position import TextPosition
+from Model.StaggeredLabelButton import StaggeredLabelButton
 
 
 class Toolbar(Container):    
@@ -37,40 +38,29 @@ class Toolbar(Container):
         self.grid_spacing = grid_spacing
         self.set_z_index(ControlZIndex.LEVEL2) 
         self.is_resizable = True
-
-    def create_buttons(self, icons:list[tuple[str, str]], font, toolbar_height, # pass height of toolbar here
-                    text_color, bg_color, hover_text_color, hover_bg_color, border_radius=0):
-        button_top_padding = (toolbar_height - self.button_height) // 2
-        x= ToolbarDimensions.BUTTON_MARGIN    
-        for icon, action in icons:
-            button_rect = pygame.Rect(x, button_top_padding, self.button_width, self.button_height)
-            button = Button(action, button_rect, icon, action, font, border_radius, 
-                            text_color, bg_color, hover_text_color, hover_bg_color, self.buttons_draggable)
-            button.set_parent(self, offset_x=x, offset_y=button_top_padding)
-            if self.buttons_draggable:
-                button.add_supported_events([pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION])
-            else:
-                button.add_supported_events([pygame.MOUSEBUTTONDOWN, pygame.MOUSEMOTION])
-
-            self.add_button(button)
-            x += self.button_width + self.button_margin
-        return self.children
-
+        self.button_type = ControlType.BUTTON
+        
     def resize(self, new_width_ratio, new_height_ratio):
-        print(f"Before resize: Toolbar rect: {self.rect}")
-        super().resize(new_width_ratio, new_height_ratio)
-        # Reposition buttons based on new size
-        # x = int(self.rect.x * new_width_ratio) + int(self.button_margin * new_width_ratio)
-        # for button in self.children:
-        #     button.rect.x = x
-        #     button.rect.y = int(button.rect.y * new_height_ratio) 
-        #     x += button.rect.width + (self.button_margin * new_width_ratio)
-        # self.rect.x = int(self.rect.x * new_width_ratio)
-        # self.rect.y = int(self.rect.y * new_height_ratio)
-        # self.rect.width = int(self.rect.width * new_width_ratio)
-        # self.rect.height = int(self.rect.height * new_height_ratio)
-        print(f"After resize: Toolbar rect: {self.rect}")
+        super().resize(new_width_ratio, new_height_ratio) 
 
+    def reposition_children(self, new_width_ratio=1, new_height_ratio=1):
+        # resize the button margin for later use.
+        self.button_margin = int(self.button_margin * new_width_ratio)    
+        x = int(self.rect.x) + self.button_margin # add first margin
+        for i, button in enumerate(self.children):  
+            x = int(self.rect.x) + self.button_margin +\
+                int(i * (button.rect.width + self.button_margin))
+            button.rect.x = x
+            button.rect.y = int(button.rect.y * new_height_ratio) 
+        
+        self.recalculate_size()
+
+    def recalculate_size(self):
+        total_width = self.button_margin  # start with left margin
+        for button in self.children:
+            total_width += button.rect.width + self.button_margin  # add button width and margin
+        self.rect.width = total_width
+        self.size = (self.rect.width, self.rect.height)
 
     def add_button(self, button):      
         self.children.append(button)
@@ -85,9 +75,10 @@ class Toolbar(Container):
             self.add_button(item)
             x += item.rect.width + self.button_margin    
 
-    def draw(self, highlight=False):
-        super().draw(highlight)
+    def draw(self):
+        super().draw()
         for button in self.children:
-            button.draw(self.screen, self.button_text_center)
+            button.draw()
+        
    
    
