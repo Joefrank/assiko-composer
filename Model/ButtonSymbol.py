@@ -6,9 +6,10 @@ from Model.Control import Control
 
 class ButtonSymbol(Control):
 
-    def __init__(self, label, rect, name):
+    def __init__(self, label, rect, name, symbol):
         super().__init__(rect, ControlType.STAGGERED_BUTTON_SYMBOL, name)
         self.label = label # Full label with font
+        self.symbol = symbol
 
     def move_horizontally(self, x_offset):
         self.rect.x += x_offset

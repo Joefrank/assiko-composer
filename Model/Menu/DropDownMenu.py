@@ -8,7 +8,7 @@ from DataClasses.MainWindowData import ControlZIndex
 from DataClasses.MenuData import MenuDimensions
 from Model.Control import Control
 from Model.Menu.MenuActivator import MenuActivator
-from Model.Position import Position
+from Model.Geometry.Position import Position
 
 
 class DropdownMenu(Control):

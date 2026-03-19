@@ -119,19 +119,19 @@ class ToolbarBuilder:
 
         return buttons
     
-    def create_button(self, toolbar, action, button_type, button_rect, icon, font, font_details, border_radius, text_color,
-                             bg_color, hover_text_color, hover_bg_color, buttons_draggable):
-        if button_type == ControlType.BUTTON:
-            return Button(self.screen, action, button_rect, icon, action, font, font_details, border_radius, toolbar.button_text_center,
-                        text_color, bg_color, hover_text_color, hover_bg_color, buttons_draggable)
-        else:
-            # ("\uE262",2) create an array of symbols with first element of tuple the number of symbols is the second item of tuple.
-            symbols = []
-            for i in range(icon[1]):
-                symbols.append(icon[0])
+    # def create_button(self, toolbar, action, button_type, button_rect, icon, font, font_details, border_radius, text_color,
+    #                          bg_color, hover_text_color, hover_bg_color, buttons_draggable):
+    #     if button_type == ControlType.BUTTON:
+    #         return Button(self.screen, action, button_rect, icon, action, font, font_details, border_radius, toolbar.button_text_center,
+    #                     text_color, bg_color, hover_text_color, hover_bg_color, buttons_draggable)
+    #     else:
+    #         # ("\uE262",2) create an array of symbols with first element of tuple the number of symbols is the second item of tuple.
+    #         symbols = []
+    #         for i in range(icon[1]):
+    #             symbols.append(icon[0])
 
-            button = StaggeredLabelButton(self.screen, action, button_rect, icon, action, font, font_details, border_radius, toolbar.button_text_center,
-                        text_color, bg_color, hover_text_color, hover_bg_color, buttons_draggable, symbols)
+    #         button = StaggeredLabelButton(self.screen, action, button_rect, icon, action, font, font_details, border_radius, toolbar.button_text_center,
+    #                     text_color, bg_color, hover_text_color, hover_bg_color, buttons_draggable, symbols)
            
-            return button
+    #         return button
                 

@@ -6,7 +6,7 @@ from DataClasses.MainWindowData import ControlZIndex
 from Helpers.ScreeHelper import ScreenHelper
 from Model.Toolbars.ToolbarActivator import ToolbarActivator
 from Model.Control import Control
-from Model.Position import TextPosition
+from Model.Geometry.Position import TextPosition
 
 class Button(Control):
     

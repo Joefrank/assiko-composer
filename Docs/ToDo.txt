@@ -1,0 +1,13 @@
+
+Toolbars:
+- Time signatures (started, missing C and half C)
+- Dynamics  (mf, mp, f, p, ff, pp, fff, ppp, sfz, sf, fz, fp, rf, crescendo, diminuendo)
+- Rit. and Accel. (rit, rall, accel, pocco rit., poco rall, poco accel, molto rit. molto rall, molto accel, A Tempo, Tempo Primo)
+- Loose buttons: Slur, Tuplet, notes tie, bar setter, Note extensions (.,..,...), staccato, Staccatissimo, Fermata, up bow, down bow etc...
+
+- Note duration (done)
+- Accidentals (done)
+- Play (done)
+- Key signatures (done)
+- Rests (done)
+- Clefs (done)

@@ -6,7 +6,7 @@ from DataClasses.ToolbarData import ToolbarDimensions
 from Model.Button import Button
 from Model.Container import Container
 from Model.DragAndDrop.DraggableNote import DraggableNoteButton
-from Model.Position import TextPosition
+from Model.Geometry.Position import TextPosition
 from Model.StaggeredLabelButton import StaggeredLabelButton
 
 

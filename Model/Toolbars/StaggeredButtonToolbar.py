@@ -4,7 +4,7 @@ import pygame
 
 from DataClasses.ButtonData import ButtonType
 from DataClasses.ControlData import ControlType
-from Model.Position import TextPosition
+from Model.Geometry.Position import TextPosition
 from Model.Toolbars.Toolbar import Toolbar
 
 

@@ -41,6 +41,7 @@ class TimeSignatureButtonBuilder(SimpleButtonBuilder):
                                     hover_bg_color, draggable_icons)
        
        button.set_parent(toolbar, offset_x=position[0], offset_y=position[1])
+       button.build_signature_symbols()
        
        return button
         

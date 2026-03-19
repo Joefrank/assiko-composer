@@ -5,7 +5,7 @@ import pygame
 from DataClasses.ButtonData import ButtonConfig
 from Model.Button import Button
 from Model.ButtonSymbol import ButtonSymbol
-from Model.Position import TextPosition
+from Model.Geometry.Position import TextPosition
 
 
 class StaggeredLabelButton(Button):
@@ -49,7 +49,7 @@ class StaggeredLabelButton(Button):
             x = start_x + (i * symbol_width)
             y = start_y + ((i % 2) * self.icon_staggered_spacing)
             label_rect.center = (x, y)  # 5 pixels gap between symbols 
-            button_symbol = ButtonSymbol(label, label_rect, "symbol")           
+            button_symbol = ButtonSymbol(label, label_rect, "symbol", symbol)           
             self.add_child(button_symbol)
             symbols_total_width += symbol_width
             
@@ -71,5 +71,15 @@ class StaggeredLabelButton(Button):
         super().resize_only(new_width_ratio, new_height_ratio)
 
     def move_children(self, h_move, v_move):
-         for child in self.children:
+        for child in self.children:
             child.move(h_move, v_move)
+
+    def draw_dragged_icons(self):       
+        for dragged_note in self.dragged_symbols:           
+            for child in self.children:
+                x_offset = child.rect.x - self.rect.x
+                y_offset = child.rect.y - self.rect.y
+                label_copy = self.font.render(child.symbol, True, (0, 0, 0))
+                copy_rect = label_copy.get_rect()
+                copy_rect.center = (dragged_note.x + x_offset, dragged_note.y + y_offset)
+                self.screen.blit(label_copy, copy_rect)    
