@@ -10,8 +10,8 @@ from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Helpers.FileHelper import FileHelper
 from Helpers.ScreeHelper import ScreenHelper
 from Model.Menu.MenuBar import MenuBar
-from Model.ScrollableContainer import ScrollableContainer
-from Model.Window import Window
+from Model.Containers.ScrollableContainer import ScrollableContainer
+from Model.Containers.Window import Window
 
 class MainWindowBuilder: 
     
@@ -36,7 +36,7 @@ class MainWindowBuilder:
         width_ratio=MainWindowDimensions.WIDTH_RATIO, 
         height_ratio=MainWindowDimensions.HEIGHT_RATIO)
 
-        asset_path = FileHelper.get_asset_paths() 
+        asset_path = FileHelper.get_asset_images_paths() 
         bg_image_path = asset_path / "blue_background.jpg"
         icon_path = asset_path / "icon.png"
 

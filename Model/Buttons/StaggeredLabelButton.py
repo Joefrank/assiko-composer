@@ -3,8 +3,8 @@
 import pygame
 
 from DataClasses.ButtonData import ButtonConfig
-from Model.Button import Button
-from Model.ButtonSymbol import ButtonSymbol
+from Model.Buttons.Button import Button
+from Model.Buttons.ButtonIcons.ButtonSymbol import ButtonSymbol
 from Model.Geometry.Position import TextPosition
 
 

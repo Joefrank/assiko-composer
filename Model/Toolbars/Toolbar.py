@@ -3,11 +3,11 @@ import pygame
 from DataClasses.ControlData import ControlType
 from DataClasses.MainWindowData import ControlZIndex
 from DataClasses.ToolbarData import ToolbarDimensions
-from Model.Button import Button
-from Model.Container import Container
+from Model.Buttons.Button import Button
+from Model.Containers.Container import Container
 from Model.DragAndDrop.DraggableNote import DraggableNoteButton
 from Model.Geometry.Position import TextPosition
-from Model.StaggeredLabelButton import StaggeredLabelButton
+from Model.Buttons.StaggeredLabelButton import StaggeredLabelButton
 
 
 class Toolbar(Container):    
@@ -52,7 +52,7 @@ class Toolbar(Container):
                 int(i * (button.rect.width + self.button_margin))
             button.rect.x = x
             button.rect.y = int(button.rect.y * new_height_ratio) 
-        
+            button.reposition_children(new_width_ratio, new_height_ratio)
         self.recalculate_size()
 
     def recalculate_size(self):

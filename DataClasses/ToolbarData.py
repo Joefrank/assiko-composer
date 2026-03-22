@@ -141,10 +141,42 @@ class KeySignatureToolbar(BaseToolbar):
             ]
     BUTTON_TYPE = ButtonType.STAGGERED_SYMBOL_BUTTON
 
+@dataclass
+class DynamicsToolbar(BaseToolbar):
+    NAME: str = "DaynamicsToolbar"
+    ICONS = [
+        ("\uE52D", "mf"),
+        ("\uE52C", "mp"),
+        ("\uE522", "f"),
+        ("\uE520", "p"),
+        ("\uE52F", "ff"),
+        ("\uE52A", "pp"),
+        ("\uE530", "fff"),
+        ("\uE52B", "ppp"),
+        ("\uE539", "sfz"),
+        ("\uE537", "sf"),
+        ("\uE535", "fz"),
+        ("\uE534", "fp"),
+        ("\uE536", "rf"),
+        ("\uE53E", "crescendo"),
+        ("\uE53F", "diminuendo"),
+    ]
+
+@dataclass
+class StaffActionToolbar(BaseToolbar):
+    NAME: str = "StaffActionToolbar"
+    ICONS = [
+        ("music_staff.png", "Music Staff"),
+        ("repeat_start.png", "Repeat Start"),
+        ("repeat_end.png", "Repeat End"),
+        ("final_staff_line.png", "Final Staff Line"),
+        ("notes_tie.png", "Notes Tie")        
+    ]
+    BUTTON_TYPE = ButtonType.IMAGE_BUTTON
 
 TOOLBAR_MATRIX = [
     [NotesToolbar, AccidentalsToolbar, PlayToolbar, KeySignatureToolbar],
-    [RestToolbar, TimeSignatureToolbar, CommonTimeSignatureToolbar, ClefToolbar]
+    [RestToolbar, TimeSignatureToolbar, CommonTimeSignatureToolbar, ClefToolbar, StaffActionToolbar]
 ]
 
 @dataclass

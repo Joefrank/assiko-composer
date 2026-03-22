@@ -122,3 +122,6 @@ class Button(Control):
         self.font_details = (self.font_details[0], int(self.font_details[1] * new_height_ratio))
         self.font = ScreenHelper.create_font(self.font_details)        
         return super().resize(new_width_ratio, new_height_ratio)
+    
+    def reposition_children(self, new_width_ratio, new_height_ratio):
+        pass

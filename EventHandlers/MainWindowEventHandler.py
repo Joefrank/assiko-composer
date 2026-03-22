@@ -4,7 +4,7 @@ import pygame
 from DataClasses.EventData import EVENT_TYPES
 from EventHandlers.EventSubscription import EventSubscription
 from Helpers.ScreeHelper import ScreenHelper
-from Model.Window import Window
+from Model.Containers.Window import Window
 
 
 class MainWindowEventHandler:

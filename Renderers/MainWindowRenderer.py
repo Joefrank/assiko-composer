@@ -1,5 +1,5 @@
 
-from Model.Window import Window
+from Model.Containers.Window import Window
 
 class MainWindowRenderer:
 

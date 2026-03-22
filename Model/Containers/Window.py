@@ -2,7 +2,7 @@ import sys
 import pygame
 from DataClasses.ControlData import ControlType
 from Model.Control import Control
-from Model.Size import Size
+from Model.Geometry.Size import Size
 
 
 class Window(Control):

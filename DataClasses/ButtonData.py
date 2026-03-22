@@ -15,4 +15,5 @@ class ButtonType(Enum):
     BUTTON = auto()
     TIME_SIGNATURE_BUTTON = auto()
     STAGGERED_SYMBOL_BUTTON = auto()
+    IMAGE_BUTTON = auto()
     

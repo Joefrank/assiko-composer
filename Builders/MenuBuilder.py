@@ -6,7 +6,7 @@ from Model.Menu.DropDownMenu import DropdownMenu
 from Model.Menu.DropDownMenuItem import DropDownMenuItem
 from Model.Menu.MenuActivator import MenuActivator
 from Model.Menu.MenuBar import MenuBar
-from Model.Size import Size
+from Model.Geometry.Size import Size
 
 
 class MenuBuilder:

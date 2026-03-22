@@ -3,7 +3,7 @@ import time
 
 from DataClasses.ControlData import ControlType
 from DataClasses.MainWindowData import ControlZIndex
-from Model.Container import Container
+from Model.Containers.Container import Container
 
 class ScrollableContainer(Container):
    

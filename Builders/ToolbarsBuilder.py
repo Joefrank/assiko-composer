@@ -6,12 +6,12 @@ from DataClasses.ToolbarData import TOOLBAR_MATRIX, NotesToolbar, PlayToolbar, R
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Factories.ButtonBuildersFactory import ButtonBuildersFactory
 from Helpers.ScreeHelper import ScreenHelper
-from Model.Button import Button
-from Model.Grid import Grid
-from Model.StaggeredLabelButton import StaggeredLabelButton
+from Model.Buttons.Button import Button
+from Model.Containers.Grid import Grid
+from Model.Buttons.StaggeredLabelButton import StaggeredLabelButton
 from Model.Toolbars.StaggeredButtonToolbar import StaggeredButtonToolbar
 from Model.Toolbars.Toolbar import Toolbar
-from Model.Window import Window
+from Model.Containers.Window import Window
 
 class ToolbarBuilder:
 
@@ -29,17 +29,20 @@ class ToolbarBuilder:
         self.no_of_grid_rows = len(TOOLBAR_MATRIX)
         self.grid_height = (self.toolbar_height * self.no_of_grid_rows) + self.grid_spacing[1]  
         self.toolbars = []
+        self.simple_button_types = [ButtonType.BUTTON, ButtonType.TIME_SIGNATURE_BUTTON, ButtonType.IMAGE_BUTTON]
 
   
     def build(self):
         # we build a Grid object to hold all our toolbars, this way we can easily manage their layout and resizing together
         toolbar_grid_rect = pygame.Rect(self.grid_offset_x, self.grid_offset_y, self.grid_width, self.grid_height)
-        toolbar_grid = Grid(toolbar_grid_rect, (ToolbarGridConfig.GRID_ROWS, ToolbarGridConfig.GRID_COLS), 
-                            self.screen, None, ToolbarGridConfig.GRID_NAME, show_grid_lines=False, grid_spacing=self.grid_spacing)
+        toolbar_grid = Grid(toolbar_grid_rect, self.screen, None, ToolbarGridConfig.GRID_NAME, 
+                            show_grid_lines=False, grid_spacing=self.grid_spacing)
+        grid_row_sizes = [0] * self.no_of_grid_rows
         
         for i, row in enumerate(TOOLBAR_MATRIX):            
             cumulative_row_width =toolbar_x_offset = self.grid_offset_x
             toolbar_y_offset = self.grid_offset_y + ((self.toolbar_height + self.grid_spacing[1]) * i)
+            grid_row_sizes[i] =0
             for j, value in enumerate(row):
                 grid_coordinates = (i, j)    
                 toolbar_x_offset = cumulative_row_width 
@@ -49,16 +52,19 @@ class ToolbarBuilder:
                                               grid_coordinates, self.grid_spacing)
                 cumulative_row_width += toolbar.rect.width + self.grid_spacing[0]                
                 toolbar_grid.add_child(toolbar)
-
+                grid_row_sizes[i] += 1
+        
+        toolbar_grid.set_grid_sizes(grid_row_sizes)
+        print(grid_row_sizes)
         return toolbar_grid ### change consuming function to handle grid instead of individual toolbars, we can get individual toolbars from grid's children when needed
-
+        
     """Builds each toolbar based on settings in config."""
     def _build_toolbar(self, spec, offset_x, offset_y, toolbar_height, toolbar_item_height, toolbar_item_width, 
                        grid_coordinates, grid_spacing):
         font = ScreenHelper.create_font(spec.FONT)
         button_type = getattr(spec, 'BUTTON_TYPE', ControlType.BUTTON)
         rect = pygame.Rect(offset_x, offset_y, ToolbarDimensions.DEFAULT_TOOLBAR_WIDTH, toolbar_height)
-        if button_type == ButtonType.BUTTON or button_type == ButtonType.TIME_SIGNATURE_BUTTON:
+        if button_type in self.simple_button_types:
             toolbar = Toolbar(rect, self.screen, spec.NAME, toolbar_item_width, toolbar_item_height,
                             ToolbarDimensions.BUTTON_MARGIN, button_text_center=getattr(spec, 'BUTTON_TEXT_CENTER', None),
                             buttons_draggable=getattr(spec, 'DRAGGABLE_BUTTONS', False),
@@ -97,41 +103,13 @@ class ToolbarBuilder:
         button_builder = ButtonBuildersFactory().get_button_builder(button_type)
         buttons =[]  
         for icon, action in icons:
-            #button_rect = pygame.Rect(x, button_top_padding, toolbar.button_width, toolbar.button_height)
-            
-            # button = self.create_button(toolbar, action, button_type, button_rect, icon, font, font_details, border_radius, text_color,
-            #                  bg_color, hover_text_color, hover_bg_color, toolbar.buttons_draggable)
             button = button_builder.build_button(self.screen, toolbar, action, icon, font, font_details, border_radius, text_color,
                              bg_color, hover_text_color, hover_bg_color, toolbar.buttons_draggable, (x,button_top_padding))
 
-            #button.set_parent(toolbar, offset_x=x, offset_y=button_top_padding)
-            # if toolbar.buttons_draggable:
-            #     button.add_supported_events([pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION])
-            # else:
-            #     button.add_supported_events([pygame.MOUSEBUTTONDOWN, pygame.MOUSEMOTION])
-            
-            # if button_type == ControlType.STAGGERED_BUTTON:
-            #     button.rect.width = button.build_staggered_symbols()
-            
             toolbar.add_button(button)
             buttons.append(button)
             x += toolbar.button_width + toolbar.button_margin
 
         return buttons
     
-    # def create_button(self, toolbar, action, button_type, button_rect, icon, font, font_details, border_radius, text_color,
-    #                          bg_color, hover_text_color, hover_bg_color, buttons_draggable):
-    #     if button_type == ControlType.BUTTON:
-    #         return Button(self.screen, action, button_rect, icon, action, font, font_details, border_radius, toolbar.button_text_center,
-    #                     text_color, bg_color, hover_text_color, hover_bg_color, buttons_draggable)
-    #     else:
-    #         # ("\uE262",2) create an array of symbols with first element of tuple the number of symbols is the second item of tuple.
-    #         symbols = []
-    #         for i in range(icon[1]):
-    #             symbols.append(icon[0])
-
-    #         button = StaggeredLabelButton(self.screen, action, button_rect, icon, action, font, font_details, border_radius, toolbar.button_text_center,
-    #                     text_color, bg_color, hover_text_color, hover_bg_color, buttons_draggable, symbols)
-           
-    #         return button
-                
+   

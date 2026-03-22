@@ -2,9 +2,9 @@
 import pygame
 from DataClasses.MainBoxData import MainBoxConfig
 from DataClasses.MainWindowData import MainWindowConfig
-from Model.ScrollableContainer import ScrollableContainer
-from Model.Size import Size
-from Model.Window import Window
+from Model.Containers.ScrollableContainer import ScrollableContainer
+from Model.Geometry.Size import Size
+from Model.Containers.Window import Window
 
 
 class ContainerBuilder:
