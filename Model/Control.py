@@ -22,7 +22,16 @@ class Control:
         self.is_resizable = False
         self.grid_coordinates = None  # (row, col) if using grid layout. None means it's not placed in a grid
         self.grid_spacing = (0, 0)  # (horizontal_spacing, vertical_spacing)
-    
+        self.app_state = None
+
+    def set_app_state(self, app_state):
+        # State doesn't get ovewritten but modified.
+        if self.app_state is None:
+            self.app_state = app_state
+            if len(self.children) > 0:
+                for child in self.children:
+                    child.set_app_state(app_state)
+        
     def add_child(self, child):
         child.parent = self
         self.children.append(child)
@@ -81,5 +90,14 @@ class Control:
         
     def hide(self):
         self.visible = False
+        if len(self.children) == 0:
+            return
+        for child in self.children:
+            child.hide()
+
+    def show(self):
+        self.visible = True
+        if len(self.children) == 0:
+            return
         for child in self.children:
             child.hide()

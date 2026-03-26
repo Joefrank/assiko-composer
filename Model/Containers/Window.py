@@ -2,6 +2,7 @@ import sys
 import pygame
 from DataClasses.ControlData import ControlType
 from Model.Control import Control
+from Model.Dialogs.BasicDialog import BasicDialog
 from Model.Geometry.Size import Size
 
 
@@ -9,7 +10,7 @@ class Window(Control):
     def __init__(self, 
                 rect:pygame.Rect,
                 bg_image_path:str, 
-                icon_path:str, 
+                icon_path:str,                
                 title="Application Window"):
         super().__init__(rect, control_type=ControlType.WINDOW , name="Main Window")   
         self.width = rect.width
@@ -18,7 +19,12 @@ class Window(Control):
         self.is_open = False
         self.bg_image_path = bg_image_path
         self.icon_path = icon_path
+        self.common_dialog:BasicDialog  = None
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)        
+        self.app_state = None
+
+    def get_state(self):
+        return self.app_state    
 
     def get_canvass(self):
         return self.screen   
@@ -53,15 +59,10 @@ class Window(Control):
 
     def draw_icon(self):
         icon = pygame.image.load(self.icon_path).convert()
-        pygame.display.set_icon(icon)
-        
-    # def resize_children(self):
-    #     for child in self.children:
-    #         if hasattr(child, 'resize'):
-    #             child.resize(self.width, self.height)
-
+        pygame.display.set_icon(icon)        
+   
     def add_child(self, control:Control):
-        self.children.append(control)
+        self.children.append(control)        
   
     def get_size(self):
         return Size(self.width, self.height)
@@ -69,6 +70,9 @@ class Window(Control):
     def get_dimensions(self):
         return self.width, self.height
     
+    def set_common_dialog(self, dialog:BasicDialog):
+        self.common_dialog = dialog
+
     # Event handlers for window-level events
     def on_video_resize(self, event):
         width_ratio = event.w / self.width
@@ -80,4 +84,9 @@ class Window(Control):
     def on_quit(self, event):        
         pygame.quit()
         sys.exit()
-    
+
+    def show_common_dialog(self, content, title:str ="", size:Size=None):
+        self.common_dialog.set_content(title, main_content=content) 
+        if not size is None:
+            self.common_dialog.set_size(size.width, size.height)
+        self.common_dialog.show()

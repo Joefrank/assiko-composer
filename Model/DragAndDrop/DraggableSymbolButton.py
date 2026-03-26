@@ -1,10 +1,10 @@
 # -----------------------------
-# Draggable Image
+# Draggable Symbol
 # -----------------------------
 import pygame
 
 
-class DraggableNoteButton:
+class DraggableSymbolButton:
     def __init__(self, rect, symbol, font, NOTE_COLOR, NOTE_BG):
         self.symbol = symbol
         self.text_surf = font.render(symbol, True, NOTE_COLOR)
@@ -15,7 +15,7 @@ class DraggableNoteButton:
         self.font = font
         self.note_color = NOTE_COLOR
         self.dragged_notes = []
-        self.current_dragged_note = None
+        self.current_dragged_symbol = None
 
     def draw(self, surface, text_center_position):
         pygame.draw.rect(surface, self.note_bg, self.rect, border_radius=6)
@@ -35,8 +35,8 @@ class DraggableNoteButton:
             if self.rect.collidepoint(event.pos):
                 self.dragging = True
                 # Create a rect for the dragging copy
-                self.current_dragged_note = self.rect.copy()
-                self.dragged_notes.append(self.current_dragged_note)
+                self.current_dragged_symbol = self.rect.copy()
+                self.dragged_notes.append(self.current_dragged_symbol)
                 # offset keeps the cursor from snapping to top-left
                 self.offset = (
                     self.rect.x - event.pos[0],
@@ -45,9 +45,7 @@ class DraggableNoteButton:
 
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self.dragging = False
-            # Pass the dragged item to target for processing.
-            #self.dragging_rect = None
-
+          
         elif event.type == pygame.MOUSEMOTION and self.dragging:
-            self.current_dragged_note.x = event.pos[0] + self.offset[0]
-            self.current_dragged_note.y = event.pos[1] + self.offset[1]
+            self.current_dragged_symbol.x = event.pos[0] + self.offset[0]
+            self.current_dragged_symbol.y = event.pos[1] + self.offset[1]

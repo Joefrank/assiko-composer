@@ -1,6 +1,6 @@
 import pygame
 
-from DataClasses.ButtonData import ButtonConfig
+from DataClasses.ButtonConfigData import ButtonConfig
 from DataClasses.ControlData import ControlType
 from DataClasses.MainWindowData import ControlZIndex
 from Helpers.ScreeHelper import ScreenHelper
@@ -10,22 +10,26 @@ from Model.Geometry.Position import TextPosition
 
 class Button(Control):
     
-   
-    def __init__(self, screen, name, rect, text, action, font, font_details, border_radius=0, text_position=TextPosition.CENTER,
-                 text_color=ButtonConfig.TEXT_DEFAULT_COLOR, bg_color=ButtonConfig.BTN_DEFAULT_COLOR, hover_text_color=ButtonConfig.TEXT_DEFAULT_COLOR, 
-                 hover_bg_color=ButtonConfig.BTN_DEFAULT_HOVER, is_draggable=False):
-        super().__init__(rect, ControlType.TOOLBARITEM, name)   
-        self.screen = screen
-        self.is_draggable = is_draggable
-        self.text = text
-        self.action = action
-        self.font = font
-        self.font_details = font_details
-        self.border_radius = border_radius
-        self.text_color = text_color
-        self.bg_color = bg_color
-        self.hover_text_color = hover_text_color
-        self.hover_bg_color = hover_bg_color
+    def __init__(self, config: ButtonConfig):
+        rect = pygame.Rect(config.position[0], config.position[1], config.toolbar.button_width, config.toolbar.button_height)
+        super().__init__(rect, ControlType.TOOLBARITEM, config.action)  
+       
+    # def __init__(self, screen, name, rect, text, tooltip, font, font_details, border_radius=0, text_position=TextPosition.CENTER,
+    #              text_color=ButtonConfig.TEXT_DEFAULT_COLOR, bg_color=ButtonConfig.BTN_DEFAULT_COLOR, hover_text_color=ButtonConfig.TEXT_DEFAULT_COLOR, 
+    #              hover_bg_color=ButtonConfig.BTN_DEFAULT_HOVER, is_draggable=False, action=None):
+    #     super().__init__(rect, ControlType.TOOLBARITEM, name)   
+        self.screen = config.screen
+        self.is_draggable = config.draggable_icons
+        self.text = config.icon
+        self.tooltip = config.action
+        self.action = config.action if config.action_value is None else config.action_value
+        self.font = config.font
+        self.font_details = config.font_details
+        self.border_radius = config.border_radius
+        self.text_color = config.text_color
+        self.bg_color = config.bg_color
+        self.hover_text_color = config.hover_text_color
+        self.hover_bg_color = config.hover_bg_color
         self.container = None
         self.activator = ToolbarActivator()
         self.dragging = False
@@ -34,7 +38,7 @@ class Button(Control):
         self.current_dragged_symbol = None
         self.set_z_index(ControlZIndex.LEVEL3)
         self.is_resizable = True 
-        self.text_position = text_position       
+        self.text_position = config.toolbar.button_text_center       
        
 
     def draw(self):
@@ -86,7 +90,7 @@ class Button(Control):
                     self.rect.x - event.pos[0],
                     self.rect.y - event.pos[1]
                 )
-            else:
+            else:# Mouse click
                 method = getattr(self.activator, self.action)
                 method()
             return True  # Event handled
@@ -94,10 +98,12 @@ class Button(Control):
 
     def on_left_mouse_up(self, event):       
         self.dragging = False
-        if self.rect.collidepoint(event.pos):# we don't want to leave the item dragged on the button.
+        # Notify state of symbol drop if it's draggable.
+        if self.current_dragged_symbol:
+            self.app_state.save_dropped_symbol(self.current_dragged_symbol, self.action, self.parent.drop_action)        
             self.dragged_symbols.remove(self.current_dragged_symbol)
             self.current_dragged_symbol = None
-
+        
     def on_mouse_motion(self, event):  
         if self.is_draggable and self.dragging:
             self.current_dragged_symbol.x = event.pos[0] + self.offset[0]
@@ -114,6 +120,7 @@ class Button(Control):
 
     def set_parent(self, parent, offset_x=0, offset_y=0):
         self.container = parent
+        self.parent = parent
         self.rect.x = parent.rect.left + offset_x
         self.rect.y = parent.rect.top + offset_y
 

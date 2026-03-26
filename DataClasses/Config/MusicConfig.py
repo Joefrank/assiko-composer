@@ -52,8 +52,10 @@ class NoteDurationInTicks:
     WHOLE: int = 1920
     HALF: int = 960
     QUARTER: int = 480
-    EIGHT: float = 240
-    SIXTHEENTH: float = 120
+    EIGHT: int = 240
+    SIXTHEENTH: int = 120
+    THIRTYSECONDTH: int = 60
+    SIXTYFOURTH: int = 30 
 
 @dataclass
 class NoteOptions:

@@ -10,12 +10,8 @@ from Model.Geometry.Position import TextPosition
 
 class StaggeredLabelButton(Button):
 
-    def __init__(self, screen, name, rect, text, action, font, font_details, border_radius=0, 
-                 text_position=TextPosition.CENTER, text_color=ButtonConfig.TEXT_DEFAULT_COLOR, 
-                 bg_color=ButtonConfig.BTN_DEFAULT_COLOR, hover_text_color=ButtonConfig.TEXT_DEFAULT_COLOR, 
-                    hover_bg_color=ButtonConfig.BTN_DEFAULT_HOVER, is_draggable=False, icons=[]):
-        super().__init__(screen, name, rect, text, action, font, font_details, border_radius, text_position,
-                         text_color, bg_color, hover_text_color, hover_bg_color, is_draggable)
+    def __init__(self, config, icons=[]):
+        super().__init__(config)
         self.icons = icons
         self.icon_spacing = 4 # used for icons horizontal spacing.
         self.button_padding = 10  

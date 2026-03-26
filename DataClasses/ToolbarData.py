@@ -4,6 +4,7 @@ import pygame
 
 from DataClasses.ButtonData import ButtonType
 from DataClasses.Config import ScreenConfig
+from DataClasses.Config.MusicConfig import BASS_CLEF, TREBLE_CLEF, AccidentalOptions, NoteDurationInTicks
 from DataClasses.ControlData import ControlType
 from Model.Geometry.Position import TextPosition
 
@@ -57,41 +58,44 @@ class PlayToolbar(BaseToolbar):
 class NotesToolbar(BaseToolbar):
     NAME = "NotesDurationToolbar"
     ICONS =[
-        ("\U0001D15D","Whole"),  # Whole
-        ("\U0001D15E","Half"),  # Half
-        ("\U0001D15F","Quarter"),  # Quarter
-        ("\U0001D160","Eighth"),  # Eighth
-        ("\U0001D161","Sixteenth"),  # Sixteenth
-        ("\U0001D162","Thirty-second"),
-        ("\U0001D163","Sixty-fourth")
+        ("\U0001D15D","Whole", NoteDurationInTicks.WHOLE),  # Whole
+        ("\U0001D15E","Half", NoteDurationInTicks.HALF),  # Half
+        ("\U0001D15F","Quarter", NoteDurationInTicks.QUARTER),  # Quarter
+        ("\U0001D160","Eighth", NoteDurationInTicks.EIGHT),  # Eighth
+        ("\U0001D161","Sixteenth", NoteDurationInTicks.SIXTHEENTH),  # Sixteenth
+        ("\U0001D162","Thirty-second", NoteDurationInTicks.THIRTYSECONDTH),
+        ("\U0001D163","Sixty-fourth", NoteDurationInTicks.SIXTYFOURTH)
     ]   
     BUTTON_TEXT_CENTER: TextPosition = TextPosition.BOTTOM_CENTER
+    DROP_ACTION = "PositionNoteOnStaff"
  
 @dataclass
 class RestToolbar(BaseToolbar):
     NAME = "RestToolbar"
     ICONS =[
-        ("\U0001D13B","Whole"),  # Whole
-        ("\U0001D13C","Half"),  # Half
-        ("\U0001D13D","Quarter"),  # Quarter
-        ("\U0001D13E","Eighth"),  # Eighth
-        ("\U0001D13F","Sixteenth"),  # Sixteenth
-        ("\U0001D140","32nd"),  # 32nd
-        ("\U0001D141","64th"),  # 64th
-        ("\U0001D142","128th"),  # 128th
+        ("\U0001D13B","Whole",  NoteDurationInTicks.WHOLE),  # Whole
+        ("\U0001D13C","Half", NoteDurationInTicks.HALF),  # Half
+        ("\U0001D13D","Quarter", NoteDurationInTicks.QUARTER),  # Quarter
+        ("\U0001D13E","Eighth", NoteDurationInTicks.EIGHT),  # Eighth
+        ("\U0001D13F","Sixteenth", NoteDurationInTicks.SIXTHEENTH),  # Sixteenth
+        ("\U0001D140","32nd", NoteDurationInTicks.THIRTYSECONDTH),  # 32nd
+        ("\U0001D141","64th", NoteDurationInTicks.SIXTYFOURTH),  # 64th
+        #("\U0001D142","128th"),  # 128th
     ]
+    DROP_ACTION = "PositionRestOnStaff"
 
 @dataclass
 class AccidentalsToolbar(BaseToolbar):
     NAME: str = "AccidentalsToolbar"
     ICONS = [
-        ("\uE262", "SHARP"),  # SHARP
-        ("\uE260", "FLAT"),  # FLAT
-        ("\uE261", "NATURAL"),   # NATURAL
-        ("\uE263", "DOUBLE_SHARP"),   # DOUBLE_SHARP
-        ("\uE264", "DOUBLE_FLAT")   # DOUBLE_FLAT
+        ("\uE262", "SHARP", AccidentalOptions.SHARP),  # SHARP
+        ("\uE260", "FLAT", AccidentalOptions.FLAT),  # FLAT
+        ("\uE261", "NATURAL", AccidentalOptions.NATURAL),   # NATURAL
+        ("\uE263", "DOUBLE_SHARP", AccidentalOptions.DOUBLE_SHARP),   # DOUBLE_SHARP
+        ("\uE264", "DOUBLE_FLAT", AccidentalOptions.DOUBLE_FLAT)   # DOUBLE_FLAT
     ]
     FONT = (ScreenConfig.FontConfig.BRAVURA_FONT_PATH, 25)
+    DROP_ACTION = "PositionAccidental"
 
 @dataclass
 class TimeSignatureToolbar(BaseToolbar):
@@ -109,37 +113,41 @@ class TimeSignatureToolbar(BaseToolbar):
     FONT = (ScreenConfig.FontConfig.BRAVURA_FONT_PATH, 18)   
     BUTTON_TEXT_CENTER: TextPosition = TextPosition.BOTTOM_CENTER   
     BUTTON_TYPE = ButtonType.TIME_SIGNATURE_BUTTON
+    DROP_ACTION = "PositionTimeSignature"
 
 @dataclass
 class CommonTimeSignatureToolbar(BaseToolbar):
     NAME: str = "CommonTimeSignatureToolbar"
     ICONS =[
-                ("\uE08A", "Common Time"),
-                ("\uE08B", "Cut Time")                             
+                ("\uE08A", "Common Time","4x4"),
+                ("\uE08B", "Cut Time", "2x2")                             
             ]
+    DROP_ACTION = "PositionTimeSignature"
 
 @dataclass
 class ClefToolbar(BaseToolbar):
     NAME: str = "ClefToolbar"
     ICONS =[
-                ("\uE050", "G_CLEF"),
-                ("\uE062", "F_CLEF"),
-                ("\uE05C", "C_CLEF")                
+                ("\uE050", "TREBLE CLEF", TREBLE_CLEF),
+                ("\uE062", "BASS CLEF", BASS_CLEF),
+                #("\uE05C", "C_CLEF")                
             ]
+    DROP_ACTION = "PositionClef"
 
 @dataclass
 class KeySignatureToolbar(BaseToolbar):
     NAME: str = "KeySignatureToolbar"
     ICONS =[
-                (("\uE262",1), "G MAJOR"),
-                (("\uE262",2), "D MAJOR"),
-                (("\uE262",3), "A MAJOR"),
-                (("\uE262",4), "E MAJOR"),
-                (("\uE262",5), "B MAJOR"),
-                (("\uE262",6), "F# MAJOR"),
-                (("\uE262",7), "C# MAJOR"),           
+                (("\uE262",1), "G MAJOR", "G"),
+                (("\uE262",2), "D MAJOR", "D"),
+                (("\uE262",3), "A MAJOR", "A"),
+                (("\uE262",4), "E MAJOR", "E"),
+                (("\uE262",5), "B MAJOR", "B"),
+                (("\uE262",6), "F# MAJOR", "F#"),
+                (("\uE262",7), "C# MAJOR", "C#"),           
             ]
     BUTTON_TYPE = ButtonType.STAGGERED_SYMBOL_BUTTON
+    DROP_ACTION = "PositionKeySignature"
 
 @dataclass
 class DynamicsToolbar(BaseToolbar):
@@ -161,19 +169,21 @@ class DynamicsToolbar(BaseToolbar):
         ("\uE53E", "crescendo"),
         ("\uE53F", "diminuendo"),
     ]
+    DROP_ACTION = "PositionDynamic"
 
 @dataclass
 class StaffActionToolbar(BaseToolbar):
     NAME: str = "StaffActionToolbar"
     ICONS = [
-        ("music_staff.png", "Music Staff"),
-        ("repeat_start.png", "Repeat Start"),
-        ("repeat_end.png", "Repeat End"),
-        ("final_staff_line.png", "Final Staff Line"),
-        ("notes_tie.png", "Notes Tie")        
+        ("music_staff.png", "Music Staff", "CreateStaff"),
+        ("repeat_start.png", "Repeat Start", "InsertStartRepeatToStaff"),
+        ("repeat_end.png", "Repeat End", "InsertEndRepeatToStaff"),
+        ("final_staff_line.png", "Final Staff Line", "InsertFinalStaffLine"),
+        ("notes_tie.png", "Notes Tie", "TieNotesOnStaff")        
     ]
     BUTTON_TYPE = ButtonType.IMAGE_BUTTON
-
+    DROP_ACTION = "Reflect"
+    
 TOOLBAR_MATRIX = [
     [NotesToolbar, AccidentalsToolbar, PlayToolbar, KeySignatureToolbar],
     [RestToolbar, TimeSignatureToolbar, CommonTimeSignatureToolbar, ClefToolbar, StaffActionToolbar]

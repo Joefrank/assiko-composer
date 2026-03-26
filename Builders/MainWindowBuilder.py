@@ -3,12 +3,13 @@ import pygame
 from Builders.ContainerBuilder import ContainerBuilder
 from Builders.MenuBuilder import MenuBuilder
 from Builders.ToolbarsBuilder import ToolbarBuilder
-from DataClasses.MainWindowData import MainWindowDimensions
+from DataClasses.MainWindowData import MainWindowConfig, MainWindowDimensions
 from DataClasses.MainWindowData import MainWindowText
-from DataClasses.ToolbarData import NotesToolbar, PlayToolbar, RestToolbar
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Helpers.FileHelper import FileHelper
 from Helpers.ScreeHelper import ScreenHelper
+from Model.ApplicationState import ApplicationState
+from Model.Dialogs.BasicDialog import BasicDialog
 from Model.Menu.MenuBar import MenuBar
 from Model.Containers.ScrollableContainer import ScrollableContainer
 from Model.Containers.Window import Window
@@ -22,12 +23,14 @@ class MainWindowBuilder:
         self.menu_bar:MenuBar = None
         self.toolbar_grid = None
         self.window_canvass:pygame.Surface = None # main screen       
-
+        self.app_state = ApplicationState() # singleton needed
+        
     def build(self):
          self.init_window()\
             .build_toolbars()\
             .build_containers()\
-            .build_menus() 
+            .build_menus() \
+            .build_common_dialog()
          return self.main_window
 
     """This must be first function to be called when building window and components."""
@@ -67,8 +70,21 @@ class MainWindowBuilder:
         self.main_window.add_child(self.menu_bar)
         return self
 
+    def build_common_dialog(self):        
+        font = pygame.font.SysFont("segoeui", MainWindowConfig.COMMON_DIALOG_FONT)
+        dialog_surface = pygame.Surface(MainWindowConfig.COMMON_DIALOG_SIZE)
+        dialog_rect = dialog_surface.get_rect()
+        dialog_rect.center = self.main_window.rect.center
+        common_dialog = BasicDialog(MainWindowConfig.COMMON_DIALOG_NAME, dialog_surface,
+                                    dialog_rect, self.main_window.get_canvass(), font)
+        self.main_window.set_common_dialog(common_dialog)
+        self.main_window.add_child(common_dialog)
+        return self
+
     def add_supported_events(self):
         self.main_window.set_supported_events( [pygame.VIDEORESIZE, pygame.QUIT])
 
     def get_main_window(self):
         return self.main_window
+    
+    

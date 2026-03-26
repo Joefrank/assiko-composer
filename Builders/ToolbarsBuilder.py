@@ -1,14 +1,13 @@
 import pygame
+from DataClasses.ButtonConfigData import ButtonConfig
 from DataClasses.ButtonData import ButtonType
 from DataClasses.ControlData import ControlType
 from DataClasses.MainWindowData import MainWindowConfig
-from DataClasses.ToolbarData import TOOLBAR_MATRIX, NotesToolbar, PlayToolbar, RestToolbar, ToolbarDimensions, ToolbarGridConfig
+from DataClasses.ToolbarData import TOOLBAR_MATRIX, ToolbarDimensions, ToolbarGridConfig
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Factories.ButtonBuildersFactory import ButtonBuildersFactory
 from Helpers.ScreeHelper import ScreenHelper
-from Model.Buttons.Button import Button
 from Model.Containers.Grid import Grid
-from Model.Buttons.StaggeredLabelButton import StaggeredLabelButton
 from Model.Toolbars.StaggeredButtonToolbar import StaggeredButtonToolbar
 from Model.Toolbars.Toolbar import Toolbar
 from Model.Containers.Window import Window
@@ -55,7 +54,7 @@ class ToolbarBuilder:
                 grid_row_sizes[i] += 1
         
         toolbar_grid.set_grid_sizes(grid_row_sizes)
-        print(grid_row_sizes)
+        
         return toolbar_grid ### change consuming function to handle grid instead of individual toolbars, we can get individual toolbars from grid's children when needed
         
     """Builds each toolbar based on settings in config."""
@@ -63,17 +62,20 @@ class ToolbarBuilder:
                        grid_coordinates, grid_spacing):
         font = ScreenHelper.create_font(spec.FONT)
         button_type = getattr(spec, 'BUTTON_TYPE', ControlType.BUTTON)
+        drop_action = getattr(spec, "DROP_ACTION", None)
+        button_text_center = getattr(spec, 'BUTTON_TEXT_CENTER', None)
+        button_draggable = getattr(spec, 'DRAGGABLE_BUTTONS', False)
+
         rect = pygame.Rect(offset_x, offset_y, ToolbarDimensions.DEFAULT_TOOLBAR_WIDTH, toolbar_height)
         if button_type in self.simple_button_types:
             toolbar = Toolbar(rect, self.screen, spec.NAME, toolbar_item_width, toolbar_item_height,
-                            ToolbarDimensions.BUTTON_MARGIN, button_text_center=getattr(spec, 'BUTTON_TEXT_CENTER', None),
-                            buttons_draggable=getattr(spec, 'DRAGGABLE_BUTTONS', False),
-                            grid_coordinates=grid_coordinates, grid_spacing=grid_spacing)
+                            ToolbarDimensions.BUTTON_MARGIN, button_text_center=button_text_center,
+                            buttons_draggable=button_draggable, grid_coordinates=grid_coordinates,
+                            grid_spacing=grid_spacing, drop_action=drop_action)
         elif button_type == ButtonType.STAGGERED_SYMBOL_BUTTON:
             toolbar = StaggeredButtonToolbar(rect, self.screen, spec.NAME, toolbar_item_width, toolbar_item_height,
-                            ToolbarDimensions.BUTTON_MARGIN, button_text_center=getattr(spec, 'BUTTON_TEXT_CENTER', None),
-                            buttons_draggable=getattr(spec, 'DRAGGABLE_BUTTONS', False),
-                            grid_coordinates=grid_coordinates, grid_spacing=grid_spacing)
+                            ToolbarDimensions.BUTTON_MARGIN, button_text_center=button_text_center, buttons_draggable=button_draggable,
+                            grid_coordinates=grid_coordinates, grid_spacing=grid_spacing, drop_action=drop_action)
       
 
         toolbar.add_supported_events(spec.SUPPORTED_EVENTS)
@@ -102,10 +104,13 @@ class ToolbarBuilder:
         x = ToolbarDimensions.BUTTON_MARGIN  
         button_builder = ButtonBuildersFactory().get_button_builder(button_type)
         buttons =[]  
-        for icon, action in icons:
-            button = button_builder.build_button(self.screen, toolbar, action, icon, font, font_details, border_radius, text_color,
-                             bg_color, hover_text_color, hover_bg_color, toolbar.buttons_draggable, (x,button_top_padding))
-
+        for icon, action, *action_value in icons:
+            payload = action_value[0] if action_value else None  
+            button_config = ButtonConfig(self.screen, toolbar, action, icon, font, font_details, border_radius, text_color,
+                             bg_color, hover_text_color, hover_bg_color, toolbar.buttons_draggable, 
+                             (x, button_top_padding), action_value=payload)         
+            button = button_builder.create_button(button_config)
+            button.set_parent(toolbar, offset_x=x, offset_y=button_top_padding)       
             toolbar.add_button(button)
             buttons.append(button)
             x += toolbar.button_width + toolbar.button_margin

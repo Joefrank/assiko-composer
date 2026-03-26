@@ -24,10 +24,11 @@ class StaggeredButtonToolbar(Toolbar):
                  button_text_center=TextPosition.CENTER,
                  buttons_draggable=False,
                  grid_coordinates=None,
-                 grid_spacing=0):
+                 grid_spacing=0,
+                 drop_action=None):
         super().__init__(rect,screen, name, button_width, button_height, button_margin,
                  bg_color, text_color, highlight_color, container_color, button_text_center,
-                 buttons_draggable, grid_coordinates, grid_spacing)
+                 buttons_draggable, grid_coordinates, grid_spacing, drop_action)
         self.button_type = ButtonType.STAGGERED_SYMBOL_BUTTON
         self.test_draw = True
 

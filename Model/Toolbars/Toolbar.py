@@ -2,12 +2,9 @@
 import pygame
 from DataClasses.ControlData import ControlType
 from DataClasses.MainWindowData import ControlZIndex
-from DataClasses.ToolbarData import ToolbarDimensions
-from Model.Buttons.Button import Button
 from Model.Containers.Container import Container
-from Model.DragAndDrop.DraggableNote import DraggableNoteButton
+from Model.DragAndDrop.DraggableSymbolButton import DraggableSymbolButton
 from Model.Geometry.Position import TextPosition
-from Model.Buttons.StaggeredLabelButton import StaggeredLabelButton
 
 
 class Toolbar(Container):    
@@ -26,7 +23,8 @@ class Toolbar(Container):
                  button_text_center=TextPosition.CENTER,
                  buttons_draggable=False,
                  grid_coordinates=None,
-                 grid_spacing=0):
+                 grid_spacing=0,
+                 drop_action = None):
         super().__init__(rect, screen, ControlType.TOOLBAR, name, None, bg_color, text_color, 
                          highlight_color, container_color)       
         self.button_width = button_width
@@ -39,6 +37,7 @@ class Toolbar(Container):
         self.set_z_index(ControlZIndex.LEVEL2) 
         self.is_resizable = True
         self.button_type = ControlType.BUTTON
+        self.drop_action = drop_action
         
     def resize(self, new_width_ratio, new_height_ratio):
         super().resize(new_width_ratio, new_height_ratio) 
@@ -67,7 +66,7 @@ class Toolbar(Container):
         button.container = self
         self.rect.width += button.rect.width + self.button_margin 
 
-    def add_draggable_items(self, items: list[DraggableNoteButton]):
+    def add_draggable_items(self, items: list[DraggableSymbolButton]):
         x = self.rect.left + self.button_margin
         for item in items:
             item.rect.x = x

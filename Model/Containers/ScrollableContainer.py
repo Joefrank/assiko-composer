@@ -101,7 +101,8 @@ class ScrollableContainer(Container):
 
     def on_mouse_button_up(self, event):
         self.dragging_content = self.dragging_x = self.dragging_y = False
-
+        print("scrollable: mouse button up")
+        
     def on_mouse_motion(self, event):
         self.hovered = self.rect.collidepoint(event.pos)
         if not self.hovered:

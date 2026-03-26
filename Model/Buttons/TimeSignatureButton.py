@@ -12,15 +12,12 @@ from Model.Buttons.ButtonIcons.TimeSignature import TimeSignature
 
 class TimeSignatureButton(Button):
    
-    def __init__(self, screen, name, rect, text, action, font, font_details, border_radius=0, text_position=TextPosition.CENTER,
-                 text_color=ButtonConfig.TEXT_DEFAULT_COLOR, bg_color=ButtonConfig.BTN_DEFAULT_COLOR, hover_text_color=ButtonConfig.TEXT_DEFAULT_COLOR, 
-                 hover_bg_color=ButtonConfig.BTN_DEFAULT_HOVER, is_draggable=False):
-           super().__init__(screen, name, rect, text, action, font, font_details, border_radius, text_position,
-                 text_color, bg_color, hover_text_color, hover_bg_color, is_draggable)           
+    def __init__(self, config):
+           super().__init__(config)
            self.line_thickness = 1
            self.line_spacing = 2      
-           self.signature = TimeSignature(screen, self, self.text[0], self.text[1], 
-                                          self.line_thickness, self.text_color, font)
+           self.signature = TimeSignature(config.screen, self, self.text[0], self.text[1], 
+                                          self.line_thickness, self.text_color, config.font)
           
 
     """For time signature, the label is a tuple with 2 elements top and bottom"""  

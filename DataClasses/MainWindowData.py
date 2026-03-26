@@ -13,6 +13,9 @@ class MainWindowText:
 class MainWindowConfig:
     LEFT_PADDING_RATIO= 0.1
     MAIN_CONTAINER_WIDTH_RATIO = 0.8
+    COMMON_DIALOG_SIZE = (400, 200)
+    COMMON_DIALOG_NAME = "Common Dialog"
+    COMMON_DIALOG_FONT = 16
 
 @dataclass
 class ControlZIndex:

@@ -9,11 +9,8 @@ import pygame
 
 class ImageButton(Button):
 
-    def __init__(self, screen, name, rect, text, action, font, font_details, border_radius=0, text_position=TextPosition.CENTER,
-                 text_color=ButtonConfig.TEXT_DEFAULT_COLOR, bg_color=ButtonConfig.BTN_DEFAULT_COLOR, hover_text_color=ButtonConfig.TEXT_DEFAULT_COLOR, 
-                 hover_bg_color=ButtonConfig.BTN_DEFAULT_HOVER, is_draggable=False):
-        super().__init__(screen, name, rect, text, action, font, font_details, border_radius, text_position,
-                 text_color, bg_color, hover_text_color, hover_bg_color, is_draggable)
+    def __init__(self, config):
+        super().__init__(config)
         self.image = None
         self.image_rect = None
 
