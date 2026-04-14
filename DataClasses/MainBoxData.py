@@ -7,6 +7,7 @@ class MainBoxConfig:
     WIDTH_RATIO = 0.8
     NAME = "MainScoreBox"
     BAR_SIZE = 8
+    FONT_SIZE = 24
     SCROLL_SPEED = 40
     BG_COLOR = (245, 245, 245)
     BAR_BG = (0, 0, 0, 0)  # invisible track

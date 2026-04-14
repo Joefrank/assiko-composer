@@ -96,13 +96,14 @@ class Button(Control):
             return True  # Event handled
         return False  # Event not handled
 
-    def on_left_mouse_up(self, event):       
-        self.dragging = False
+    def on_left_mouse_up(self, event):
         # Notify state of symbol drop if it's draggable.
-        if self.current_dragged_symbol:
+        if self.current_dragged_symbol and self.app_state:
             self.app_state.save_dropped_symbol(self.current_dragged_symbol, self.action, self.parent.drop_action)        
             self.dragged_symbols.remove(self.current_dragged_symbol)
             self.current_dragged_symbol = None
+            
+        self.dragging = False
         
     def on_mouse_motion(self, event):  
         if self.is_draggable and self.dragging:

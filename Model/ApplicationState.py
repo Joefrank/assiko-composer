@@ -7,4 +7,7 @@ class ApplicationState:
 
     def save_dropped_symbol(self, rect, action, params_input):
         self.pending_dropped_item = (rect, action, params_input)
-        print("received dropped item. awaiting processors")
+
+    def get_dropped_symbol(self):
+        return self.pending_dropped_item
+       

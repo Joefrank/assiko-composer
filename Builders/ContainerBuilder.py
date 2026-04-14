@@ -2,9 +2,9 @@
 import pygame
 from DataClasses.MainBoxData import MainBoxConfig
 from DataClasses.MainWindowData import MainWindowConfig
-from Model.Containers.ScrollableContainer import ScrollableContainer
-from Model.Geometry.Size import Size
+from Model.Containers.ScoreContainer import ScoreContainer
 from Model.Containers.Window import Window
+from Model.Score.MusicScore import MusicScore
 
 
 class ContainerBuilder:
@@ -25,13 +25,16 @@ class ContainerBuilder:
         offset_y = MainBoxConfig.TOP_OFFSET_RATIO * self.window_size.height
         self.height = MainBoxConfig.HEIGHT_RATIO * self.window_size.height
         self.width = MainBoxConfig.WIDTH_RATIO * self.window_size.width
+        music_score = MusicScore(top_left=(offset_x, offset_y), score_width=self.width * 0.9, title="My Music Score", credits="Composed by Me", tempo=120) # Example music score initialization
 
-        self.main_box = ScrollableContainer(
+        self.main_box = ScoreContainer(
+            music_score,
             rect=pygame.Rect(offset_x, offset_y, self.width , self.height),
             content_size=(self.width, self.height * 2),
             name=MainBoxConfig.NAME,
             screen=self.main_window.get_canvass(),
             bar_size=MainBoxConfig.BAR_SIZE,
+            font_size=MainBoxConfig.FONT_SIZE,
             scroll_speed=MainBoxConfig.SCROLL_SPEED,
             bg_color=MainBoxConfig.BG_COLOR,
             text_color=MainBoxConfig.TEXT_COLOR,
@@ -49,12 +52,5 @@ class ContainerBuilder:
         self.event_handler.subscribe(pygame.MOUSEBUTTONUP, self.main_box)
         self.event_handler.subscribe(pygame.MOUSEMOTION, self.main_box)
         self.event_handler.subscribe(pygame.MOUSEWHEEL, self.main_box)
-        
-        font = pygame.font.SysFont(None, 24)
-
-        # Sample content
-        for i in range(50):
-            txt = font.render(f"Item {i}", True, (0, 0, 0))
-            self.main_box.content.blit(txt, (20, i * 30))
         
         return self.main_box

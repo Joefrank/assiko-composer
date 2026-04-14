@@ -60,15 +60,4 @@ class Grid(Container):
                 child.reposition_children(new_width_ratio, new_height_ratio)  
                 original_x += child.rect.width + self.grid_spacing[0]
 
-        # for child in self.children:            
-        #     child.rect.x = original_x
-        #     child.rect.y = int(child.rect.y * new_height_ratio)
-        #     child.reposition_children(new_width_ratio, new_height_ratio)  
-        #     # first coordinate is row index and second is column index.
-        #     if child.grid_coordinates[1] == self.grid_size[1] - 1:  # if it's not in the first column, we calculate x based on original_x, column index, child width and horizontal spacing
-        #         original_x = self.rect.x  # reset original_x for first column, we are using a grid 2D array
-        #     else:
-        #         original_x += child.rect.width + self.grid_spacing[0] 
-           
-            
-          
+       

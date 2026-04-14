@@ -9,7 +9,7 @@ class ScrollableContainer(Container):
    
     FADE_TIME = 1.0  # seconds
 
-    def __init__(self, rect, content_size, name, screen, bar_size, scroll_speed, bg_color, text_color,
+    def __init__(self, rect, content_size, name, screen, bar_size, font_size, scroll_speed, bg_color, text_color,
                     bar_bg, bar_thumb, bar_thumb_hover, highlight_color, container_color, enable_x=True, enable_y=True):
         super().__init__(rect, screen, ControlType.CONTAINER, name, None, bg_color, text_color, 
                          highlight_color, container_color)
@@ -19,6 +19,7 @@ class ScrollableContainer(Container):
         self.BG_COLOR = bg_color
         self.TEXT_COLOR = text_color
         self.BAR_SIZE = bar_size
+        self.font_size = font_size
         self.SCROLL_SPEED = scroll_speed
         self.BAR_BG = bar_bg
         self.BAR_THUMB = bar_thumb
@@ -89,6 +90,7 @@ class ScrollableContainer(Container):
     # Events
     # -----------------------
     def on_left_mouse_down(self, event):
+        
         if event.button == 1:
             if self.enable_y and self.vthumb_rect().collidepoint(event.pos):
                 self.dragging_y = True
@@ -99,9 +101,11 @@ class ScrollableContainer(Container):
             self.last_mouse = event.pos
             self.interaction()
 
-    def on_mouse_button_up(self, event):
+    def on_left_mouse_up(self, event):
+        # check if we were dragging a symbol from a button and notify state of drop.
+        # if yes, action the current params ans symbols       
         self.dragging_content = self.dragging_x = self.dragging_y = False
-        print("scrollable: mouse button up")
+        
         
     def on_mouse_motion(self, event):
         self.hovered = self.rect.collidepoint(event.pos)
@@ -187,25 +191,14 @@ class ScrollableContainer(Container):
             )
             self.screen.blit(surf, thumb.topleft)
 
-    # -----------------------
-    # Resize this box
-    # -----------------------
-    # def resize(self, screen_width, screen_height):
-    #     """Resize the visible viewport"""
-    #     left_margin = ((100 - self.width_percent_of_window) // 2) * screen_width / 100
-    #     top_margin =  (screen_height * self.height_percent_of_window / 100) + 50
-
-    #     self.rect = pygame.Rect(left_margin, 
-    #                             top_margin, 
-    #                             screen_width * self.width_percent_of_window / 100, 
-    #                             screen_height - top_margin - 50)
-    #     self.clamp()
-        #self.draw(self.screen)
+    def add_content(self, text, font_size, text_color, position):
+        """Add content to the scrollable area at a specific position."""      
+        font = pygame.font.SysFont(None, font_size)
+        content = font.render(text, True, text_color)
+        self.content.blit(content, position)   
 
     def resize(self, width_ratio, height_ratio):
         """Resize the visible viewport based on new window size."""
-        #print(f"Before resize: rect={self.rect}")
         super().resize_only(width_ratio, height_ratio)
         super().reset_position(width_ratio, height_ratio)
-        #print(f"After resize: rect={self.rect}")
         self.clamp()
