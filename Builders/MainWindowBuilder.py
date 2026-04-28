@@ -30,7 +30,8 @@ class MainWindowBuilder:
             .build_toolbars()\
             .build_containers()\
             .build_menus() \
-            .build_common_dialog()
+            .build_common_dialog()\
+         .init_app_state()
          return self.main_window
 
     """This must be first function to be called when building window and components."""
@@ -86,5 +87,9 @@ class MainWindowBuilder:
 
     def get_main_window(self):
         return self.main_window
+    
+    def init_app_state(self):
+        self.main_window.set_app_state(self.app_state)
+        return self
     
     

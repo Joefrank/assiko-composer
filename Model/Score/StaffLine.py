@@ -4,16 +4,17 @@ from Model.Score.Note import Note
 from Model.Score.Note import Note
 from Model.Score.StaffItem import StaffItem
 
-class Line(Line, StaffItem):
+class StaffLine(Line, StaffItem):
     def __init__(self, 
-                 start_position, end_position, thickness, is_virtual, key, 
-                 key_id, vertical_positioning, staff_index, 
-                 line_collateral_boundaries, velocity, tempo, parent_staff):
+                 start_position, end_position, thickness, color=(0,0,0), is_virtual=False, key=None, 
+                 key_id=None, vertical_positioning=None, staff_index=None, 
+                 line_collateral_boundaries=None, velocity=None, tempo=None, parent_staff=None):
 
         super().__init__(
             start_position=start_position,
             end_position=end_position,
             thickness=thickness,
+            color=color,
             staff_index=staff_index,
             key=key,
             key_id=key_id,

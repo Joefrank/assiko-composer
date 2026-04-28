@@ -3,7 +3,6 @@ from DataClasses.Config.MusicConfig import (MODULATION_FLAT, MODULATION_SHARP, M
     piano_notes_sharps, piano_notes_flats, lowest_note_code, note_modifiers)
 from Model.Geometry.Position import Position
 from Model.Score.GrandStaff import GrandStaff
-from Model.Score.Staff import Staff
 
 
 class StaffUtils:
@@ -70,6 +69,7 @@ class StaffUtils:
 
     @staticmethod
     def calculate_score_dimension(music_score):
+        from Model.Score.Staff import Staff
         height, width = (0, 0)
         all_staves = music_score.staves_sequence
         

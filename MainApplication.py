@@ -1,7 +1,6 @@
 import pygame
 from Builders.MainWindowBuilder import MainWindowBuilder
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
-from Model.ApplicationState import ApplicationState
 from Renderers.MainWindowRenderer import MainWindowRenderer
 
 pygame.init()
@@ -10,7 +9,6 @@ clock = pygame.time.Clock()
 
 event_handler = MainWindowEventHandler()
 main_window = MainWindowBuilder(event_handler).build()
-main_window.set_app_state(ApplicationState()) # This is to be done once for all.
 MainWindowRenderer(main_window).render()
 
 # --------------------------------------------------

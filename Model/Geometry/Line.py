@@ -3,7 +3,8 @@ from Model.Geometry.Position import Position
 
 class Line:
 
-     def __init__(self, start_position, end_position, thickness, color):       
+     def __init__(self, start_position, end_position, thickness, color, **kwargs):       
+        super().__init__(**kwargs)
         self.start_position = start_position
         self.end_position = end_position
         self.thickness = thickness

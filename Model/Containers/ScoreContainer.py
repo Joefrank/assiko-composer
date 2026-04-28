@@ -28,4 +28,7 @@ class ScoreContainer(ScrollableContainer):
             print("✓ No pending dropped symbol found on mouse up.") 
 
    
-    
+    def draw(self):
+        super().draw()       
+        # This is where you would implement the actual drawing logic for the music score, staves, notes, etc.
+        self.music_score.draw() # we can use renderers here.

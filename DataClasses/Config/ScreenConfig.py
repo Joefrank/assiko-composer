@@ -67,6 +67,7 @@ class StaffConfig:
     STAFF_NO_LINES: int =  5
     STAFF_NO_INTERVALS: int =  4
     STAFF_RIGHT_PADDING:  int = 10
+    STAFF_LEFT_PADDING: int = 1 # use as default only for empty staff when clef is not added yet.
     STAFF_ALLOWED_MARGIN: int =  55
     STAFF_NOTE_SIZE:  int = 40
     STAFF_ACCIDENTAL_SIZE: int = 30

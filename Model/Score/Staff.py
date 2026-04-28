@@ -2,7 +2,7 @@ from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.Config.MusicConfig import supported_time_signatures,TREBLE_CLEF, BARITON_CLEF
 from Model.Geometry.Position import Position
 from Model.Geometry.Line import Line
-from Model.Score.Chord import Chord
+from Model.Score.IntervalRect import IntervalRect
 from Model.Score.Note import Note
 from Model.Score.StaffBar import StaffBar
 
@@ -136,6 +136,7 @@ class Staff:
         return notes
     
     def get_chords(self):
+        from Model.Score.Chord import Chord
         chords = []
         all_staff_notes = self.get_notes()
         # group all notes by x position into chords
@@ -147,7 +148,7 @@ class Staff:
                     note_list.append(note)
                 
                 if len(note_list) > 0:
-                    chord = Chord.Chord("", x)   
+                    chord = Chord("", x)   
                     chord.set_notes(note_list)              
                     chords.append(chord)
 
@@ -177,6 +178,33 @@ class Staff:
     def is_stem_inverted_by_default(self):
         return self.clef in [TREBLE_CLEF, BARITON_CLEF]
     
+    def get_staff_bottom_line(self):
+        if len(self.lines) == 0:
+            return
+        return max(
+            (line for line in self.lines if not line.is_virtual),
+            key=lambda line: line.start_position.y,
+            default=None
+        )
+    
+    def get_bottom_virtual_line(self):
+        if len(self.virtual_lines) == 0:
+            return
+        return max(
+            (line for line in self.virtual_lines if line.is_virtual),
+            key=lambda line: line.start_position.y,
+            default=None
+        )
+    
+    def set_positions(self):
+       
+        self.top_line = self.lines[0]
+        self.bottom_line = self.lines[-1]
+        self.position_rect = IntervalRect(self.top_line.start_position,  self.top_line.end_position,
+                                        self.bottom_line.end_position, self.bottom_line.start_position)
+        self.top_position = self.top_line.start_position
+        self.bottom_position = self.bottom_line.start_position 
+        
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)
         intervals_str = "-> ".join(str(interval) for interval in self.intervals)

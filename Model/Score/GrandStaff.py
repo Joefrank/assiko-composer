@@ -1,8 +1,8 @@
 
 
-import copy
+from __future__ import annotations
 
-from Model.Score.Chord import Chord
+import copy
 
 class GrandStaff:   
    
@@ -49,7 +49,8 @@ class GrandStaff:
             return self.staves[0].get_notes_offsets()
         
     def get_chords(self):
-        chords = list[Chord]()
+        from Model.Score.Chord import Chord
+        chords = []
         staff_count = 0
         for staff in self.staves:
             if staff_count == 0:

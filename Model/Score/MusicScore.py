@@ -13,7 +13,7 @@ class MusicScore:
         self.score_width = score_width
         self.title = title
         self.raw_credits = credits # these need processing    
-      
+        self.children_item_builders = {}
      
     def add_staff(self, staff):
         self.staves_sequence.append(staff)
@@ -38,6 +38,24 @@ class MusicScore:
           
         return None  
 
+    def add_child_item_builder(self, item_type, builder):
+        self.children_item_builders[item_type] = builder
+
+    def get_child_item_builder(self, item_type):
+        return self.children_item_builders.get(item_type, None)
+    
+    def draw(self):
+        # Call draw for score title, credits and other elements if exist.
+
+        # Call draw on staves.
+        for staff in self.staves_sequence:
+            print('rendering staff...')
+            ## Add a renderer here to render score and staves.
+            staff.draw() # we can use renderers here.
+ 
     def CreateStaff(self, params_input):
         # Placeholder for staff creation logic
         print("Creating staff..from score..." + params_input) 
+        staff_builder = self.get_child_item_builder("staff")
+        if staff_builder:
+            self.staves_sequence.append(staff_builder.build_empty_staff())
