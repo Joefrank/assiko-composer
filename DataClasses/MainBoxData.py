@@ -5,6 +5,7 @@ class MainBoxConfig:
     TOP_OFFSET_RATIO = 0.26  # based on MENU_BAR_HEIGHT_RATIO + TOOLBAR_HEIGHT_RATIO * 2
     HEIGHT_RATIO = 0.7
     WIDTH_RATIO = 0.8
+    SCORE_WIDTH_RATIO = 0.9
     NAME = "MainScoreBox"
     BAR_SIZE = 8
     FONT_SIZE = 24

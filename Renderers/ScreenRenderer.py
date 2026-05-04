@@ -28,7 +28,7 @@ class ScreenRenderer(BaseRenderer):
         if (self.state.screen_needs_refresh or self.state.score_navigator.is_running()):
             self._clear_screen(self.state.main_canvass)
             # self.menu_renderer.render_menu()
-            self.score_renderer.render_score(self.state.main_canvass, self.state.music_score)               
+            self.score_renderer.render_score(self.state.music_score)               
             pygame.display.flip()
             self.state.set_screen_refresh_status(False)
         #except Exception as e:

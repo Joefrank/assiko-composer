@@ -1,7 +1,5 @@
 import pygame
-import math
 from datetime import datetime
-
 from DataClasses.Config import ScreenConfig
 from DataClasses.Config.ScreenConfig import Color, StaffConfig
 from DataClasses.Config.MusicConfig import supported_clef_settings, \
@@ -41,7 +39,8 @@ class StaffRenderer(BaseRenderer):
 
     """ Displays a single staff on our music score."""
     def render_staff(self, staff, screen): 
-        self.draw_staff_boundaries(staff)        
+        self.draw_staff_boundaries(staff)   
+        # For a blank staff, there will be no clef.     
         clef_position = self.draw_staff_clef(staff)
         key_signature_position = Position(clef_position.x + 20, clef_position.y)
         last_offset_x = self.draw_key_signature(staff, key_signature_position)
@@ -199,6 +198,9 @@ class StaffRenderer(BaseRenderer):
         Draws the clef on the staff.
     """
     def draw_staff_clef(self, staff, font_color=(0, 0, 0)):
+        if staff.clef is None:
+            return staff.top_position
+        
         clef_settings = supported_clef_settings[staff.clef]
         clef_size = clef_settings["size"]
         clef_font_size =ScreenHelper.create_font((ScreenConfig.FontConfig.BRAVURA_FONT_PATH, clef_size)) 
@@ -214,6 +216,9 @@ class StaffRenderer(BaseRenderer):
         Draws the time signature specified for the staff
     """
     def draw_time_signature(self, screen, time_signature, position, font_color=(0, 0, 0)):
+        if time_signature is None:
+            return (0,0), (0,0), position.x
+        
         time_signature_fonts = supported_time_signatures[time_signature]["symbol"]
         item_size = supported_time_signatures[time_signature]["size"]
         item_margins = supported_time_signatures[time_signature]["margins"]
@@ -234,6 +239,9 @@ class StaffRenderer(BaseRenderer):
         Draws the key signature of the staff
     """
     def draw_key_signature(self, staff, reference_position):
+        if staff.key_signature is None:# normally return an error message ***
+            return reference_position.x
+        
         clef_settings = supported_clef_settings[staff.clef]
         signature_patterns =clef_settings["signature_position_pattern"]
         signature_details = signature_patterns[staff.key_signature]

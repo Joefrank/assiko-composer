@@ -1,9 +1,9 @@
-from itertools import zip_longest
-from Configs.music_config import (supported_clef_settings, piano_notes_sharps, supported_modulations,
-                                  MODULATION_SHARP, MODULATION_FLAT, piano_notes_key_patterns, piano_notes_flats)
-from Configs.screen_config import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP
-from Models import NoteItemsList, StaffNoteItems
-from Services.Utils import StaffUtils
+from DataClasses.Config.MusicConfig import supported_clef_settings,  supported_modulations, MODULATION_SHARP,\
+MODULATION_FLAT, piano_notes_key_patterns, piano_notes_sharp, piano_notes_flat
+from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP
+from Model.Score.Helpers.StaffUtils import StaffUtils
+from Model.Score.NoteItemsList import NoteItemsList
+from Model.Score.StaffNoteItems import StaffNoteItems
 
 class StaffNoteBuilder:
 

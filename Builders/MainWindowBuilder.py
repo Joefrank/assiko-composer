@@ -22,8 +22,8 @@ class MainWindowBuilder:
         self.main_box:ScrollableContainer = None
         self.menu_bar:MenuBar = None
         self.toolbar_grid = None
-        self.window_canvass:pygame.Surface = None # main screen       
-        self.app_state = ApplicationState() # singleton needed
+        self.window_canvass:pygame.Surface = None # main screen  
+        self.app_state = None # singleton needed
         
     def build(self):
          self.init_window()\
@@ -48,7 +48,7 @@ class MainWindowBuilder:
         self.window_canvass = self.main_window.get_canvass()
         # register window for resize and quit events
         self.event_handler.subscribe(pygame.VIDEORESIZE, self.main_window)
-        self.event_handler.subscribe(pygame.QUIT, self.main_window)
+        self.event_handler.subscribe(pygame.QUIT, self.main_window)        
         
         return self
    
@@ -62,7 +62,6 @@ class MainWindowBuilder:
     def build_containers(self):
         self.main_box = ContainerBuilder(self.main_window, self.event_handler).build()
         self.main_window.add_child(self.main_box)
-       # self.main_box.hide()
         return self
 
     """Builds the main menu.Should be called last when rendering because of z-index"""
@@ -89,7 +88,7 @@ class MainWindowBuilder:
         return self.main_window
     
     def init_app_state(self):
-        self.main_window.set_app_state(self.app_state)
+        self.main_window.propagate_state()
         return self
     
     

@@ -1,6 +1,7 @@
 import sys
 import pygame
 from DataClasses.ControlData import ControlType
+from Model.ApplicationState import ApplicationState
 from Model.Control import Control
 from Model.Dialogs.BasicDialog import BasicDialog
 from Model.Geometry.Size import Size
@@ -20,8 +21,8 @@ class Window(Control):
         self.bg_image_path = bg_image_path
         self.icon_path = icon_path
         self.common_dialog:BasicDialog  = None
-        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)        
-        self.app_state = None
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE) 
+        self.app_state = ApplicationState(self.screen)
 
     def get_state(self):
         return self.app_state    
@@ -90,3 +91,7 @@ class Window(Control):
         if not size is None:
             self.common_dialog.set_size(size.width, size.height)
         self.common_dialog.show()
+
+    def propagate_state(self):
+        for child in self.children:
+            child.set_app_state(self.app_state)

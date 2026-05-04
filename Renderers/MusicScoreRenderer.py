@@ -13,16 +13,24 @@ class MusicScoreRenderer(BaseRenderer):
         self.start_time = datetime.now().time()
         self.staff_renderer = StaffRenderer(state)
 
-    def render_score(self, screen, music_score):
+    def render_score(self, music_score):
         # render all staves in Score
-        for staff in music_score.staves_sequence:
-            if  isinstance(staff, GrandStaff):
-                self.staff_renderer.render_grand_staff(staff, screen)
-            elif isinstance(staff, Staff):
-                self.staff_renderer.render_staff(staff, screen)
-        # render credit and title
-        self.render_score_credit(screen, music_score)
-        self.render_score_title(music_score.title, music_score.title_position, music_score.score_width, screen)
+        original_active_screen = self.staff_renderer.active_screen
+        self.staff_renderer.active_screen = music_score.screen
+        try:
+            for staff in music_score.staves_sequence:
+                if  isinstance(staff, GrandStaff):
+                    self.staff_renderer.render_grand_staff(staff, music_score.screen)
+                elif isinstance(staff, Staff):
+                    self.staff_renderer.render_staff(staff, music_score.screen)
+            # render credit
+            if music_score.credits:
+                self.render_score_credit(music_score.screen, music_score)
+
+            if music_score.title:
+                self.render_score_title(music_score.title, music_score.title_position, music_score.score_width, music_score.screen)
+        finally:
+            self.staff_renderer.active_screen = original_active_screen
       
     
     def render_score_credit(self, screen, score):

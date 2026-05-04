@@ -1,3 +1,8 @@
+import pygame
+
+from Renderers import MusicScoreRenderer
+
+
 class MusicScore:
     TICKS_PER_BEAT = 480
     
@@ -14,7 +19,16 @@ class MusicScore:
         self.title = title
         self.raw_credits = credits # these need processing    
         self.children_item_builders = {}
+        self.renderer: MusicScoreRenderer = None
+        self.app_state = None
+        self.screen: pygame.Surface = None
      
+    def set_state(self, app_state):
+        self.app_state = app_state
+
+    def set_screen(self, screen: pygame.Surface):
+        self.screen = screen
+        
     def add_staff(self, staff):
         self.staves_sequence.append(staff)
 
@@ -44,15 +58,16 @@ class MusicScore:
     def get_child_item_builder(self, item_type):
         return self.children_item_builders.get(item_type, None)
     
-    def draw(self):
-        # Call draw for score title, credits and other elements if exist.
+    def set_renderer(self, renderer):
+        self.renderer = renderer
 
-        # Call draw on staves.
-        for staff in self.staves_sequence:
-            print('rendering staff...')
-            ## Add a renderer here to render score and staves.
-            staff.draw() # we can use renderers here.
- 
+    def get_renderer(self):
+        return self.renderer
+
+    def draw(self):
+        if self.renderer:
+            self.renderer.render_score(self)
+
     def CreateStaff(self, params_input):
         # Placeholder for staff creation logic
         print("Creating staff..from score..." + params_input) 

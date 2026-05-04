@@ -28,9 +28,10 @@ class Control:
         # State doesn't get ovewritten but modified.
         if self.app_state is None:
             self.app_state = app_state
-            if len(self.children) > 0:
-                for child in self.children:
-                    child.set_app_state(app_state)
+
+        if len(self.children) > 0:
+            for child in self.children:
+                child.set_app_state(app_state)
         
     def add_child(self, child):
         child.parent = self

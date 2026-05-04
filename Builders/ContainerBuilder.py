@@ -1,10 +1,10 @@
 
 import pygame
+from Builders.MusicScoreBuilder import MusicScoreBuilder
 from DataClasses.MainBoxData import MainBoxConfig
 from DataClasses.MainWindowData import MainWindowConfig
 from Model.Containers.ScoreContainer import ScoreContainer
 from Model.Containers.Window import Window
-from Model.Score.MusicScore import MusicScore
 from Builders.DynamicStaffBuilder import DynamicStaffBuilder
 
 
@@ -17,16 +17,27 @@ class ContainerBuilder:
         self.height = 0
         self.width = 0
         self.main_box = None
+        self.score_builder = MusicScoreBuilder(main_window)
 
     def build(self):
-        return self.build_main_container()
+        return self.build_score_container()
 
-    def build_main_container(self):     
-        offset_x = MainWindowConfig.LEFT_PADDING_RATIO *  self.window_size.width
-        offset_y = MainBoxConfig.TOP_OFFSET_RATIO * self.window_size.height
-        self.height = MainBoxConfig.HEIGHT_RATIO * self.window_size.height
-        self.width = MainBoxConfig.WIDTH_RATIO * self.window_size.width        
-        music_score = MusicScore(top_left=(offset_x, offset_y), score_width=self.width * 0.9, title="My Music Score", credits="Composed by Me", tempo=120) # Example music score initialization
+    def build_score_container(self):     
+        offset_x = int(MainWindowConfig.LEFT_PADDING_RATIO *  self.window_size.width)
+        offset_y = int(MainBoxConfig.TOP_OFFSET_RATIO * self.window_size.height)
+        self.height = int(MainBoxConfig.HEIGHT_RATIO * self.window_size.height)
+        self.width = int(MainBoxConfig.WIDTH_RATIO * self.window_size.width)        
+        score_width = int(self.width * MainBoxConfig.SCORE_WIDTH_RATIO)
+
+        print(f"ContainerBuilder: Building score container with offset_x={offset_x}, offset_y={offset_y}, width={self.width}, height={self.height}, score_width={score_width}")
+        music_score = self.score_builder.build_blank_score(
+            offset_x=offset_x,
+            offset_y=offset_y,
+            score_width=score_width,
+            score_title="My Music Score",
+            score_credits="Composed by Me",
+            tempo=120
+        )
 
         self.main_box = ScoreContainer(
             music_score,
@@ -47,9 +58,10 @@ class ContainerBuilder:
             enable_x=False,
             enable_y=True
         )
+        
         # Set staff builder. This will build new staffs dynamically when we call CreateStaff method on the music score. 
         music_score.add_child_item_builder("staff", DynamicStaffBuilder(self.main_box))
-       
+        
         #register events for mainbox
         self.event_handler.subscribe(pygame.MOUSEBUTTONDOWN, self.main_box)
         self.event_handler.subscribe(pygame.MOUSEBUTTONUP, self.main_box)

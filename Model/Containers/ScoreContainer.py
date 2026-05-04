@@ -1,4 +1,6 @@
 
+import pygame
+
 from Model.Containers.ScrollableContainer import ScrollableContainer
 
 
@@ -11,7 +13,16 @@ class ScoreContainer(ScrollableContainer):
 
         self.staves = []  # List of staves, each containing measures and notes
         self.music_score = music_score
+        self.score_screen = None
+        self.set_music_score_screen(self.content)
 
+    def set_music_score_screen(self, screen: pygame.Surface):
+        self.score_screen = screen
+        self.music_score.set_screen(screen)
+
+    def get_scrollable_screen(self):
+        return self.content
+    
     def add_staff(self, staff):
         self.staves.append(staff)
 
@@ -24,11 +35,16 @@ class ScoreContainer(ScrollableContainer):
            function = getattr(self.music_score, action, None)
            if function:
                function(params_input)
+
+           # Now clear the pending dropped symbol from the app state
+           self.app_state.clear_dropped_symbol()
        else:
             print("✓ No pending dropped symbol found on mouse up.") 
-
    
     def draw(self):
-        super().draw()       
-        # This is where you would implement the actual drawing logic for the music score, staves, notes, etc.
+        # Draw music score content into the scrollable surface first,
+        # then blit the clipped viewport to the screen.
         self.music_score.draw() # we can use renderers here.
+        super().draw()
+
+    

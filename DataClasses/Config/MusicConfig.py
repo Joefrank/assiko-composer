@@ -75,6 +75,13 @@ class AccidentalOptions:
     DOUBLE_SHARP = (1.0, "\uE263")
     DOUBLE_FLAT = (-1.0, "\uE264")
 
+@dataclass
+class SoundPlayerEventConstants:
+    CHORD_START: str = "chord_start"
+    CHORD_END: str = "chord_end"
+    PENDING_CHORD_END: str = "pending_chord_end"
+    BATCH_END: str = "batch_end"
+    
 valid_note_durations = \
     [ #(duration, note_type, font_code, stem-on/off, Actual duration)
         ("1","Whole", "\uE0A2",False, NoteDurationInTicks.WHOLE),

@@ -196,15 +196,14 @@ class Staff:
             default=None
         )
     
-    def set_positions(self):
-       
+    def set_positions(self):       
         self.top_line = self.lines[0]
         self.bottom_line = self.lines[-1]
         self.position_rect = IntervalRect(self.top_line.start_position,  self.top_line.end_position,
                                         self.bottom_line.end_position, self.bottom_line.start_position)
         self.top_position = self.top_line.start_position
-        self.bottom_position = self.bottom_line.start_position 
-        
+        self.bottom_position = self.bottom_line.start_position  
+    
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)
         intervals_str = "-> ".join(str(interval) for interval in self.intervals)

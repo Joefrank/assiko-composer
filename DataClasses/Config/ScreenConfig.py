@@ -78,7 +78,14 @@ class StaffConfig:
     STAFF_ITEM_THRESHOLD: int = 2
     STACCATO_SYMBOL_SIZE: int = 40
     NOTE_PROXIMITY_THRESHOLD: int = 40
-    
+
+@dataclass
+class ScoreConfig:
+    SCORE_WIDTH_PERCENT: int = 90 # this is a percentage
+    HEADER_FONT_SIZE: int = 40
+    TITLE_Y_OFFSET: int = 20
+
+
 @dataclass
 class FontConfig:
     BRAVURA_FONT_PATH = "Assets/Fonts/Bravura.otf"
