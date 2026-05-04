@@ -5,7 +5,6 @@
 from Builders.Params.BuildStaffItemParams import StaffItemBuildParams
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
 from Model.Geometry.Position import Position
-#from Model.Score import StaffLine
 from Model.Score.CollateralBoundary import CollateralBoundary
 from Model.Score.Interval import Interval
 from Model.Score.Rect import Rect
@@ -163,12 +162,14 @@ class DynamicStaffBuilder:
             
         return staves
 
+    """Because staff is inside a scrollable container, the container for score is at position (0,0) and we work out all 
+    staff positions based on this. So, we need to calculate the first staff position based on the container position and then calculate the next staff positions based on the first staff position and the spacing we want between staves."""
     @staticmethod
     def calculate_first_staff_position(container, staff_width_percentage, staff_original_y_offset):
         container_width = container.rect.width
         staff_with = container_width * staff_width_percentage / 100
-        all_staves_x_offset = container.rect.x + ((container_width - staff_with) // 2)
-        return staff_with, Position(all_staves_x_offset, container.rect.y + staff_original_y_offset)
+        all_staves_x_offset = int((container_width - staff_with) // 2) 
+        return staff_with, Position(all_staves_x_offset, staff_original_y_offset)
     
     
     

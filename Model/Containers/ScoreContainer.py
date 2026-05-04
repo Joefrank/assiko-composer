@@ -38,8 +38,7 @@ class ScoreContainer(ScrollableContainer):
 
            # Now clear the pending dropped symbol from the app state
            self.app_state.clear_dropped_symbol()
-       else:
-            print("✓ No pending dropped symbol found on mouse up.") 
+      
    
     def draw(self):
         # Draw music score content into the scrollable surface first,

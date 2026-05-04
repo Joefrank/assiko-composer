@@ -66,7 +66,7 @@ class MusicScoreBuilder:
         music_score = MusicScore(top_left=(offset_x, offset_y), score_width=score_width, title=score_title, 
                                  credits=score_credits, tempo=tempo) # Example music score initialization
         music_score.set_state(self.app_state) # pass the state to the music score so that it can access it when needed (e.g. in renderer)
-        music_score.title_position = Position(offset_x,  offset_y-160) # + ScoreConfig.TITLE_Y_OFFSET)
+        music_score.title_position = Position(offset_x,  offset_y) # + ScoreConfig.TITLE_Y_OFFSET)
         music_score.set_renderer(MusicScoreRenderer(self.app_state)) # we can add a renderer here to render the score and staves.
        
         return music_score

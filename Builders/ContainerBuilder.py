@@ -1,6 +1,7 @@
 
 import pygame
 from Builders.MusicScoreBuilder import MusicScoreBuilder
+from DataClasses.Config.ScreenConfig import ScoreConfig
 from DataClasses.MainBoxData import MainBoxConfig
 from DataClasses.MainWindowData import MainWindowConfig
 from Model.Containers.ScoreContainer import ScoreContainer
@@ -28,11 +29,11 @@ class ContainerBuilder:
         self.height = int(MainBoxConfig.HEIGHT_RATIO * self.window_size.height)
         self.width = int(MainBoxConfig.WIDTH_RATIO * self.window_size.width)        
         score_width = int(self.width * MainBoxConfig.SCORE_WIDTH_RATIO)
-
-        print(f"ContainerBuilder: Building score container with offset_x={offset_x}, offset_y={offset_y}, width={self.width}, height={self.height}, score_width={score_width}")
+       
+        """The score coordinates start from offset (0,0) based on the mainbox because this is a scrollable container."""
         music_score = self.score_builder.build_blank_score(
-            offset_x=offset_x,
-            offset_y=offset_y,
+            offset_x=0,
+            offset_y=ScoreConfig.TITLE_Y_OFFSET,
             score_width=score_width,
             score_title="My Music Score",
             score_credits="Composed by Me",
@@ -67,5 +68,5 @@ class ContainerBuilder:
         self.event_handler.subscribe(pygame.MOUSEBUTTONUP, self.main_box)
         self.event_handler.subscribe(pygame.MOUSEMOTION, self.main_box)
         self.event_handler.subscribe(pygame.MOUSEWHEEL, self.main_box)
-        
+
         return self.main_box

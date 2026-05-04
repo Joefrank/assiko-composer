@@ -82,8 +82,8 @@ class StaffConfig:
 @dataclass
 class ScoreConfig:
     SCORE_WIDTH_PERCENT: int = 90 # this is a percentage
-    HEADER_FONT_SIZE: int = 40
-    TITLE_Y_OFFSET: int = 20
+    HEADER_FONT_SIZE: int = 30
+    TITLE_Y_OFFSET: int = 30
 
 
 @dataclass
