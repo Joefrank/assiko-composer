@@ -1,12 +1,16 @@
 import pygame
 
+from DataClasses.Config.EventsConfig import TextInputBlinkTimer
+from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
+from Model.Geometry import Position
+from Model.Inputs.TextInput import TextInput
 from Renderers import MusicScoreRenderer
 
 
 class MusicScore:
     TICKS_PER_BEAT = 480
     
-    def __init__(self, top_left, score_width=None, title=None, credits=None, tempo=80):        
+    def __init__(self, top_left, event_handler:MainWindowEventHandler, score_width=None, title=None, credits=None, tempo=80):        
         self.staves_sequence = [] #combination of all GrandStaves, could also be simple staffs         
         self.staff_color = None
         self.key_signature_list = None
@@ -15,6 +19,7 @@ class MusicScore:
         self.credits = [] # array of text blocks to be added to the top of score apart from title.        
         self.lyrics = []
         self.top_left_position = top_left
+        self.container_root_coordinates = None
         self.score_width = score_width
         self.title = title
         self.raw_credits = credits # these need processing    
@@ -22,7 +27,22 @@ class MusicScore:
         self.renderer: MusicScoreRenderer = None
         self.app_state = None
         self.screen: pygame.Surface = None
+        self.text_inputs = []
+        self.window_event_handler = event_handler
      
+    def contains_rect(self, rect):
+        if self.container_root_coordinates is None:
+            return False
+        # Assuming a very large height for the score. We can extend the height dynamically.
+        score_rect = pygame.Rect(0, 0, self.score_width, 10000)  
+        return score_rect.colliderect(rect)
+    
+    def get_text_inputs(self):
+        return self.text_inputs
+    
+    def set_root_coordinates(self, coordinates):
+        self.container_root_coordinates = coordinates
+
     def set_state(self, app_state):
         self.app_state = app_state
 
@@ -68,9 +88,31 @@ class MusicScore:
         if self.renderer:
             self.renderer.render_score(self)
 
-    def CreateStaff(self, params_input):
-        # Placeholder for staff creation logic
-        print("Creating staff..from score..." + params_input) 
+    def CreateStaff(self, params_input, rect):
         staff_builder = self.get_child_item_builder("staff")
         if staff_builder:
             self.staves_sequence.append(staff_builder.build_empty_staff())
+
+    """ This function is called when a symbol is dropped onto the score. It translates the drop coordinates to score space and creates a TextInput at that location."""
+    def translate_coordinates_to_score_space(self, coordinates):
+        if self.container_root_coordinates is None:
+            return coordinates
+        translated_x = coordinates[0] - self.container_root_coordinates[0]
+        translated_y = coordinates[1] - self.container_root_coordinates[1]
+        return (translated_x, translated_y)
+    
+    def CreateTextInput(self, params_input, event_rect):
+        #RED = (255, 0, 0)
+        
+        real_coordinates = self.translate_coordinates_to_score_space((event_rect.x, event_rect.y))
+        #pygame.draw.rect(self.screen, RED, (real_coordinates[0], real_coordinates[1], 200, 40))
+        #print(f"event rect:{event_rect} - param input:{params_input} - real_coordinates:{real_coordinates}")
+
+        new_rect = pygame.Rect(real_coordinates[0], real_coordinates[1], 200, 40)
+        text_input = TextInput(self.screen, self, new_rect, font_size=30)
+        self.window_event_handler.subscribe(pygame.MOUSEBUTTONDOWN, text_input)
+        self.window_event_handler.subscribe(pygame.KEYDOWN, text_input)
+        self.window_event_handler.subscribe_timer(TextInputBlinkTimer.NAME, text_input)
+
+        self.text_inputs.append(text_input)
+        #print(f"Created TextInput at {new_rect.topleft} - screenid:{id(self.screen)} - top-left:{self.top_left_position} - container-root:{self.container_root_coordinates}")

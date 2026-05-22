@@ -179,7 +179,8 @@ class StaffActionToolbar(BaseToolbar):
         ("repeat_start.png", "Repeat Start", "InsertStartRepeatToStaff"),
         ("repeat_end.png", "Repeat End", "InsertEndRepeatToStaff"),
         ("final_staff_line.png", "Final Staff Line", "InsertFinalStaffLine"),
-        ("notes_tie.png", "Notes Tie", "TieNotesOnStaff")        
+        ("notes_tie.png", "Notes Tie", "TieNotesOnStaff") ,
+        ("text.png", "Text Input", "CreateTextInput"),       
     ]
     BUTTON_TYPE = ButtonType.IMAGE_BUTTON
     DROP_ACTION = "Reflect"

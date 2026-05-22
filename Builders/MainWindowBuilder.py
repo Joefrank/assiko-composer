@@ -3,11 +3,13 @@ import pygame
 from Builders.ContainerBuilder import ContainerBuilder
 from Builders.MenuBuilder import MenuBuilder
 from Builders.ToolbarsBuilder import ToolbarBuilder
+from DataClasses.Config.EventsConfig import TextInputBlinkTimer
 from DataClasses.MainWindowData import MainWindowConfig, MainWindowDimensions
 from DataClasses.MainWindowData import MainWindowText
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Helpers.FileHelper import FileHelper
 from Helpers.ScreeHelper import ScreenHelper
+from Model.Timer import Timer
 from Model.ApplicationState import ApplicationState
 from Model.Dialogs.BasicDialog import BasicDialog
 from Model.Menu.MenuBar import MenuBar
@@ -16,8 +18,8 @@ from Model.Containers.Window import Window
 
 class MainWindowBuilder: 
     
-    def __init__(self, event_handler:MainWindowEventHandler):
-        self.event_handler = event_handler
+    def __init__(self):
+        self.event_handler = None
         self.main_window:Window = None
         self.main_box:ScrollableContainer = None
         self.menu_bar:MenuBar = None
@@ -31,6 +33,7 @@ class MainWindowBuilder:
             .build_containers()\
             .build_menus() \
             .build_common_dialog()\
+            .build_timers()\
          .init_app_state()
          return self.main_window
 
@@ -45,6 +48,8 @@ class MainWindowBuilder:
         icon_path = asset_path / "icon.png"
 
         self.main_window = Window(pygame.Rect(x, y, WIDTH, HEIGHT), bg_image_path, icon_path, MainWindowText.TITLE)
+        # This is needed early because some components need to subscribe to window events during their build process, and they need access to the event handler for that. We can get the event handler from the main window since it's created in the main window's constructor.
+        self.event_handler = self.main_window.get_event_handler()
         self.window_canvass = self.main_window.get_canvass()
         # register window for resize and quit events
         self.event_handler.subscribe(pygame.VIDEORESIZE, self.main_window)
@@ -81,6 +86,11 @@ class MainWindowBuilder:
         self.main_window.add_child(common_dialog)
         return self
 
+    def build_timers(self):
+        text_input_blink_timer = Timer(TextInputBlinkTimer.NAME, TextInputBlinkTimer.INTERVAL)
+        self.event_handler.add_timer(text_input_blink_timer)
+        return self
+        
     def add_supported_events(self):
         self.main_window.set_supported_events( [pygame.VIDEORESIZE, pygame.QUIT])
 

@@ -7,18 +7,17 @@ pygame.init()
 
 clock = pygame.time.Clock()
 
-event_handler = MainWindowEventHandler()
-main_window = MainWindowBuilder(event_handler).build()
+main_window = MainWindowBuilder().build()
 MainWindowRenderer(main_window).render()
 
 # --------------------------------------------------
 # Main Loop
 # --------------------------------------------------
 running = True
-while running:
-    event_handler.handle_events()   
-    main_window.re_draw_component()
+while running: 
+    dt = clock.tick(60)  # Limit to 60 FPS
+    main_window.handle_events(dt)
     pygame.display.flip()
-    clock.tick(60)
+    
 
 pygame.quit()

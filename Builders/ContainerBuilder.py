@@ -35,7 +35,7 @@ class ContainerBuilder:
             offset_x=0,
             offset_y=ScoreConfig.TITLE_Y_OFFSET,
             score_width=score_width,
-            score_title="My Music Score",
+            score_title="....Title Here....",
             score_credits="Composed by Me",
             tempo=120
         )

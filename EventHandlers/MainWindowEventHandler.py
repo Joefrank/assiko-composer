@@ -4,13 +4,14 @@ import pygame
 from DataClasses.EventData import EVENT_TYPES
 from EventHandlers.EventSubscription import EventSubscription
 from Helpers.ScreeHelper import ScreenHelper
-from Model.Containers.Window import Window
+from Model.Timer import Timer
 
 
 class MainWindowEventHandler:
 
     def __init__(self):
         self.event_subscriptions = []
+        self.timers = []
         self.init_event_subscriptions()
 
     def init_event_subscriptions(self):
@@ -27,7 +28,17 @@ class MainWindowEventHandler:
         if event_type not in subscriber.supported_events:
             subscriber.supported_events.append(event_type)     
 
-    def handle_events(self) -> None:
+    def add_timer(self, timer: Timer):
+        self.timers.append(timer)
+        
+    def subscribe_timer(self, timer_id, subscriber):
+        # Find timer with the given timer_id and add subscriber to it.
+        timer = next((t for t in self.timers if t.timer_name == timer_id), None)
+        if timer:
+            timer.subscribe(subscriber)      
+        
+        
+    def handle_events(self, dt: int) -> None:
         """Process all pygame events."""
         for event in pygame.event.get():
             #try:
@@ -46,10 +57,13 @@ class MainWindowEventHandler:
                             is_event_handled = handler(event)
                             if is_event_handled:
                                 break               
-                
+            
             #except Exception as e:
                # print(f"Error handling event {event.type}: {e}")
                 #self.logger.error(f"Error handling event {event.type}: {e}")
                 #self.state.add_error(f"Event handling error: {e}")
-       
+
+        # Make each time tick and potentially notify subscribers if their timer has reached its interval
+        for timer in self.timers:
+            timer.tick(dt)
         

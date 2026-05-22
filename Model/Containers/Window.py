@@ -1,6 +1,7 @@
 import sys
 import pygame
 from DataClasses.ControlData import ControlType
+from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Model.ApplicationState import ApplicationState
 from Model.Control import Control
 from Model.Dialogs.BasicDialog import BasicDialog
@@ -23,6 +24,7 @@ class Window(Control):
         self.common_dialog:BasicDialog  = None
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE) 
         self.app_state = ApplicationState(self.screen)
+        self.event_handler = MainWindowEventHandler()
 
     def get_state(self):
         return self.app_state    
@@ -95,3 +97,10 @@ class Window(Control):
     def propagate_state(self):
         for child in self.children:
             child.set_app_state(self.app_state)
+
+    def get_event_handler(self):
+        return self.event_handler
+    
+    def handle_events(self, dt:int):
+        self.event_handler.handle_events(dt)
+        self.re_draw_component()

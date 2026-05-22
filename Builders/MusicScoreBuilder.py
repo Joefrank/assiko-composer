@@ -1,8 +1,11 @@
 
 import math
 
+import pygame
+
 from Model.Containers.Window import Window
 from Model.Geometry.Position import Position
+from Model.Inputs.TextInput import TextInput
 from Model.Score.MusicScore import MusicScore
 from Model.Score.GrandStaff import GrandStaff
 from Model.Score.ScoreCredit import ScoreCredit
@@ -16,7 +19,7 @@ class MusicScoreBuilder:
         self.top_staff = None
         self.highest_credit_y_offset = None 
         self.main_window = main_window
-        self.app_state = main_window.get_state()
+        self.app_state = main_window.get_state()        
 
     """This initializes the score with top staff"""
     def init_score(self, initial_staff, score_title, score_credits, tempo=80):
@@ -24,7 +27,8 @@ class MusicScoreBuilder:
             self.top_staff = initial_staff.staves[0]
         else: # normal staff            
             self.top_staff = initial_staff
-        self.music_score = MusicScore(self.top_staff.top_position, self.top_staff.get_width(), score_title, score_credits, tempo)
+        self.music_score = MusicScore(self.top_staff.top_position, self.main_window.get_event_handler(),\
+                                       self.top_staff.get_width(), score_title, score_credits, tempo)
         self.music_score.add_staff(initial_staff)
         
         return self
@@ -63,7 +67,7 @@ class MusicScoreBuilder:
         return self
 
     def build_blank_score(self, offset_x, offset_y, score_width, score_title="", score_credits=None, tempo=80):
-        music_score = MusicScore(top_left=(offset_x, offset_y), score_width=score_width, title=score_title, 
+        music_score = MusicScore(top_left=(offset_x, offset_y), event_handler=self.main_window.get_event_handler(), score_width=score_width, title=score_title, 
                                  credits=score_credits, tempo=tempo) # Example music score initialization
         music_score.set_state(self.app_state) # pass the state to the music score so that it can access it when needed (e.g. in renderer)
         music_score.title_position = Position(offset_x,  offset_y) # + ScoreConfig.TITLE_Y_OFFSET)
@@ -73,3 +77,4 @@ class MusicScoreBuilder:
 
     def build(self):
         return self.music_score 
+    

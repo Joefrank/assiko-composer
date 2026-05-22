@@ -15,14 +15,12 @@ class ScoreContainer(ScrollableContainer):
         self.music_score = music_score
         self.score_screen = None
         self.set_music_score_screen(self.content)
+        self.music_score.set_root_coordinates((rect.x, rect.y))
 
     def set_music_score_screen(self, screen: pygame.Surface):
         self.score_screen = screen
         self.music_score.set_screen(screen)
 
-    def get_scrollable_screen(self):
-        return self.content
-    
     def add_staff(self, staff):
         self.staves.append(staff)
 
@@ -34,16 +32,16 @@ class ScoreContainer(ScrollableContainer):
            # run the action by calling the function with the parameters
            function = getattr(self.music_score, action, None)
            if function:
-               function(params_input)
+               function(params_input, rect)
 
            # Now clear the pending dropped symbol from the app state
            self.app_state.clear_dropped_symbol()
-      
+       else:
+            print("✓ No pending dropped symbol found on mouse up.") 
+
    
     def draw(self):
         # Draw music score content into the scrollable surface first,
         # then blit the clipped viewport to the screen.
         self.music_score.draw() # we can use renderers here.
         super().draw()
-
-    
