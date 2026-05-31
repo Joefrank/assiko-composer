@@ -29,11 +29,11 @@ class ContainerBuilder:
         self.height = int(MainBoxConfig.HEIGHT_RATIO * self.window_size.height)
         self.width = int(MainBoxConfig.WIDTH_RATIO * self.window_size.width)        
         score_width = int(self.width * MainBoxConfig.SCORE_WIDTH_RATIO)
-       
+        
         """The score coordinates start from offset (0,0) based on the mainbox because this is a scrollable container."""
         music_score = self.score_builder.build_blank_score(
-            offset_x=0,
-            offset_y=ScoreConfig.TITLE_Y_OFFSET,
+            0,
+            0,
             score_width=score_width,
             score_title="....Title Here....",
             score_credits="Composed by Me",
@@ -59,6 +59,8 @@ class ContainerBuilder:
             enable_x=False,
             enable_y=True
         )
+       
+        music_score.set_parent_container(self.main_box)
         
         # Set staff builder. This will build new staffs dynamically when we call CreateStaff method on the music score. 
         music_score.add_child_item_builder("staff", DynamicStaffBuilder(self.main_box))

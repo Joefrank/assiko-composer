@@ -109,9 +109,11 @@ class TextInput(Control):
         text_width = font.size(self.text)[0]
         if text_width > self.rect.width - 2 * self.padding:
             # check that we are not exceeding the parent container's width
-            print(f"box width:{self.rect.width} - text width: {text_width} - parent score width: {self.parent.score_width}")
+            #print(f"box width:{self.rect.width} - text width: {text_width} - parent score width: {self.parent.score_width}")
+            
             new_width = self.rect.width + (2 * self.padding)
             can_extend = self.parent.score_width - (self.rect.x + new_width)
+            print(f"self.rect.x: {self.rect.x} - new_width: {new_width} - parent score width: {self.parent.score_width} - can_extend: {can_extend}")
             if can_extend > 0:
                 self.rect.width = new_width
             else:

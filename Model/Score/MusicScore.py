@@ -29,7 +29,20 @@ class MusicScore:
         self.screen: pygame.Surface = None
         self.text_inputs = []
         self.window_event_handler = event_handler
-     
+        # sets debug mode for score.
+        self.debug_on = True
+        self.parent_container = None
+       
+      
+    def set_parent_container(self, container):
+        self.parent_container = container
+        if self.parent_container.rect.width > self.score_width:
+            x = (self.parent_container.rect.width - self.score_width) // 2
+            self.top_left_position = (self.top_left_position[0] + x, self.top_left_position[1])
+
+    def get_parent_container(self):
+        return self.parent_container
+    
     def contains_rect(self, rect):
         if self.container_root_coordinates is None:
             return False
@@ -43,6 +56,9 @@ class MusicScore:
     def set_root_coordinates(self, coordinates):
         self.container_root_coordinates = coordinates
 
+    def get_root_coordinates(self):
+        return self.container_root_coordinates
+    
     def set_state(self, app_state):
         self.app_state = app_state
 
@@ -85,8 +101,31 @@ class MusicScore:
         return self.renderer
 
     def draw(self):
-        if self.renderer:
-            self.renderer.render_score(self)
+        #if self.renderer:
+            #self.renderer.render_score(self)
+        if self.debug_on:
+            self.draw_debug()
+
+    def draw_debug(self):
+        # Draw a border around the score for debugging
+        #import traceback
+        # print(f"draw_debug called - debug_on={self.debug_on}")
+        #print("".join(traceback.format_stack()[-4:-1]))
+        #self.debug_on = False  # Disable debug after drawing once to prevent clutter
+        
+        if self.screen and self.container_root_coordinates:
+            _, scroll_y = self.parent_container.get_scroll_position()
+            debug_rect = pygame.Rect(self.top_left_position[0], 
+                                     self.top_left_position[1], self.score_width,
+                                       self.parent_container.rect.height + scroll_y)  
+            # Assuming a very large height for the score. We can extend the height dynamically.
+           
+            pygame.draw.rect(
+                self.screen,
+                (255, 100, 100),  # Red color for debug border
+                debug_rect,
+                2  # Border width
+            )
 
     def CreateStaff(self, params_input, rect):
         staff_builder = self.get_child_item_builder("staff")
@@ -102,17 +141,11 @@ class MusicScore:
         return (translated_x, translated_y)
     
     def CreateTextInput(self, params_input, event_rect):
-        #RED = (255, 0, 0)
-        
         real_coordinates = self.translate_coordinates_to_score_space((event_rect.x, event_rect.y))
-        #pygame.draw.rect(self.screen, RED, (real_coordinates[0], real_coordinates[1], 200, 40))
-        #print(f"event rect:{event_rect} - param input:{params_input} - real_coordinates:{real_coordinates}")
-
         new_rect = pygame.Rect(real_coordinates[0], real_coordinates[1], 200, 40)
         text_input = TextInput(self.screen, self, new_rect, font_size=30)
         self.window_event_handler.subscribe(pygame.MOUSEBUTTONDOWN, text_input)
         self.window_event_handler.subscribe(pygame.KEYDOWN, text_input)
         self.window_event_handler.subscribe_timer(TextInputBlinkTimer.NAME, text_input)
-
         self.text_inputs.append(text_input)
-        #print(f"Created TextInput at {new_rect.topleft} - screenid:{id(self.screen)} - top-left:{self.top_left_position} - container-root:{self.container_root_coordinates}")
+        

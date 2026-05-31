@@ -161,7 +161,7 @@ class ScrollableContainer(Container):
                 self.rect.height
             )
         )
-
+        
         self.screen.set_clip(clip)
 
         alpha = self.scrollbar_alpha()
@@ -179,6 +179,11 @@ class ScrollableContainer(Container):
                 border_radius=6
             )
             self.screen.blit(surf, thumb.topleft)
+            #display the scroll position for debugging
+            font = pygame.font.SysFont(None, 24)      
+            text = font.render(f"Scroll Y: {int(self.offset_y)}", True, (255, 0, 0))
+            self.screen.blit(text, (thumb.left - 100, thumb.top))
+
 
         if self.enable_x and self.content_w > self.rect.width:
             thumb = self.hthumb_rect()
@@ -202,3 +207,6 @@ class ScrollableContainer(Container):
         super().resize_only(width_ratio, height_ratio)
         super().reset_position(width_ratio, height_ratio)
         self.clamp()
+
+    def get_scroll_position(self):
+        return self.offset_x, self.offset_y
