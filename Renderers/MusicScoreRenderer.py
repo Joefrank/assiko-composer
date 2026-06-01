@@ -15,25 +15,17 @@ class MusicScoreRenderer(BaseRenderer):
 
     def render_score(self, music_score):
         # render all staves in Score
-        original_active_screen = self.staff_renderer.active_screen
-        self.staff_renderer.active_screen = music_score.screen
-        try:
-            
-            for staff in music_score.staves_sequence:
-                if  isinstance(staff, GrandStaff):
-                    self.staff_renderer.render_grand_staff(staff, music_score.screen)
-                elif isinstance(staff, Staff):
-                    self.staff_renderer.render_staff(staff, music_score.screen)
-            # render credit
-            if music_score.credits:
-                self.render_score_credit(music_score.screen, music_score)
+        for staff in music_score.staves_sequence:
+            if  isinstance(staff, GrandStaff):
+                self.staff_renderer.render_grand_staff(staff, music_score.screen)
+            elif isinstance(staff, Staff):
+                self.staff_renderer.render_staff(staff, music_score.screen)
+        # render credit
+        if music_score.credits:
+            self.render_score_credit(music_score.screen, music_score)
 
-            self.render_score_text_inputs(music_score)
-            
-            #if music_score.title:
-                #self.render_score_title(music_score.title, music_score.title_position, music_score.score_width, music_score.screen)
-        finally:
-            self.staff_renderer.active_screen = original_active_screen
+        if music_score.title:
+            self.render_score_title(music_score.title, music_score.title_position, music_score.score_width, music_score.screen)
       
     
     def render_score_credit(self, screen, score):
@@ -45,8 +37,3 @@ class MusicScoreRenderer(BaseRenderer):
     def render_score_title(self, title, position, container_width, screen):
         font_size = 40
         self.draw_text(screen, title, position, font_size, container_width, text_alignment="CENTER")
-
-    def render_score_text_inputs(self, music_score):
-        inputs = music_score.get_text_inputs()
-        for text_input in inputs:
-            text_input.draw()

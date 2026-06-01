@@ -96,6 +96,7 @@ class Window(Control):
 
     def propagate_state(self):
         for child in self.children:
+            print(f"Propagating state to child: {child.name}")
             child.set_app_state(self.app_state)
 
     def get_event_handler(self):

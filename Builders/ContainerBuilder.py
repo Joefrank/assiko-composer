@@ -4,6 +4,7 @@ from Builders.MusicScoreBuilder import MusicScoreBuilder
 from DataClasses.Config.ScreenConfig import ScoreConfig
 from DataClasses.MainBoxData import MainBoxConfig
 from DataClasses.MainWindowData import MainWindowConfig
+from Model.Containers.ScrollableScoreContainer import ScrollableScoreContainer
 from Model.Containers.ScoreContainer import ScoreContainer
 from Model.Containers.Window import Window
 from Builders.DynamicStaffBuilder import DynamicStaffBuilder
@@ -19,6 +20,7 @@ class ContainerBuilder:
         self.width = 0
         self.main_box = None
         self.score_builder = MusicScoreBuilder(main_window)
+        self.item_counter = 0 # testing only
 
     def build(self):
         return self.build_score_container()
@@ -30,6 +32,20 @@ class ContainerBuilder:
         self.width = int(MainBoxConfig.WIDTH_RATIO * self.window_size.width)        
         score_width = int(self.width * MainBoxConfig.SCORE_WIDTH_RATIO)
         
+        # self.main_box = ScrollableScoreContainer(
+        #     pygame.Rect(offset_x, offset_y, self.width , self.height),
+        #     screen=self.main_window.get_canvass(),
+        #     name=MainBoxConfig.NAME,
+        #     item_height=40,
+        #     score_width=score_width,
+        #     bg_color=(140, 140, 140),
+        #     border_color=(200, 200, 200),
+        #     scroll_speed=10
+        # )
+        # self._add_initial_items()
+
+        # return self.main_box
+    
         """The score coordinates start from offset (0,0) based on the mainbox because this is a scrollable container."""
         music_score = self.score_builder.build_blank_score(
             0,
@@ -72,3 +88,28 @@ class ContainerBuilder:
         self.event_handler.subscribe(pygame.MOUSEWHEEL, self.main_box)
 
         return self.main_box
+
+    def _add_initial_items(self):
+        """Add some initial items to the container."""
+        items_data = [
+            ("C Major", {"notes": ["C", "E", "G"]}),
+            ("G Major", {"notes": ["G", "B", "D"]}),
+            ("D Major", {"notes": ["D", "F#", "A"]}),
+            ("A Major", {"notes": ["A", "C#", "E"]}),
+            ("E Major", {"notes": ["E", "G#", "B"]}),
+            ("B Major", {"notes": ["B", "D#", "F#"]}),
+            ("F# Major", {"notes": ["F#", "A#", "C#"]}),
+            ("C# Major", {"notes": ["C#", "E#", "G#"]}),
+            ("C# Major", {"notes": ["C#", "E#", "G#"]}),
+            ("F Major", {"notes": ["F", "A", "C"]}),
+            ("Bb Major", {"notes": ["Bb", "D", "F"]}),
+            ("Eb Major", {"notes": ["Eb", "G", "Bb"]}),
+            ("Ab Major", {"notes": ["Ab", "C", "Eb"]}),
+            ("Db Major", {"notes": ["Db", "F", "Ab"]}),
+            ("Gb Major", {"notes": ["Gb", "Bb", "Db"]}),
+            ("Cb Major", {"notes": ["Cb", "Eb", "Gb"]})
+        ]
+        
+        for text, data in items_data:
+            self.item_counter += 1
+            self.main_box.add_item(f"item_{self.item_counter}", text, data)

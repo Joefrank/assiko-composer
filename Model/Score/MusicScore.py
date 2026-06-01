@@ -32,6 +32,7 @@ class MusicScore:
         # sets debug mode for score.
         self.debug_on = True
         self.parent_container = None
+        self.draw_count = 0 # for debugging draw calls
        
       
     def set_parent_container(self, container):
@@ -101,10 +102,10 @@ class MusicScore:
         return self.renderer
 
     def draw(self):
-        #if self.renderer:
-            #self.renderer.render_score(self)
-        if self.debug_on:
-            self.draw_debug()
+        if self.renderer:
+            self.renderer.render_score(self)
+        # Debug overlay is drawn by the parent container after blit
+        print(f"Drawing Music score")
 
     def draw_debug(self):
         # Draw a border around the score for debugging
@@ -113,8 +114,10 @@ class MusicScore:
         #print("".join(traceback.format_stack()[-4:-1]))
         #self.debug_on = False  # Disable debug after drawing once to prevent clutter
         
-        if self.screen and self.container_root_coordinates:
+        if self.screen and self.container_root_coordinates:           
             _, scroll_y = self.parent_container.get_scroll_position()
+            #print(f"drawing:{self.draw_count} - scroll:{scroll_y}")
+            self.draw_count += 1
             debug_rect = pygame.Rect(self.top_left_position[0], 
                                      self.top_left_position[1], self.score_width,
                                        self.parent_container.rect.height + scroll_y)  
@@ -122,10 +125,35 @@ class MusicScore:
            
             pygame.draw.rect(
                 self.screen,
-                (255, 100, 100),  # Red color for debug border
+                (255, 100, self.draw_count % 255),  # Red color for debug border
                 debug_rect,
                 2  # Border width
             )
+
+    def draw_debug_overlay(self, target_screen: pygame.Surface):
+        """Draw debug rectangle onto the provided target screen (overlay),
+        so it doesn't accumulate inside the scrollable content surface.
+        """
+        if not target_screen or not self.container_root_coordinates or not self.parent_container:
+            return
+
+        offset_x, offset_y = self.parent_container.get_scroll_position()
+        container_rect = self.parent_container.rect
+        #container_rect.height += offset_y  # Extend the container rect height by scroll offset for accurate debug overlay
+        
+        # Compute score top-left position relative to main screen (after blit)
+        screen_x = container_rect.left #+ (self.top_left_position[0] - offset_x)
+        screen_y = container_rect.top #+ (self.top_left_position[1] - offset_y)
+
+        self.draw_count += 1
+        debug_rect = pygame.Rect(screen_x, screen_y, self.score_width, container_rect.height + offset_y)
+
+        pygame.draw.rect(
+            target_screen,
+            (255, 100, self.draw_count % 255),
+            debug_rect,
+            2
+        )
 
     def CreateStaff(self, params_input, rect):
         staff_builder = self.get_child_item_builder("staff")

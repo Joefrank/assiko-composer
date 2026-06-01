@@ -147,6 +147,8 @@ class ScrollableContainer(Container):
     # Draw
     # -----------------------
     def draw(self):
+        print(f"Drawing ScrollableContainer '{self.name}' with offset ({self.offset_x}, {self.offset_y})")
+        #self.content.fill(self.BG_COLOR)
         # Clip content cleanly (no border)
         clip = self.screen.get_clip()
         self.screen.set_clip(self.rect)

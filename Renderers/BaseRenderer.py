@@ -17,14 +17,9 @@ class BaseRenderer:
     def __init__(self, state):
         self.state = state
         self.screen_init_time = None
-        self.original_screen = None
-        self.active_screen = None       
+        self.original_screen = None       
         # put these in config
         self.default_note_duration = default_note_duration
-
-    @property
-    def screen(self):
-        return self.active_screen if self.active_screen is not None else self.state.screen
 
     def render_mouse_tracker(self, position, key_id):
         note_duration = self.get_registered_note_duration()
