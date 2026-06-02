@@ -18,6 +18,7 @@ class MainWindowEventHandler:
         for supported_event, _, handler_name in EVENT_TYPES:
             self.event_subscriptions.append(EventSubscription(supported_event, handler_name))           
 
+    """Subscribes a listener to an event type. e.g. for text inputs to receive keyboard events."""
     def subscribe(self, event_type, subscriber):
         # Find the subscription for the event type and add the subscriber to it
         subscription = next((s for s in self.event_subscriptions if s.event_type == event_type), None)
@@ -30,7 +31,8 @@ class MainWindowEventHandler:
 
     def add_timer(self, timer: Timer):
         self.timers.append(timer)
-        
+
+    """Subscribes a listener to a timer. e.g. for cursor blinking in text inputs."""  
     def subscribe_timer(self, timer_id, subscriber):
         # Find timer with the given timer_id and add subscriber to it.
         timer = next((t for t in self.timers if t.timer_name == timer_id), None)

@@ -1,19 +1,19 @@
 
 import pygame
 
-from DataClasses.Config import ScreenConfig
-from Helpers.ScreeHelper import ScreenHelper
+from DataClasses.ControlData import ControlType
 from Model.Control import Control
+from Model.DragAndDrop.DraggableControl import DraggableControl
 
 """Class used to input text. When inactive, acts like a label."""
-class TextInput(Control):
+class TextInput(Control, DraggableControl):
     MEDIUM_GRAY = (200, 200, 200)
     LIGHT_GRAY = (240, 240, 240)
     BLUE = (80, 160, 255)
     
     def __init__(self, screen: pygame.Surface, parent, rect: pygame.Rect, name="TextInput", font_size=20):
-        super().__init__(rect, control_type="text_input", name=name)
-
+        Control.__init__(self, rect, ControlType.TEXT_INPUT, "TextInput")
+        DraggableControl.__init__(self, rect)
         self.text = ""
         self.text_color = (25, 25, 25)
         self.cursor_pos = 0
@@ -27,13 +27,34 @@ class TextInput(Control):
         self.padding = 10
         self.screen = screen
         self.parent = parent
+        self.set_translate_coordinates_function(self.parent.translate_coordinates_to_score_space)
 
-    def on_left_mouse_down(self, event):
-        print(f"TextInput received MOUSEBUTTONDOWN at {event.pos} - rect:{self.rect}")
-        event_pos_in_score_space = self.parent.translate_coordinates_to_score_space(event.pos)
-        print(f"Translated event position to score space: {event_pos_in_score_space}")
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            self.active = self.rect.collidepoint(event_pos_in_score_space)
+    def position_collides(self, position):
+        event_pos_in_score_space = self.parent.translate_coordinates_to_score_space(position)
+        return self.rect.collidepoint(event_pos_in_score_space)
+
+    def on_left_mouse_down(self, event):        
+        self.active = self.position_collides(event.pos)
+        # call parent left mouse down to enable dragging if click is within rect
+        #print(f"TextInput on_left_mouse_down - active: {self.position_collides(event.pos)} - event.pos: {self.parent.translate_coordinates_to_score_space(event.pos)} - rect: {self.rect}")
+        if self.active:
+            DraggableControl.on_left_mouse_down(self, event)
+            return True
+
+    def on_left_mouse_up(self, event):  
+        #print(f"TextInput on_left_mouse_up - active: {self.position_collides(event.pos)} - event.pos: {self.parent.translate_coordinates_to_score_space(event.pos)} - rect: {self.rect}")
+        if self.dragging:
+            DraggableControl.on_left_mouse_up(self, event)
+            return True
+
+    def on_mouse_motion(self, event):
+        #print(f"TextInput on_mouse_motion - active: {self.position_collides(event.pos)} - event.pos: {self.parent.translate_coordinates_to_score_space(event.pos)} - rect: {self.rect}")
+        if self.dragging:
+            DraggableControl.on_mouse_motion(self, event)
+            return True
+        if self.position_collides(event.pos):
+            self.active = False
+            return True
 
     def on_key_down(self, event):
         if not self.active:

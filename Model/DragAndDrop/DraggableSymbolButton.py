@@ -2,15 +2,14 @@
 # Draggable Symbol
 # -----------------------------
 import pygame
+from Model.DragAndDrop.DraggableControl import DraggableControl
 
 
-class DraggableSymbolButton:
+class DraggableSymbolButton(DraggableControl):
     def __init__(self, rect, symbol, font, NOTE_COLOR, NOTE_BG):
+        super().__init__(rect)
         self.symbol = symbol
         self.text_surf = font.render(symbol, True, NOTE_COLOR)
-        self.rect = rect
-        self.dragging = False
-        self.offset = (0, 0)
         self.note_bg = NOTE_BG
         self.font = font
         self.note_color = NOTE_COLOR
@@ -45,6 +44,9 @@ class DraggableSymbolButton:
 
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self.dragging = False
+            if self.current_dragged_symbol in self.dragged_notes:
+                self.dragged_notes.remove(self.current_dragged_symbol)
+            self.current_dragged_symbol = None
           
         elif event.type == pygame.MOUSEMOTION and self.dragging:
             self.current_dragged_symbol.x = event.pos[0] + self.offset[0]

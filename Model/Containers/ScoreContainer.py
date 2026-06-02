@@ -41,6 +41,8 @@ class ScoreContainer(ScrollableContainer):
 
    
     def draw(self):
+        # Clear the scrollable content surface before each redraw so moved controls do not leave stale artifacts.
+        self.content.fill(self.BG_COLOR)
         # Draw music score content into the scrollable surface first,
         # then blit the clipped viewport to the screen.
         self.music_score.draw() # we can use renderers here.

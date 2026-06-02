@@ -30,7 +30,7 @@ class MusicScore:
         self.text_inputs = []
         self.window_event_handler = event_handler
         # sets debug mode for score.
-        self.debug_on = True
+        self.debug_on = False
         self.parent_container = None
        
       
@@ -101,8 +101,8 @@ class MusicScore:
         return self.renderer
 
     def draw(self):
-        #if self.renderer:
-            #self.renderer.render_score(self)
+        if self.renderer:
+            self.renderer.render_score(self)
         if self.debug_on:
             self.draw_debug()
 
@@ -126,25 +126,29 @@ class MusicScore:
                 debug_rect,
                 2  # Border width
             )
-
-    def CreateStaff(self, params_input, rect):
-        staff_builder = self.get_child_item_builder("staff")
-        if staff_builder:
-            self.staves_sequence.append(staff_builder.build_empty_staff())
+   
 
     """ This function is called when a symbol is dropped onto the score. It translates the drop coordinates to score space and creates a TextInput at that location."""
     def translate_coordinates_to_score_space(self, coordinates):
         if self.container_root_coordinates is None:
             return coordinates
-        translated_x = coordinates[0] - self.container_root_coordinates[0]
-        translated_y = coordinates[1] - self.container_root_coordinates[1]
+        scroll_x, scroll_y = self.parent_container.get_scroll_position()
+        translated_x = coordinates[0] - self.container_root_coordinates[0] + scroll_x
+        translated_y = coordinates[1] - self.container_root_coordinates[1] + scroll_y
         return (translated_x, translated_y)
     
+    def CreateStaff(self, params_input, rect):
+        staff_builder = self.get_child_item_builder("staff")
+        if staff_builder:
+            self.staves_sequence.append(staff_builder.build_empty_staff())
+
     def CreateTextInput(self, params_input, event_rect):
         real_coordinates = self.translate_coordinates_to_score_space((event_rect.x, event_rect.y))
         new_rect = pygame.Rect(real_coordinates[0], real_coordinates[1], 200, 40)
         text_input = TextInput(self.screen, self, new_rect, font_size=30)
         self.window_event_handler.subscribe(pygame.MOUSEBUTTONDOWN, text_input)
+        self.window_event_handler.subscribe(pygame.MOUSEBUTTONUP, text_input)
+        self.window_event_handler.subscribe(pygame.MOUSEMOTION, text_input)
         self.window_event_handler.subscribe(pygame.KEYDOWN, text_input)
         self.window_event_handler.subscribe_timer(TextInputBlinkTimer.NAME, text_input)
         self.text_inputs.append(text_input)
