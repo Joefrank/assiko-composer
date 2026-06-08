@@ -130,7 +130,10 @@ class MusicScore:
     def CreateStaff(self, params_input, rect):
         staff_builder = self.get_child_item_builder("staff")
         if staff_builder:
-            self.staves_sequence.append(staff_builder.build_empty_staff())
+            new_staff = staff_builder.build_empty_staff((rect.x, rect.y), self.score_width)
+            self.staves_sequence.append(new_staff)
+            return new_staff
+        return None
 
     """ This function is called when a symbol is dropped onto the score. It translates the drop coordinates to score space and creates a TextInput at that location."""
     def translate_coordinates_to_score_space(self, coordinates):

@@ -11,6 +11,7 @@ class ControlType(Enum):
     BUTTON = auto()
     STAGGERED_BUTTON_SYMBOL = auto()
     DIALOG = auto()
+    SCORE_ITEM = auto()
     
 
 

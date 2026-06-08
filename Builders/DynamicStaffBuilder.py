@@ -2,6 +2,8 @@
 """
     Class is used to build staff progressively while user creates it and adds items to it.
 """
+import pygame
+
 from Builders.Params.BuildStaffItemParams import StaffItemBuildParams
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
 from Model.Geometry.Position import Position
@@ -10,28 +12,35 @@ from Model.Score.Interval import Interval
 from Model.Score.Rect import Rect
 from Model.Score.Staff import Staff
 from Model.Score.StaffLine import StaffLine
+from Renderers.StaffRenderer import StaffRenderer
 
 
 class DynamicStaffBuilder:
 
-    def __init__(self, container):        
-        self.container = container
+    def __init__(self, app_state):        
         self.all_staves = []
         # work out first staff position and width
-        self.staff_with, self.staff_original_position = self.calculate_first_staff_position(container,
-                                                                                      StaffConfig.STAFF_WIDTH_PERCENT,
-                                                                                      StaffConfig.STAFF_ORIGINAL_Y_OFFSET)
-        self.next_staff_position = self.staff_original_position
+        #self.staff_with, self.staff_original_position = self.calculate_first_staff_position(container,
+                                                                                     # StaffConfig.STAFF_WIDTH_PERCENT,
+                                                                                     # StaffConfig.STAFF_ORIGINAL_Y_OFFSET)
+        self.app_state = app_state
+        self.next_staff_position = None
+        self.staff_height = self.calculate_staff_height()
+        self.staff_renderer = StaffRenderer(app_state)
+
+
+    def calculate_staff_height(self):
+        return (StaffConfig.STAFF_NO_LINES * StaffConfig.STAFF_LINE_THICKNESS) + (StaffConfig.STAFF_NO_INTERVALS * StaffConfig.STAFF_LINE_GAP)
+  
 
     """
     staff_virtual_position is the position where the first virtual line will be placed. 
     This is calculated based on the original position of the staff and the exact padding we have for virtual items. This is because we want to make sure that we have enough space for all virtual items above the staff without overlapping with the staff lines and intervals.
     """
-    def create_staff_build_params(self):            
-       
-        staff = Staff()       
-        staff_original_position = self.next_staff_position
-
+    def create_staff_build_params(self, position, staff):  
+           
+        staff_original_position = position
+        staff_width = staff.rect.width
         # set original position for top virtual items.
         line_and_interval_tickness = (StaffConfig.STAFF_LINE_GAP + StaffConfig.STAFF_LINE_THICKNESS)        
         no_virtual_items_per_section = StaffConfig.STAFF_ALLOWED_MARGIN // line_and_interval_tickness            
@@ -41,7 +50,7 @@ class DynamicStaffBuilder:
         # Virtual items above the staff, we have same no of virtual lines as intervals.
         top_virtual_items_param = StaffItemBuildParams(
             no_of_items=no_virtual_items_per_section,
-            staff_width=self.staff_with,
+            staff_width=staff_width,
             original_position=staff_virtual_position,
             parent_staff=staff,
             is_virtual=True,
@@ -51,14 +60,14 @@ class DynamicStaffBuilder:
         # reset original position for staff contained items.
         staff_lines_params = StaffItemBuildParams(
             no_of_items=StaffConfig.STAFF_NO_LINES,
-            staff_width=self.staff_with,
+            staff_width=staff_width,
             original_position=staff_original_position,
             parent_staff=staff,
         )
 
         staff_intervals_params = StaffItemBuildParams(
             no_of_items=StaffConfig.STAFF_NO_INTERVALS,
-            staff_width=self.staff_with,
+            staff_width=staff_width,
             original_position=Position(staff_original_position.x, 
                                        staff_original_position.y + StaffConfig.STAFF_LINE_THICKNESS),            
             parent_staff=staff
@@ -66,19 +75,21 @@ class DynamicStaffBuilder:
 
         bottom_virtual_items_param = StaffItemBuildParams(
             no_of_items=no_virtual_items_per_section,
-            staff_width=self.staff_with,
+            staff_width=staff_width,
             original_position=staff_original_position,            
             parent_staff=staff,
             is_virtual=True,
             vertical_positioning=VERTICAL_POSITION_BOTTOM
         )    
 
-        return staff, top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param
+        return top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param
     
-    def build_empty_staff(self):            
+     
+    def build_empty_staff(self, top_left_position, staff_width):            
         # Prepare parameters for building staff components (lines and intervals) and virtual components (lines and intervals above and below the staff)
-        staff, top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param =\
-        self.create_staff_build_params()
+        staff = Staff(pygame.Rect(top_left_position[0], top_left_position[1], staff_width, self.staff_height), len(self.all_staves) + 1, self.staff_renderer) 
+        top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param =\
+        self.create_staff_build_params(Position(top_left_position[0], top_left_position[1]), staff)
         
         # build and set virtual lines for the staff.
         staff.virtual_lines += self.build_lines(top_virtual_items_param)
@@ -154,11 +165,11 @@ class DynamicStaffBuilder:
         
         return lines
     
-    def build_empty_staves(self, no_of_staves=1):
+    def build_empty_staves(self, top_left_position, staff_width, no_of_staves=1):
         staves = []
         if no_of_staves >= 0:
             for i in range(no_of_staves):
-                staves.append(self.build_empty_staff())
+                staves.append(self.build_empty_staff(top_left_position, staff_width))
             
         return staves
 

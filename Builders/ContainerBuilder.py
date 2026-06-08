@@ -4,9 +4,14 @@ from Builders.MusicScoreBuilder import MusicScoreBuilder
 from DataClasses.Config.ScreenConfig import ScoreConfig
 from DataClasses.MainBoxData import MainBoxConfig
 from DataClasses.MainWindowData import MainWindowConfig
+from Model.Containers.ScoreDocument import ScoreDocument
+from Model.Containers.ScrollableDocumentViewPort import ScrollableDocumentViewport
+from Model.Containers.ScrollableScoreContainer import ScrollableScoreContainer
 from Model.Containers.ScoreContainer import ScoreContainer
 from Model.Containers.Window import Window
 from Builders.DynamicStaffBuilder import DynamicStaffBuilder
+from Model.DragAndDrop.DraggableItem import DraggableItem
+from Model.DragAndDrop.TextItem import TextItem
 
 
 class ContainerBuilder:
@@ -29,7 +34,8 @@ class ContainerBuilder:
         self.height = int(MainBoxConfig.HEIGHT_RATIO * self.window_size.height)
         self.width = int(MainBoxConfig.WIDTH_RATIO * self.window_size.width)        
         score_width = int(self.width * MainBoxConfig.SCORE_WIDTH_RATIO)
-        
+        rect = pygame.Rect(offset_x, offset_y, self.width, self.height)
+
         """The score coordinates start from offset (0,0) based on the mainbox because this is a scrollable container."""
         music_score = self.score_builder.build_blank_score(
             0,
@@ -39,6 +45,27 @@ class ContainerBuilder:
             score_credits="Composed by Me",
             tempo=120
         )
+        
+        # Set staff builder. This will build new staffs dynamically when we call CreateStaff method on the music score. 
+        music_score.add_child_item_builder("staff", DynamicStaffBuilder(self.main_window.get_state()))
+
+        score_document = ScrollableDocumentViewport(
+            rect,
+            self.main_window.get_canvass(),
+            self.main_window.get_state(),
+            music_score,
+            no_of_pages=2
+        )
+
+       
+        self.event_handler.subscribe(pygame.MOUSEBUTTONDOWN, score_document)
+        self.event_handler.subscribe(pygame.MOUSEBUTTONUP, score_document)
+        self.event_handler.subscribe(pygame.MOUSEMOTION, score_document)
+        self.event_handler.subscribe(pygame.MOUSEWHEEL, score_document)
+
+        return score_document
+    
+       
 
         self.main_box = ScoreContainer(
             music_score,
@@ -63,8 +90,8 @@ class ContainerBuilder:
         music_score.set_parent_container(self.main_box)
         
         # Set staff builder. This will build new staffs dynamically when we call CreateStaff method on the music score. 
-        music_score.add_child_item_builder("staff", DynamicStaffBuilder(self.main_box))
-        
+        music_score.add_child_item_builder("staff", DynamicStaffBuilder(self.main_window.get_state()))
+
         #register events for mainbox
         self.event_handler.subscribe(pygame.MOUSEBUTTONDOWN, self.main_box)
         self.event_handler.subscribe(pygame.MOUSEBUTTONUP, self.main_box)

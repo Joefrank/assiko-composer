@@ -1,14 +1,18 @@
 from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.Config.MusicConfig import supported_time_signatures,TREBLE_CLEF, BARITON_CLEF
+from DataClasses.ControlData import ControlType
+from Model.Control import Control
 from Model.Geometry.Position import Position
 from Model.Geometry.Line import Line
 from Model.Score.IntervalRect import IntervalRect
 from Model.Score.Note import Note
 from Model.Score.StaffBar import StaffBar
+from Renderers.StaffRenderer import StaffRenderer
 
-class Staff:   
+class Staff(Control):   
     
-    def __init__(self, clef=None, time_signature=None, key_signature=None, tempo:int=None, velocity:int=None):       
+    def __init__(self, rect, staff_number, staff_renderer, clef=None, time_signature=None, key_signature=None, tempo:int=None, velocity:int=None):
+        super().__init__(rect, ControlType.SCORE_ITEM, f"Staff {staff_number}")
          # lines and intervals
         self.lines = [] 
         self.intervals = []
@@ -36,7 +40,9 @@ class Staff:
         self.time_signature = time_signature
         self.key_signature = key_signature
         self.velocity:int = velocity
-        self.tempo:int = tempo        
+        self.tempo:int = tempo     
+        self.staff_renderer:StaffRenderer = staff_renderer
+        self.staff_number = staff_number   
       
     def set_notes_boundaries(self):
         self.notes_left_offset = self.top_line.line_collateral_boundaries.left_boundary
@@ -204,6 +210,14 @@ class Staff:
         self.top_position = self.top_line.start_position
         self.bottom_position = self.bottom_line.start_position  
     
+    def draw(self, scrollable_screen=None):
+        if scrollable_screen is None:
+            print("staff has no screen to draw on")
+        else:
+            # Implementation for drawing on the scrollable screen
+            print("Drawing staff lementation for scrollable screen")
+            self.staff_renderer.render_staff(self, scrollable_screen)
+
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)
         intervals_str = "-> ".join(str(interval) for interval in self.intervals)

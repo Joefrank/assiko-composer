@@ -62,8 +62,10 @@ class BaseRenderer:
         else:
             screen.blit(text_renderer, (position.x, position.y))  # White color text
 
-    def draw_line_from_point(self, start_point, end_point, color=(0, 0, 0), thickness=1):
-        pygame.draw.line(self.screen, color, (start_point.x, start_point.y),
+    def draw_line_from_point(self, start_point, end_point, color=(0, 0, 0), thickness=1, screen=None):
+        if screen is None:
+            screen = self.screen
+        pygame.draw.line(screen, color, (start_point.x, start_point.y),
                          (end_point.x, end_point.y), thickness)
         
     def draw_line(self, line, color=(0, 0, 0), thickness=1):
