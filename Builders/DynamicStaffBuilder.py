@@ -6,6 +6,7 @@ import pygame
 
 from Builders.Params.BuildStaffItemParams import StaffItemBuildParams
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
+from Model.Containers.ScorePage import ScorePage
 from Model.Geometry.Position import Position
 from Model.Score.CollateralBoundary import CollateralBoundary
 from Model.Score.Interval import Interval
@@ -84,12 +85,19 @@ class DynamicStaffBuilder:
 
         return top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param
     
-     
-    def build_empty_staff(self, top_left_position, staff_width):            
+    def build_staff_rect(self, click_position, staff_width_percentage, parent_page:ScorePage):
+        # All staves should be horizontally-aligned and resize based on parent_page.  
+        staff_width = int((parent_page.rect.width * staff_width_percentage)/100)
+        x_offset = parent_page.rect.x + ((parent_page.rect.width - staff_width) // 2)
+        return pygame.Rect(x_offset, click_position[1], staff_width, self.staff_height)
+
+    def build_empty_staff(self, top_left_position, staff_width_percentage, parent_page:ScorePage):            
         # Prepare parameters for building staff components (lines and intervals) and virtual components (lines and intervals above and below the staff)
-        staff = Staff(pygame.Rect(top_left_position[0], top_left_position[1], staff_width, self.staff_height), len(self.all_staves) + 1, self.staff_renderer) 
+        staff_rect = self.build_staff_rect(top_left_position, staff_width_percentage, parent_page)
+        staff_top_left = Position(staff_rect.x, staff_rect.y)
+        staff = Staff(staff_rect, len(self.all_staves) + 1, self.staff_renderer) 
         top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param =\
-        self.create_staff_build_params(Position(top_left_position[0], top_left_position[1]), staff)
+        self.create_staff_build_params(staff_top_left, staff)
         
         # build and set virtual lines for the staff.
         staff.virtual_lines += self.build_lines(top_virtual_items_param)
@@ -116,7 +124,7 @@ class DynamicStaffBuilder:
         # Finally, build the bottom virtual lines.
         staff.virtual_lines += self.build_lines(bottom_virtual_items_param)     
        
-        staff.set_positions()
+        #staff.set_positions()
         self.all_staves.append(staff)
         return staff
        
@@ -167,9 +175,9 @@ class DynamicStaffBuilder:
     
     def build_empty_staves(self, top_left_position, staff_width, no_of_staves=1):
         staves = []
-        if no_of_staves >= 0:
-            for i in range(no_of_staves):
-                staves.append(self.build_empty_staff(top_left_position, staff_width))
+        # if no_of_staves >= 0:
+        #     for i in range(no_of_staves):
+        #         staves.append(self.build_empty_staff(top_left_position, staff_width))
             
         return staves
 

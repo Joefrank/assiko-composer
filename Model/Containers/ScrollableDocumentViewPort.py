@@ -181,6 +181,15 @@ class ScrollableDocumentViewport(Control):
         for _, page in enumerate(self.children):
            page.draw(surface)
 
+        score_renderer = self.music_score.get_renderer()
+        if score_renderer is not None:
+            previous_music_score_screen = self.music_score.screen
+            self.music_score.set_screen(surface)
+            try:
+                self.music_score.draw()
+            finally:
+                self.music_score.set_screen(previous_music_score_screen)
+
 
         # -----------------------------------------
         # Clip drawing to viewport
@@ -279,9 +288,11 @@ class ScrollableDocumentViewport(Control):
 
 
     def on_left_mouse_up(self, event):
-        if self.drag_item:
-            doc_x, doc_y = self.get_coordinates_in_viewport(event.pos)
-            target_page = self.get_page_at((doc_x, doc_y))
+        # translate mouse position to document coordinates
+        doc_x, doc_y = self.get_coordinates_in_viewport(event.pos)
+        target_page = self.get_page_at((doc_x, doc_y))
+
+        if self.drag_item: # if item was dragged only within the document viewport.          
 
             if target_page: # Valid drop target              
 
@@ -295,27 +306,30 @@ class ScrollableDocumentViewport(Control):
 
             self.drag_item = None
             self.drag_page = None
-        else:
-            self._process_state_change_on_left_mouse_up()
+        else: # if dragging started from outside of the document viewport.
+            self._process_state_change_on_left_mouse_up((doc_x, doc_y), target_page)
 
-    def _process_state_change_on_left_mouse_up(self):
-      
+    def _process_state_change_on_left_mouse_up(self, drop_coordinates, target_page):      
        dragged_symbol = self.app_state.get_dropped_symbol()
        if dragged_symbol:
            rect, action, params_input = dragged_symbol
            # run the action by calling the function with the parameters
            function = getattr(self.music_score, action, None)
            if function:
-               created_item = function(params_input, rect)
+               translated_rect = pygame.Rect(
+                   drop_coordinates[0],
+                   drop_coordinates[1],
+                   rect.width,
+                   rect.height
+               )
+               # build a dictionary for other parameters
+               input_dict = {"original_value" : params_input, "parent_page": target_page}
+
+               created_item = function(input_dict, translated_rect)
                if created_item:
-                     #created_item.set_screen(self.screen)
-                     
-                     # Now we can directly add the created item to the page based on the drop coordinates.
-                     doc_x, doc_y = self.get_coordinates_in_viewport(rect.topleft)
-                     target_page = self.get_page_at((doc_x, doc_y))
-                     if target_page:
-                          #created_item.set_parent_container(target_page)
-                          target_page.children.append(created_item)
+                    # Now we can directly add the created item to the page based on the drop coordinates.                    
+                     if target_page:                         
+                          created_item.set_parent(target_page)
 
            # Now clear the pending dropped symbol from the app state
            self.app_state.clear_dropped_symbol()

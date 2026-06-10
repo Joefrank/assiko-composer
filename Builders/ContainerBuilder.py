@@ -57,6 +57,8 @@ class ContainerBuilder:
             no_of_pages=2
         )
 
+        music_score.set_parent_container(score_document)
+
        
         self.event_handler.subscribe(pygame.MOUSEBUTTONDOWN, score_document)
         self.event_handler.subscribe(pygame.MOUSEBUTTONUP, score_document)

@@ -8,17 +8,14 @@ from Helpers.ScreeHelper import ScreenHelper
 from Model.Geometry.Position import Position
 from Model.Score.Note import Note
 
-class BaseRenderer:
-
-    @property
-    def screen(self):
-        return self.state.screen
+class BaseRenderer: 
     
     def __init__(self, state):
         self.state = state
         self.screen_init_time = None
         self.original_screen = None
         self.active_screen = None       
+        self.vertical_offset = 0
         # put these in config
         self.default_note_duration = default_note_duration
 
@@ -26,9 +23,19 @@ class BaseRenderer:
     def screen(self):
         return self.active_screen if self.active_screen is not None else self.state.screen
 
+    @screen.setter
+    def screen(self, value):
+        self.active_screen = value
+
     def render_mouse_tracker(self, position, key_id):
         note_duration = self.get_registered_note_duration()
         self.draw_note(note_duration, key_id, 40, 30, position) 
+
+    def _offset_y(self, y):
+        return y - self.vertical_offset
+
+    def _offset_position(self, position):
+        return Position(position.x, self._offset_y(position.y))
 
     def draw_rect_surface(self, width, height, surface_color, alpha, position):
         if self.original_screen is None:
@@ -46,6 +53,7 @@ class BaseRenderer:
     """
     def draw_text(self, screen, text, position, font_size, container_width=100, font_color=(0, 0, 0), text_alignment="LEFT"):
         font = pygame.font.SysFont(None, font_size)  # None = default font, 48 = font size
+        position = self._offset_position(position)
         
         try:
             text_renderer = font.render(text, True, font_color)
@@ -62,11 +70,10 @@ class BaseRenderer:
         else:
             screen.blit(text_renderer, (position.x, position.y))  # White color text
 
-    def draw_line_from_point(self, start_point, end_point, color=(0, 0, 0), thickness=1, screen=None):
-        if screen is None:
-            screen = self.screen
-        pygame.draw.line(screen, color, (start_point.x, start_point.y),
-                         (end_point.x, end_point.y), thickness)
+    def draw_line_from_point(self, start_point, end_point, color=(0, 0, 0), thickness=1):
+       
+        pygame.draw.line(self.screen, color, (start_point.x, self._offset_y(start_point.y)),
+                         (end_point.x, self._offset_y(end_point.y)), thickness)
         
     def draw_line(self, line, color=(0, 0, 0), thickness=1):
         self.draw_line_from_point(line.start_position, line.end_position, color, 
@@ -81,22 +88,22 @@ class BaseRenderer:
         note_font_size = ScreenHelper.create_font((ScreenConfig.FontConfig.BRAVURA_FONT_PATH, note_size))
         note = note_font_size.render(note_duration_details[2], True, color)
         # Get its rect and move it
-        note_rect = note.get_rect(center=position.get_tuple())
+        note_rect = note.get_rect(center=self._offset_position(position).get_tuple())
         self.screen.blit(note, note_rect)
 
         # draw stem only if config says so
         if note_duration_details[3]:
-            stem_start = (note_rect.right - 2, position.y)  # stem on right
-            stem_end = (note_rect.right - 2, position.y - stem_height)
+            stem_start = (note_rect.right - 2, self._offset_y(position.y))  # stem on right
+            stem_end = (note_rect.right - 2, self._offset_y(position.y - stem_height))
             pygame.draw.line(self.screen, color, stem_start, stem_end, 2) 
 
-        text_position = Position(position.x + 5, position.y)           
+        text_position = Position(position.x + 5, self._offset_y(position.y))           
         self.draw_text(self.screen, note_name, text_position, 20, font_color=color)
 
     def render_symbol(self, size, symbol_value, position, color=Color.BLACK):
         font = ScreenHelper.create_font((ScreenConfig.FontConfig.BRAVURA_FONT_PATH, size))
         surface = font.render(symbol_value, True, color)
-        note_rect = surface.get_rect(center=position.get_tuple())
+        note_rect = surface.get_rect(center=self._offset_position(position).get_tuple())
         self.screen.blit(surface, note_rect)
         return note_rect
 

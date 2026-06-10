@@ -25,11 +25,19 @@ class StaffRenderer(BaseRenderer):
         self.music_score = None
         self.piano_notes = None 
         self.sound_player = state.sound_player
+        self.screen = None
       
+    def get_screen(self):
+        return self.screen
+    
+    def set_screen(self, screen):
+        self.screen = screen
+
     def render_grand_staff(self, grand_staff, screen):
         previous_staff = None
         for staff in grand_staff.staves:
-            self.render_staff(staff, screen)
+            self.set_screen(screen)
+            self.render_staff(staff)
             if previous_staff is not None:
                 self.bind_staves(previous_staff, staff)
             previous_staff = staff
@@ -38,17 +46,22 @@ class StaffRenderer(BaseRenderer):
         self.draw_line_from_point(top_staff.top_position, bottom_staff.top_position, thickness=2)
 
     """ Displays a single staff on our music score."""
-    def render_staff(self, staff, screen): 
-        self.draw_staff_boundaries(staff, screen)   
-        # For a blank staff, there will be no clef.     
-        clef_position = self.draw_staff_clef(staff, screen)
-        key_signature_position = Position(clef_position.x + 20, clef_position.y)
-        last_offset_x = self.draw_key_signature(staff, key_signature_position, screen)
+    def render_staff(self, staff): 
+        self.draw_staff_boundaries(staff)   
+        # For a blank staff, there will be no clef.
+        self.render_staff_items(staff)
+        # We shouldn't draw anything on staff until clef has been defined.
+        if staff.clef is None:
+            return None     
+        clef_position = self.draw_staff_clef(staff)
+        key_signature_position = Position(clef_position[0] + 20, clef_position[1])
+        #Once clef is placed, we can add signature.
+        last_offset_x = self.draw_key_signature(staff, key_signature_position)
         last_offset_x += 30
-        _, _, end_offset = self.draw_time_signature(screen, staff.time_signature, Position(last_offset_x, staff.top_position.y))  
+        _, _, end_offset = self.draw_time_signature(staff.time_signature, Position(last_offset_x, staff.top_position.y))  
         # Collaterals are every music symbols to be drawn on or around the staff. 
         end_offset += 30            
-        self.render_staff_items(staff)
+        
 
     """
         Renders all items: lines, intervals, notes and other musical items. 
@@ -162,10 +175,9 @@ class StaffRenderer(BaseRenderer):
          # Adjust position to be position of staff_item (line/interval)
          if isinstance(staff_item, StaffLine):
              note_position = Position(mouse_position.x, staff_item.start_position.y)
-         elif isinstance(staff_item, Interval):
-             rect = staff_item.position_rect
-             y_offset =  ((rect.bottom_left.y - rect.top_left.y) // 2)
-             note_position = Position(mouse_position.x, rect.top_left.y + y_offset)
+         elif isinstance(staff_item, Interval):             
+             y_offset =  ((staff_item.rect.bottomleft.y - staff_item.rect.topleft.y) // 2)
+             note_position = Position(mouse_position.x, staff_item.rect.top_left.y + y_offset)
             
          # change note duration to key pressed        
          note_duration = self.get_registered_note_duration()
@@ -179,11 +191,11 @@ class StaffRenderer(BaseRenderer):
          staff_item.add_note(new_note)  
          return new_note    
     
-    def draw_staff_boundaries(self, staff, screen=None):
-        if screen is None:
-            screen = self.screen
-        self.draw_line_from_point(staff.position_rect.top_left, staff.position_rect.bottom_left, thickness=2, screen=screen)
-        self.draw_line_from_point(staff.position_rect.top_right, staff.position_rect.bottom_right, thickness=2, screen=screen)
+    def draw_staff_boundaries(self, staff): 
+        self.draw_line_from_point(Position.convert_from_tuple(staff.rect.topleft), 
+                                  Position.convert_from_tuple(staff.rect.bottomleft), thickness=2)
+        self.draw_line_from_point(Position.convert_from_tuple(staff.rect.topright), 
+                                  Position.convert_from_tuple(staff.rect.bottomright), thickness=2)
 
     """
         Draws a virtual line at the top or bottom of the staff
@@ -199,26 +211,25 @@ class StaffRenderer(BaseRenderer):
     """
         Draws the clef on the staff.
     """
-    def draw_staff_clef(self, staff, font_color=(0, 0, 0), screen=None):
+    def draw_staff_clef(self, staff, font_color=(0, 0, 0)):
         if staff.clef is None:
             return staff.top_position
-        if screen is None:
-            screen = self.screen
+       
         clef_settings = supported_clef_settings[staff.clef]
         clef_size = clef_settings["size"]
         clef_font_size =ScreenHelper.create_font((ScreenConfig.FontConfig.BRAVURA_FONT_PATH, clef_size)) 
         clef = clef_font_size.render(clef_settings["font_code"], True, font_color)
         # Get clef rect to position it
         clef_rect = clef.get_rect()
-        clef_position = StaffUtils.resolve_position_with_margins(staff.position_rect.top_left, clef_settings["margins"])
+        clef_position = StaffUtils.resolve_position_with_margins(staff.rect.topleft, clef_settings["margins"])
         clef_rect.center = (clef_position.x, clef_position.y)
-        screen.blit(clef, clef_rect)
+        self.screen.blit(clef, clef_rect)
         return clef_position
     
     """
         Draws the time signature specified for the staff
     """
-    def draw_time_signature(self, screen, time_signature, position, font_color=(0, 0, 0)):
+    def draw_time_signature(self, time_signature, position, font_color=(0, 0, 0)):
         if time_signature is None:
             return (0,0), (0,0), position.x
         
@@ -233,18 +244,16 @@ class StaffRenderer(BaseRenderer):
         denominator_rect = time_denominator.get_rect()
         numerator_rect.center = (position.x + item_margins[0], position.y + item_margins[1])
         denominator_rect.center = (position.x + item_margins[2], position.y + item_margins[3]  + (item_size // 2))
-        screen.blit(time_numerator, numerator_rect)
-        screen.blit(time_denominator, denominator_rect)
+        self.screen.blit(time_numerator, numerator_rect)
+        self.screen.blit(time_denominator, denominator_rect)
         next_x_offset = position.x + item_size
         return numerator_rect.center, denominator_rect.center, next_x_offset
     
     """
         Draws the key signature of the staff
     """
-    def draw_key_signature(self, staff, reference_position, screen=None):
-        if screen is None:
-            screen = self.screen
-
+    def draw_key_signature(self, staff, reference_position):
+     
         if staff.key_signature is None:# normally return an error message ***
             return reference_position.x
         
@@ -272,7 +281,7 @@ class StaffRenderer(BaseRenderer):
                                                                                    staff.intervals, signature_item_positioning[1], self.MODULATION_SPACING, reference_position.x)
 
             signature_position = (staff_item_position.x, staff_item_position.y)
-            self.draw_modulation(screen, modulation_font_code, StaffConfig.STAFF_MODULATION_FONT_SIZE,
+            self.draw_modulation(modulation_font_code, StaffConfig.STAFF_MODULATION_FONT_SIZE,
                                  signature_position)
             modulation_item_index += 1
             last_modulation_x_offset = staff_item_position.x
@@ -282,10 +291,10 @@ class StaffRenderer(BaseRenderer):
     """
         Displays modulation at specific position # or b on line or interval
     """
-    def draw_modulation(self, screen, modulation_font_code, modulation_font_size, position, modulation_color=(0, 0, 0)):
+    def draw_modulation(self, modulation_font_code, modulation_font_size, position, modulation_color=(0, 0, 0)):
         modulation_font = ScreenHelper.create_font((ScreenConfig.FontConfig.BRAVURA_FONT_PATH, modulation_font_size))
         modulation = modulation_font.render(modulation_font_code, True, modulation_color)
         # Get clef rect to position it
         modulation_rect = modulation.get_rect()
         modulation_rect.center = position
-        screen.blit(modulation, modulation_rect)
+        self.screen.blit(modulation, modulation_rect)

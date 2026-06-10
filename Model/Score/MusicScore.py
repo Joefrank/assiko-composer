@@ -1,6 +1,7 @@
 import pygame
 
 from DataClasses.Config.EventsConfig import TextInputBlinkTimer
+from DataClasses.Config.ScreenConfig import StaffConfig
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Model.Geometry import Position
 from Model.Inputs.TextInput import TextInput
@@ -40,6 +41,9 @@ class MusicScore:
             x = (self.parent_container.rect.width - self.score_width) // 2
             self.top_left_position = (self.top_left_position[0] + x, self.top_left_position[1])
 
+        for staff in self.staves_sequence:
+            staff.parent_container = container
+
     def get_parent_container(self):
         return self.parent_container
     
@@ -67,6 +71,8 @@ class MusicScore:
         
     def add_staff(self, staff):
         self.staves_sequence.append(staff)
+        if self.parent_container is not None:
+            staff.parent_container = self.parent_container
 
     def set_top_left_position(self, top_left):
         self.top_left_position = top_left   
@@ -101,8 +107,8 @@ class MusicScore:
         return self.renderer
 
     def draw(self):
-        #if self.renderer:
-            #self.renderer.render_score(self)
+        if self.renderer:
+            self.renderer.render_score(self)
         if self.debug_on:
             self.draw_debug()
 
@@ -127,11 +133,13 @@ class MusicScore:
                 2  # Border width
             )
 
-    def CreateStaff(self, params_input, rect):
+    def CreateStaff(self, input_dict, rect):
+        print(f"Input dictionary: ", input_dict["parent_page"].rect)
         staff_builder = self.get_child_item_builder("staff")
         if staff_builder:
-            new_staff = staff_builder.build_empty_staff((rect.x, rect.y), self.score_width)
-            self.staves_sequence.append(new_staff)
+            parent_page = input_dict["parent_page"]
+            new_staff = staff_builder.build_empty_staff((rect.x, rect.y), StaffConfig.STAFF_WIDTH_PERCENT, parent_page)
+            self.add_staff(new_staff)
             return new_staff
         return None
 

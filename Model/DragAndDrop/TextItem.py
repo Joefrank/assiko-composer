@@ -1,10 +1,14 @@
 
 import pygame
 
+from DataClasses.ControlData import ControlType
+from Model.Control import Control
 
-class TextItem:
+
+class TextItem(Control):
 
     def __init__(self, rect, text, main_screen, parent_container, font_size=20):
+        super().__init__(rect, control_type=ControlType.TEXT, name="TextItem", parent=parent_container)
         self.font = pygame.font.SysFont("segoeui", font_size, bold=True)
         self.rect = rect
         self.text = text
@@ -54,4 +58,4 @@ class TextItem:
             )
         )
 
-     
+    

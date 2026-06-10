@@ -19,7 +19,7 @@ class Staff(Control):
         self.virtual_lines = [] # any lines above or below staff
         self.virtual_intervals = [] #any interval above or below staff
          # position attributes
-        self.position_rect = None
+        self.position_rect = rect
         self.top_position = None #postion of top line of staff
         self.bottom_position = None #position of bottom line of staff
         self.bottom_line = None # not necessary a line on the staff but how far below you can go with the ledger
@@ -211,12 +211,17 @@ class Staff(Control):
         self.bottom_position = self.bottom_line.start_position  
     
     def draw(self, scrollable_screen=None):
-        if scrollable_screen is None:
-            print("staff has no screen to draw on")
-        else:
-            # Implementation for drawing on the scrollable screen
-            print("Drawing staff lementation for scrollable screen")
-            self.staff_renderer.render_staff(self, scrollable_screen)
+        if scrollable_screen is not None:
+            self.staff_renderer.set_screen(scrollable_screen)
+        
+        parent_container = getattr(self, "parent_container", None)
+        previous_vertical_offset = self.staff_renderer.vertical_offset
+        self.staff_renderer.vertical_offset = 0 if parent_container is None else getattr(parent_container, "scroll_y", 0)
+
+        try:
+            self.staff_renderer.render_staff(self)
+        finally:
+            self.staff_renderer.vertical_offset = previous_vertical_offset
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

@@ -65,4 +65,5 @@ class ScorePage(Control):
 
         # Draw items on page
         for child_item in self.children:
+            child_item.parent_container = self.parent_container
             child_item.draw(scrollable_screen)
