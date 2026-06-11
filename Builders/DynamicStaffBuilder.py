@@ -101,6 +101,7 @@ class DynamicStaffBuilder:
         
         # build and set virtual lines for the staff.
         staff.virtual_lines += self.build_lines(top_virtual_items_param)
+        
         # we need to update the original position for the intervals because they start after the first line thickness
         next_y_offset = top_virtual_items_param.original_position.y + StaffConfig.STAFF_LINE_THICKNESS
         top_virtual_items_param.original_position.moveVerticallyTo(next_y_offset)
@@ -124,7 +125,14 @@ class DynamicStaffBuilder:
         # Finally, build the bottom virtual lines.
         staff.virtual_lines += self.build_lines(bottom_virtual_items_param)     
        
-        #staff.set_positions()
+        # Record these as staff children for later manipulation.
+        staff.add_children(staff.virtual_lines)
+        staff.add_children(staff.virtual_intervals)
+        staff.add_children(staff.lines)
+        staff.add_children(staff.intervals)
+        staff.add_children(staff.virtual_intervals)
+        staff.add_children(staff.virtual_lines)
+        
         self.all_staves.append(staff)
         return staff
        

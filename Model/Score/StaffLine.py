@@ -68,6 +68,10 @@ class StaffLine(Line, StaffItem):
         new_note.set_parent(self)
         self.add_note(new_note)  
         return new_note
-
+    
+    def move(self, offset_x, offset_y):
+        self.start_position.translateTo(offset_x, offset_y)
+        self.end_position.translateTo(offset_x, offset_y)
+        
     def __str__(self):
         return f"\n{"Virtual " if self.is_virtual else ""}Line #{self.staff_index} - Thickness: {self.thickness} - Key id: {self.key_id} - Vertical positioning: {self.vertical_positioning} - Start: {self.start_position} - End: {self.end_position}"

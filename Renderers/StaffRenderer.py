@@ -26,12 +26,22 @@ class StaffRenderer(BaseRenderer):
         self.piano_notes = None 
         self.sound_player = state.sound_player
         self.screen = None
+        self.view_intervals = True
       
     def get_screen(self):
         return self.screen
     
     def set_screen(self, screen):
         self.screen = screen
+
+    def _to_staff_space_position(self, position):
+        if position is None:
+            return None
+
+        return Position(
+            position.x,
+            position.y + self.vertical_offset
+        )
 
     def render_grand_staff(self, grand_staff, screen):
         previous_staff = None
@@ -76,6 +86,17 @@ class StaffRenderer(BaseRenderer):
     def render_staff_intervals(self, staff):
         for interval in staff.intervals:
             self.draw_staff_item_collaterals(interval, staff)
+            if self.view_intervals:
+                interval_rect = interval.get_position_rect()
+                x = interval_rect.top_left.x
+                y = interval_rect.top_left.y - self.vertical_offset
+                width = interval_rect.top_right.x - interval_rect.top_left.x
+                height = interval_rect.bottom_left.y - interval_rect.top_left.y
+                pygame.draw.rect(
+                    self.screen,
+                    (0, 128, 255),      # rectangle color
+                    (x, y, width, height)  # x, y, width, height
+                )
            
         for interval in staff.virtual_intervals:
             self.draw_staff_item_collaterals(interval, staff, nearest_staff=staff)
@@ -98,7 +119,9 @@ class StaffRenderer(BaseRenderer):
         Draws any items in ApplicationState that collide with the line
     """
     def draw_staff_item_collaterals(self, staff_item, staff, nearest_staff=None):
-        mouse_over_position = self.state.mouse_hover.get_current_position()
+        mouse_over_position = self._to_staff_space_position(
+            self.state.mouse_hover.get_current_position()
+        )
         # if staff item has notes, we want to display them.
         if len(staff_item.notes) > 0:
             for note in staff_item.notes:
@@ -176,8 +199,11 @@ class StaffRenderer(BaseRenderer):
          if isinstance(staff_item, StaffLine):
              note_position = Position(mouse_position.x, staff_item.start_position.y)
          elif isinstance(staff_item, Interval):             
-             y_offset =  ((staff_item.rect.bottomleft.y - staff_item.rect.topleft.y) // 2)
-             note_position = Position(mouse_position.x, staff_item.rect.top_left.y + y_offset)
+             y_offset = ((staff_item.position_rect.bottom_left.y - staff_item.position_rect.top_left.y) // 2)
+             note_position = Position(
+                 mouse_position.x,
+                 staff_item.position_rect.top_left.y + y_offset
+             )
             
          # change note duration to key pressed        
          note_duration = self.get_registered_note_duration()

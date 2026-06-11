@@ -37,6 +37,9 @@ class Control:
         child.parent = self
         self.children.append(child)
 
+    def add_children(self, children):
+        self.children += children
+        
     def set_parent(self, parent):
         self.parent = parent
         parent.add_child(self)

@@ -243,15 +243,22 @@ class ScrollableDocumentViewport(Control):
     
     def on_mouse_motion(self, event):
          if self.drag_item:
-
             doc_x, doc_y = self.get_coordinates_in_viewport(event.pos)
+            
+            # let's remember original coordinates. we'll need this to calculate the offsets
+            previous_drag_x = self.drag_doc_x
+            previous_drag_y = self.drag_doc_y
 
             # calculate new coordinates based on offset between mouse position and topleft of the dragged item
             self.drag_doc_x = (doc_x - self.drag_offset_x)
             self.drag_doc_y = (doc_y - self.drag_offset_y)
 
-            self.drag_item.rect.x = self.drag_doc_x            
-            self.drag_item.rect.y = self.drag_doc_y
+            # Work out the vertical and horizontal move offset
+            offset_x = (self.drag_doc_x - previous_drag_x)
+            offset_y = (self.drag_doc_y - previous_drag_y)
+            
+            # move the item accordingly
+            self.drag_item.move(offset_x, offset_y)
             
 
     def on_left_mouse_down(self, event):
@@ -333,8 +340,8 @@ class ScrollableDocumentViewport(Control):
 
            # Now clear the pending dropped symbol from the app state
            self.app_state.clear_dropped_symbol()
-       else:
-            print("✓ No pending dropped symbol found on mouse up.") 
+    #    else:
+    #         print("✓ No pending dropped symbol found on mouse up.") 
 
     def get_coordinates_in_viewport(self, content_pos):      
         return (

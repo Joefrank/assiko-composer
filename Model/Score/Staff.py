@@ -1,23 +1,19 @@
 from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.Config.MusicConfig import supported_time_signatures,TREBLE_CLEF, BARITON_CLEF
 from DataClasses.ControlData import ControlType
-from Model.Control import Control
 from Model.Geometry.Position import Position
 from Model.Geometry.Line import Line
 from Model.Score.IntervalRect import IntervalRect
 from Model.Score.Note import Note
+from Model.Score.ScoreControl import ScoreControl
 from Model.Score.StaffBar import StaffBar
 from Renderers.StaffRenderer import StaffRenderer
 
-class Staff(Control):   
+class Staff(ScoreControl):   
     
     def __init__(self, rect, staff_number, staff_renderer, clef=None, time_signature=None, key_signature=None, tempo:int=None, velocity:int=None):
-        super().__init__(rect, ControlType.SCORE_ITEM, f"Staff {staff_number}")
-         # lines and intervals
-        self.lines = [] 
-        self.intervals = []
-        self.virtual_lines = [] # any lines above or below staff
-        self.virtual_intervals = [] #any interval above or below staff
+        super().__init__(rect, ControlType.SCORE_ITEM, f"Staff {staff_number}", parent=None)
+       
          # position attributes
         self.position_rect = rect
         self.top_position = None #postion of top line of staff
@@ -29,18 +25,24 @@ class Staff(Control):
         self.notes_right_offset = 0 # this is the right boundary for notes on this staff.
         self.notes_top_offset = 0 # top boundary for notes belonging to this staff
         self.notes_bottom_offset = 0 # bottom boundary for notes belonging to this staff
-         # other staff components
+        
+        # Staff children components
+        self.lines = [] 
+        self.intervals = []
+        self.virtual_lines = [] # any lines above or below staff
+        self.virtual_intervals = [] #any interval above or below staff
         self.modulations = []
         self.bars = []
-        self.step_notes_rests_lyrics = []  # these are chords played in steps. It's a list of StaffStep
-        self.dynamics = [] # use StaffDynamic as a list
-        self.lyrics_lines = []
-        # values from constructor parameters
         self.clef = clef
         self.time_signature = time_signature
         self.key_signature = key_signature
+        self.step_notes_rests_lyrics = []  # these are chords played in steps. It's a list of StaffStep
+        self.dynamics = [] # use StaffDynamic as a list
+        self.lyrics_lines = []  
+
         self.velocity:int = velocity
-        self.tempo:int = tempo     
+        self.tempo:int = tempo  
+
         self.staff_renderer:StaffRenderer = staff_renderer
         self.staff_number = staff_number   
       
@@ -51,7 +53,7 @@ class Staff(Control):
         self.notes_bottom_offset = self.bottom_line.start_position.y
 
     def get_width(self):
-        return self.top_line.end_position.x - self.top_line.start_position.x
+        return self.rect.width
     
     def get_height(self):
         return self.bottom_position.y - self.top_position.y 
@@ -222,6 +224,14 @@ class Staff(Control):
             self.staff_renderer.render_staff(self)
         finally:
             self.staff_renderer.vertical_offset = previous_vertical_offset
+ 
+
+    """Staff override move because it needs to move all its children"""
+    def move(self, offset_x, offset_y):
+        super().move(offset_x, offset_y)
+        #print(f"staff items moving to {offset_x, offset_y}")
+        for child in self.get_children():
+            child.move(offset_x, offset_y)
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

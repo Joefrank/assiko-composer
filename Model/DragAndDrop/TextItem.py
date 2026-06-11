@@ -2,10 +2,10 @@
 import pygame
 
 from DataClasses.ControlData import ControlType
-from Model.Control import Control
+from Model.Score.ScoreControl import ScoreControl
 
 
-class TextItem(Control):
+class TextItem(ScoreControl):
 
     def __init__(self, rect, text, main_screen, parent_container, font_size=20):
         super().__init__(rect, control_type=ControlType.TEXT, name="TextItem", parent=parent_container)
