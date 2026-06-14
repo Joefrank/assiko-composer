@@ -8,6 +8,8 @@ from DataClasses.ControlData import ControlType
 from Model.Containers.ScorePage import ScorePage
 from Model.Control import Control
 from Model.DragAndDrop.TextItem import TextItem
+from Model.Score.GrandStaff import GrandStaff
+from Model.Score.Staff import Staff
 
 
 class ScrollableDocumentViewport(Control):
@@ -70,15 +72,15 @@ class ScrollableDocumentViewport(Control):
         page1 = self.children[0]
 
         page1.children.append(
-            TextItem(pygame.Rect(page1.rect.x + 50, page1.rect.y + 50, 160, 50), "Button 1", screen, self)
+            TextItem(pygame.Rect(page1.rect.x + 50, page1.rect.y + 50, 160, 50), "Button 1", self)
         )
 
         page1.children.append(
-            TextItem(pygame.Rect(page1.rect.x + 50, page1.rect.y + 150, 160, 50), "Button 1", screen, self)
+            TextItem(pygame.Rect(page1.rect.x + 50, page1.rect.y + 150, 160, 50), "Button 1", self)
         )
         page2 = self.children[1]
         page2.children.append(
-            TextItem(pygame.Rect(page2.rect.x + 50, page2.rect.y + 50, 160, 50), "Button 2", screen, self)
+            TextItem(pygame.Rect(page2.rect.x + 50, page2.rect.y + 50, 160, 50), "Button 2", self)
         )
               
     # ------------------------------------------------
@@ -229,6 +231,33 @@ class ScrollableDocumentViewport(Control):
 
         return self.drag_page
 
+    def _iter_staves(self):
+        for staff_item in self.music_score.staves_sequence:
+            if isinstance(staff_item, GrandStaff):
+                for staff in staff_item.staves:
+                    yield staff
+            elif isinstance(staff_item, Staff):
+                yield staff_item
+
+    def _get_staff_action_at(self, doc_pos):
+        for staff in reversed(list(self._iter_staves())):
+            action_icons = getattr(staff, "action_icon_rects", {})
+            for action_name, action_rect in action_icons.items():
+                if action_rect.collidepoint(doc_pos):
+                    return staff, action_name
+        return None, None
+
+    def _handle_staff_action(self, staff, action_name):
+        if action_name == "delete":
+            self.music_score.remove_staff(staff)
+            return True
+
+        if action_name == "add":
+            self.music_score.add_staff_after(staff)
+            return True
+
+        return False
+
     # -----------------------------------------
     # Events Handlers
     # -----------------------------------------
@@ -265,6 +294,13 @@ class ScrollableDocumentViewport(Control):
         
         # Convert to document coordinates
         doc_x, doc_y = self.get_coordinates_in_viewport(event.pos)
+
+        staff, action_name = self._get_staff_action_at((doc_x, doc_y))
+        if staff is not None:
+            if self._handle_staff_action(staff, action_name):
+                self.drag_item = None
+                self.drag_page = None
+                return
        
         self.drag_item = None
         self.drag_page = None

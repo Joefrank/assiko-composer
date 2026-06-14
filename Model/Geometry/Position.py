@@ -59,6 +59,9 @@ class Position:
     def translateTo(self, x, y):
         self.x += x
         self.y += y
+    
+    def translate_y(self, y):
+        self.y += y
 
     def moveTo(self, x, y):
         self.x = x

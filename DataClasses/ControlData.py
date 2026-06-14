@@ -10,6 +10,7 @@ class ControlType(Enum):
     WINDOW = auto()
     BUTTON = auto()
     STAGGERED_BUTTON_SYMBOL = auto()
+    ACTION_BUTTON = auto()
     DIALOG = auto()
     SCORE_ITEM = auto()
     TEXT = auto()

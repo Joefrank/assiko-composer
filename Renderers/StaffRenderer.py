@@ -26,7 +26,10 @@ class StaffRenderer(BaseRenderer):
         self.piano_notes = None 
         self.sound_player = state.sound_player
         self.screen = None
-        self.view_intervals = True
+        self.view_intervals = False
+        self.staff_action_icon_size = 14
+        self.staff_action_icon_gap = 8
+        self.staff_action_icon_margin = 10
       
     def get_screen(self):
         return self.screen
@@ -61,6 +64,7 @@ class StaffRenderer(BaseRenderer):
         # For a blank staff, there will be no clef.
         self.render_staff_items(staff)
         # We shouldn't draw anything on staff until clef has been defined.
+        self.draw_staff_action_icons(staff)
         if staff.clef is None:
             return None     
         clef_position = self.draw_staff_clef(staff)
@@ -71,6 +75,57 @@ class StaffRenderer(BaseRenderer):
         _, _, end_offset = self.draw_time_signature(staff.time_signature, Position(last_offset_x, staff.top_position.y))  
         # Collaterals are every music symbols to be drawn on or around the staff. 
         end_offset += 30            
+        
+
+    def draw_staff_action_icons(self, staff):
+        icon_size = self.staff_action_icon_size
+        icon_x = staff.rect.right + self.staff_action_icon_margin
+        delete_y = staff.rect.y + self.staff_action_icon_margin
+        add_y = delete_y + icon_size + self.staff_action_icon_gap
+
+        delete_rect = pygame.Rect(icon_x, delete_y, icon_size, icon_size)
+        add_rect = pygame.Rect(icon_x, add_y, icon_size, icon_size)
+        staff.action_icon_rects = {
+            "delete": delete_rect,
+            "add": add_rect,
+        }
+
+        self._draw_delete_icon(delete_rect)
+        self._draw_add_icon(add_rect)
+
+    def _draw_delete_icon(self, rect):
+        print(f"screen:{id(self.screen)}")
+        draw_rect = rect.move(0, -self.vertical_offset)
+        pygame.draw.rect(self.screen, (240, 240, 240), draw_rect, border_radius=4)
+        pygame.draw.rect(self.screen, (120, 40, 40), draw_rect, 1, border_radius=4)
+        pygame.draw.rect(self.screen, (160, 40, 40), draw_rect.inflate(-6, -4).move(0, 1))
+        pygame.draw.line(
+            self.screen,
+            (255, 255, 255),
+            (draw_rect.left + 4, draw_rect.centery),
+            (draw_rect.right - 4, draw_rect.centery),
+            2,
+        )
+
+    def _draw_add_icon(self, rect):
+        draw_rect = rect.move(0, -self.vertical_offset)
+        pygame.draw.rect(self.screen, (240, 240, 240), draw_rect, border_radius=4)
+        pygame.draw.rect(self.screen, (40, 110, 60), draw_rect, 1, border_radius=4)
+        pygame.draw.rect(self.screen, (55, 150, 85), draw_rect.inflate(-6, -6))
+        pygame.draw.line(
+            self.screen,
+            (255, 255, 255),
+            (draw_rect.left + 4, draw_rect.centery),
+            (draw_rect.right - 4, draw_rect.centery),
+            2,
+        )
+        pygame.draw.line(
+            self.screen,
+            (255, 255, 255),
+            (draw_rect.centerx, draw_rect.top + 4),
+            (draw_rect.centerx, draw_rect.bottom - 4),
+            2,
+        )
         
 
     """
@@ -87,15 +142,11 @@ class StaffRenderer(BaseRenderer):
         for interval in staff.intervals:
             self.draw_staff_item_collaterals(interval, staff)
             if self.view_intervals:
-                interval_rect = interval.get_position_rect()
-                x = interval_rect.top_left.x
-                y = interval_rect.top_left.y - self.vertical_offset
-                width = interval_rect.top_right.x - interval_rect.top_left.x
-                height = interval_rect.bottom_left.y - interval_rect.top_left.y
+                rect = interval.get_rect()               
                 pygame.draw.rect(
                     self.screen,
                     (0, 128, 255),      # rectangle color
-                    (x, y, width, height)  # x, y, width, height
+                    rect #(x, y, width, height)  # x, y, width, height
                 )
            
         for interval in staff.virtual_intervals:

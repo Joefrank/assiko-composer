@@ -4,6 +4,7 @@ import math
 import pygame
 
 from Model.Containers.Window import Window
+from Model.DragAndDrop.TextItem import TextItem
 from Model.Geometry.Position import Position
 from Model.Inputs.TextInput import TextInput
 from Model.Score.MusicScore import MusicScore
@@ -74,6 +75,10 @@ class MusicScoreBuilder:
         music_score.set_renderer(MusicScoreRenderer(self.app_state)) # we can add a renderer here to render the score and staves.
        
         return music_score
+    
+    def build_score_text_item(self, rect, parent_page):
+        item_rect = pygame.Rect(rect.x, rect.y, 160, 50)
+        return TextItem(item_rect, "...", parent_page)
 
     def build(self):
         return self.music_score 

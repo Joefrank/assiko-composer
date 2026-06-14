@@ -11,3 +11,6 @@ class ScoreControl(Control):
     def move(self, offset_x:int, offset_y:int):
         self.rect.x += offset_x
         self.rect.y += offset_y
+
+    def move_y(self, offset_y:int):
+        self.rect.y += offset_y

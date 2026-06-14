@@ -1,10 +1,9 @@
 import pygame
 
-from DataClasses.Config.EventsConfig import TextInputBlinkTimer
 from DataClasses.Config.ScreenConfig import StaffConfig
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
-from Model.Geometry import Position
-from Model.Inputs.TextInput import TextInput
+from Model.Score.GrandStaff import GrandStaff
+from Model.Score.Staff import Staff
 from Renderers import MusicScoreRenderer
 
 
@@ -74,6 +73,41 @@ class MusicScore:
         if self.parent_container is not None:
             staff.parent_container = self.parent_container
 
+    def remove_staff(self, staff):
+        if staff in self.staves_sequence:
+            self.staves_sequence.remove(staff)
+
+        staff_builder = self.get_child_item_builder("staff")
+        if staff_builder and hasattr(staff_builder, "all_staves") and staff in staff_builder.all_staves:
+            staff_builder.all_staves.remove(staff)
+
+    def add_staff_after(self, staff):
+        staff_builder = self.get_child_item_builder("staff")
+        parent_page = getattr(staff, "parent_page", None)
+
+        if staff_builder is None or parent_page is None:
+            return None
+
+        new_staff_top_left = (
+            staff.rect.x,
+            staff.rect.bottom + StaffConfig.STAFF_SPACING
+        )
+        new_staff = staff_builder.build_empty_staff(
+            new_staff_top_left,
+            StaffConfig.STAFF_WIDTH_PERCENT,
+            parent_page
+        )
+        self.add_staff(new_staff)
+        return new_staff
+
+    def iter_staves(self):
+        for staff_item in self.staves_sequence:
+            if isinstance(staff_item, GrandStaff):
+                for staff in staff_item.staves:
+                    yield staff
+            elif isinstance(staff_item, Staff):
+                yield staff_item
+
     def set_top_left_position(self, top_left):
         self.top_left_position = top_left   
 
@@ -112,13 +146,7 @@ class MusicScore:
         if self.debug_on:
             self.draw_debug()
 
-    def draw_debug(self):
-        # Draw a border around the score for debugging
-        #import traceback
-        # print(f"draw_debug called - debug_on={self.debug_on}")
-        #print("".join(traceback.format_stack()[-4:-1]))
-        #self.debug_on = False  # Disable debug after drawing once to prevent clutter
-        
+    def draw_debug(self):       
         if self.screen and self.container_root_coordinates:
             _, scroll_y = self.parent_container.get_scroll_position()
             debug_rect = pygame.Rect(self.top_left_position[0], 
@@ -133,16 +161,7 @@ class MusicScore:
                 2  # Border width
             )
 
-    def CreateStaff(self, input_dict, rect):
-        print(f"Input dictionary: ", input_dict["parent_page"].rect)
-        staff_builder = self.get_child_item_builder("staff")
-        if staff_builder:
-            parent_page = input_dict["parent_page"]
-            new_staff = staff_builder.build_empty_staff((rect.x, rect.y), StaffConfig.STAFF_WIDTH_PERCENT, parent_page)
-            self.add_staff(new_staff)
-            return new_staff
-        return None
-
+   
     """ This function is called when a symbol is dropped onto the score. It translates the drop coordinates to score space and creates a TextInput at that location."""
     def translate_coordinates_to_score_space(self, coordinates):
         if self.container_root_coordinates is None:
@@ -151,12 +170,21 @@ class MusicScore:
         translated_y = coordinates[1] - self.container_root_coordinates[1]
         return (translated_x, translated_y)
     
-    def CreateTextInput(self, params_input, event_rect):
-        real_coordinates = self.translate_coordinates_to_score_space((event_rect.x, event_rect.y))
-        new_rect = pygame.Rect(real_coordinates[0], real_coordinates[1], 200, 40)
-        text_input = TextInput(self.screen, self, new_rect, font_size=30)
-        self.window_event_handler.subscribe(pygame.MOUSEBUTTONDOWN, text_input)
-        self.window_event_handler.subscribe(pygame.KEYDOWN, text_input)
-        self.window_event_handler.subscribe_timer(TextInputBlinkTimer.NAME, text_input)
-        self.text_inputs.append(text_input)
-        
+    def CreateStaff(self, input_dict, rect):
+        staff_builder = self.get_child_item_builder("staff")
+        if staff_builder:
+            parent_page = input_dict["parent_page"]
+            new_staff = staff_builder.build_empty_staff((rect.x, rect.y), StaffConfig.STAFF_WIDTH_PERCENT, parent_page)
+            self.add_staff(new_staff)
+            return new_staff
+        return None
+
+
+    def CreateTextInput(self, input_dict, rect):        
+        parent_page = input_dict["parent_page"]
+        score_builder = self.get_child_item_builder("score")
+        text_item =  score_builder.build_score_text_item(rect, parent_page=parent_page)
+        parent_page.children.append(text_item)
+        return text_item
+    
+    

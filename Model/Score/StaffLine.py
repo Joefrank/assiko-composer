@@ -72,6 +72,10 @@ class StaffLine(Line, StaffItem):
     def move(self, offset_x, offset_y):
         self.start_position.translateTo(offset_x, offset_y)
         self.end_position.translateTo(offset_x, offset_y)
-        
+    
+    def move_y(self, offset_y:int):
+        self.start_position.translate_y(offset_y)
+        self.end_position.translate_y(offset_y)
+
     def __str__(self):
         return f"\n{"Virtual " if self.is_virtual else ""}Line #{self.staff_index} - Thickness: {self.thickness} - Key id: {self.key_id} - Vertical positioning: {self.vertical_positioning} - Start: {self.start_position} - End: {self.end_position}"

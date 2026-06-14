@@ -21,6 +21,13 @@ class Rect:
         self.bottom_right.translateTo(offset_x, offset_y)
         self.bottom_left.translateTo(offset_x, offset_y)
 
+    def move_y(self, offset_y:int):
+        self.top_left.translate_y(offset_y)
+        self.top_right.translate_y(offset_y)
+        self.bottom_right.translate_y(offset_y)
+        self.bottom_left.translate_y(offset_y)
+
+
     def get_rect(self):
         x = self.top_left.x
         y = self.top_left.y

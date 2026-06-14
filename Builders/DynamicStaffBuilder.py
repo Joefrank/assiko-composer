@@ -20,10 +20,6 @@ class DynamicStaffBuilder:
 
     def __init__(self, app_state):        
         self.all_staves = []
-        # work out first staff position and width
-        #self.staff_with, self.staff_original_position = self.calculate_first_staff_position(container,
-                                                                                     # StaffConfig.STAFF_WIDTH_PERCENT,
-                                                                                     # StaffConfig.STAFF_ORIGINAL_Y_OFFSET)
         self.app_state = app_state
         self.next_staff_position = None
         self.staff_height = self.calculate_staff_height()
@@ -31,7 +27,7 @@ class DynamicStaffBuilder:
 
 
     def calculate_staff_height(self):
-        return (StaffConfig.STAFF_NO_LINES * StaffConfig.STAFF_LINE_THICKNESS) + (StaffConfig.STAFF_NO_INTERVALS * StaffConfig.STAFF_LINE_GAP)
+        return (StaffConfig.STAFF_NO_LINES * StaffConfig.STAFF_LINE_THICKNESS) + (StaffConfig.STAFF_NO_INTERVALS * StaffConfig.STAFF_LINE_GAP) - 1
   
 
     """
@@ -96,6 +92,7 @@ class DynamicStaffBuilder:
         staff_rect = self.build_staff_rect(top_left_position, staff_width_percentage, parent_page)
         staff_top_left = Position(staff_rect.x, staff_rect.y)
         staff = Staff(staff_rect, len(self.all_staves) + 1, self.staff_renderer) 
+        staff.parent_page = parent_page
         top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param =\
         self.create_staff_build_params(staff_top_left, staff)
         

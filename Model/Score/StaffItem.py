@@ -31,5 +31,7 @@ class StaffItem:
         return [
             note for note in self.notes
             if x_offset is None or note.position.x == x_offset
-] 
+    ] 
+
+   
 

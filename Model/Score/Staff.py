@@ -45,6 +45,8 @@ class Staff(ScoreControl):
 
         self.staff_renderer:StaffRenderer = staff_renderer
         self.staff_number = staff_number   
+        self.parent_page = None
+        self.action_icon_rects = {}
       
     def set_notes_boundaries(self):
         self.notes_left_offset = self.top_line.line_collateral_boundaries.left_boundary
@@ -226,12 +228,33 @@ class Staff(ScoreControl):
             self.staff_renderer.vertical_offset = previous_vertical_offset
  
 
-    """Staff override move because it needs to move all its children"""
+    """Staff override move because it needs to move all its children.
+        Staff offset_x should not change otherwise the alignment get messed up on page.
+    """
     def move(self, offset_x, offset_y):
-        super().move(offset_x, offset_y)
-        #print(f"staff items moving to {offset_x, offset_y}")
+        actual_offset_y = offset_y
+
+        parent_page = self.get_parent()
+        parent_container = getattr(parent_page, "parent_container", None)
+        pages = getattr(parent_container, "children", None)
+
+        if pages and len(pages) > 0 and hasattr(self.rect, "height"):
+            first_page_top = pages[0].rect.top
+            last_page_bottom = pages[-1].rect.bottom
+
+            min_y = first_page_top
+            max_y = last_page_bottom - self.rect.height
+
+            if max_y < min_y:
+                max_y = min_y
+
+            target_y = self.rect.y + offset_y
+            clamped_y = max(min_y, min(max_y, target_y))
+            actual_offset_y = clamped_y - self.rect.y
+
+        super().move_y(actual_offset_y)        
         for child in self.get_children():
-            child.move(offset_x, offset_y)
+            child.move_y(actual_offset_y)
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

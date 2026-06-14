@@ -7,12 +7,11 @@ from Model.Score.ScoreControl import ScoreControl
 
 class TextItem(ScoreControl):
 
-    def __init__(self, rect, text, main_screen, parent_container, font_size=20):
+    def __init__(self, rect, text, parent_container, font_size=20):
         super().__init__(rect, control_type=ControlType.TEXT, name="TextItem", parent=parent_container)
         self.font = pygame.font.SysFont("segoeui", font_size, bold=True)
         self.rect = rect
         self.text = text
-        self.main_screen = main_screen
         self.parent_container = parent_container
         self.color = (120,190,255)
 
