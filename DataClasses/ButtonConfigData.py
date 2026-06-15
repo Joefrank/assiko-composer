@@ -4,7 +4,8 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from pygame import Rect
-
+from enum import Enum, auto
+from Model.Geometry.Size import Size
 from Model.Toolbars.Toolbar import Toolbar
 
 
@@ -43,5 +44,39 @@ class SimpleButtonParams:
     border_radius: int = 0 
     draggable_icons=[] 
     action_value=None
+
+
+class StaffActionButtonPosition(Enum):
+    TOP = auto()
+    RIGHT = auto()
+    BOTTOM = auto()
+    LEFT = auto()
+
+@dataclass
+class ActionButtonConfig:
+    name: str
+    tooltip: str
+    action: str
+    icon_path: str
+    position: StaffActionButtonPosition
+    size: Size=Size(20,20)
+
+# Icons are from this site: https://www.flaticon.com/search?word=Add
+STAFF_ACTION_BUTTON_CONFIG = [
+    ActionButtonConfig(
+        name="Staff Add",
+        tooltip="Add staff",
+        action="AddStaff",
+        icon_path="add.png",
+        position=StaffActionButtonPosition.RIGHT
+    ),
+    ActionButtonConfig(
+        name="Staff Delete",
+        tooltip="Delete staff",
+        action="DeleteStaff",
+        icon_path="red-bin.png",
+        position=StaffActionButtonPosition.RIGHT
+    )
+]
 
     

@@ -39,6 +39,7 @@ class Staff(ScoreControl):
         self.step_notes_rests_lyrics = []  # these are chords played in steps. It's a list of StaffStep
         self.dynamics = [] # use StaffDynamic as a list
         self.lyrics_lines = []  
+        self.action_buttons = []
 
         self.velocity:int = velocity
         self.tempo:int = tempo  

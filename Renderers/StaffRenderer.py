@@ -1,9 +1,12 @@
+import io
+
 import pygame
 from datetime import datetime
 from DataClasses.Config import ScreenConfig
 from DataClasses.Config.ScreenConfig import Color, StaffConfig
 from DataClasses.Config.MusicConfig import supported_clef_settings, \
     supported_time_signatures, supported_modulations
+from Helpers.FileHelper import FileHelper
 from Helpers.ScreeHelper import ScreenHelper
 from Model.Geometry.Position import Position
 from Model.Score.Helpers import StaffUtils
@@ -27,9 +30,10 @@ class StaffRenderer(BaseRenderer):
         self.sound_player = state.sound_player
         self.screen = None
         self.view_intervals = False
-        self.staff_action_icon_size = 14
+        self.staff_action_icon_size = 18
         self.staff_action_icon_gap = 8
         self.staff_action_icon_margin = 10
+        self._svg_icon_cache = {}
       
     def get_screen(self):
         return self.screen
@@ -78,55 +82,30 @@ class StaffRenderer(BaseRenderer):
         
 
     def draw_staff_action_icons(self, staff):
-        icon_size = self.staff_action_icon_size
-        icon_x = staff.rect.right + self.staff_action_icon_margin
-        delete_y = staff.rect.y + self.staff_action_icon_margin
-        add_y = delete_y + icon_size + self.staff_action_icon_gap
+       
+        for button in staff.action_buttons:
+            # Display button icon in rect
+            icon_path = FileHelper.get_asset_images_paths() / "Buttons" / button.icon_path         
+            adjusted_coordinates = self._to_staff_space_position(
+                Position(button.rect.x, button.rect.y)
+            )
+            self.build_image_icon(icon_path, 
+                                  pygame.Rect(adjusted_coordinates.x, adjusted_coordinates.y, 
+                                   button.rect.width, button.rect.height) )
+      
 
-        delete_rect = pygame.Rect(icon_x, delete_y, icon_size, icon_size)
-        add_rect = pygame.Rect(icon_x, add_y, icon_size, icon_size)
-        staff.action_icon_rects = {
-            "delete": delete_rect,
-            "add": add_rect,
-        }
+    def build_image_icon(self, icon_path, rect):       
+        try:
+            image = pygame.image.load(str(icon_path)).convert_alpha()
+            # Scale the image to fit the button rect (100% of rect size)
+            scaled_size = (int(rect.width * 1), int(rect.height * 1))
+            image_item = pygame.transform.scale(image, scaled_size)
+            # Center the image in the button
+            image_item_rect = image_item.get_rect(center=rect.center)
+            self.screen.blit(image_item, image_item_rect)
+        except pygame.error:
+             print("Error building image for action button icon.build_image_icon()")
 
-        self._draw_delete_icon(delete_rect)
-        self._draw_add_icon(add_rect)
-
-    def _draw_delete_icon(self, rect):
-        print(f"screen:{id(self.screen)}")
-        draw_rect = rect.move(0, -self.vertical_offset)
-        pygame.draw.rect(self.screen, (240, 240, 240), draw_rect, border_radius=4)
-        pygame.draw.rect(self.screen, (120, 40, 40), draw_rect, 1, border_radius=4)
-        pygame.draw.rect(self.screen, (160, 40, 40), draw_rect.inflate(-6, -4).move(0, 1))
-        pygame.draw.line(
-            self.screen,
-            (255, 255, 255),
-            (draw_rect.left + 4, draw_rect.centery),
-            (draw_rect.right - 4, draw_rect.centery),
-            2,
-        )
-
-    def _draw_add_icon(self, rect):
-        draw_rect = rect.move(0, -self.vertical_offset)
-        pygame.draw.rect(self.screen, (240, 240, 240), draw_rect, border_radius=4)
-        pygame.draw.rect(self.screen, (40, 110, 60), draw_rect, 1, border_radius=4)
-        pygame.draw.rect(self.screen, (55, 150, 85), draw_rect.inflate(-6, -6))
-        pygame.draw.line(
-            self.screen,
-            (255, 255, 255),
-            (draw_rect.left + 4, draw_rect.centery),
-            (draw_rect.right - 4, draw_rect.centery),
-            2,
-        )
-        pygame.draw.line(
-            self.screen,
-            (255, 255, 255),
-            (draw_rect.centerx, draw_rect.top + 4),
-            (draw_rect.centerx, draw_rect.bottom - 4),
-            2,
-        )
-        
 
     """
         Renders all items: lines, intervals, notes and other musical items. 

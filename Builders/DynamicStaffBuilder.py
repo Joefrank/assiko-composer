@@ -2,11 +2,16 @@
 """
     Class is used to build staff progressively while user creates it and adds items to it.
 """
+from typing import Any, Callable
+
 import pygame
 
 from Builders.Params.BuildStaffItemParams import StaffItemBuildParams
+from DataClasses.ButtonConfigData import STAFF_ACTION_BUTTON_CONFIG, StaffActionButtonPosition
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
+from Model.Buttons.ButtonIcons.ActionButton import ActionButton
 from Model.Containers.ScorePage import ScorePage
+from Model.Containers.Window import Window
 from Model.Geometry.Position import Position
 from Model.Score.CollateralBoundary import CollateralBoundary
 from Model.Score.Interval import Interval
@@ -18,12 +23,14 @@ from Renderers.StaffRenderer import StaffRenderer
 
 class DynamicStaffBuilder:
 
-    def __init__(self, app_state):        
+    def __init__(self, main_window:Window):        
         self.all_staves = []
-        self.app_state = app_state
+        self.main_window = main_window
+        self.app_state = main_window.get_state()
         self.next_staff_position = None
         self.staff_height = self.calculate_staff_height()
-        self.staff_renderer = StaffRenderer(app_state)
+        self.staff_renderer = StaffRenderer(self.app_state)
+        self.event_handler = self.main_window.get_event_handler()
 
 
     def calculate_staff_height(self):
@@ -121,7 +128,10 @@ class DynamicStaffBuilder:
                                                  StaffConfig.STAFF_LINE_GAP + StaffConfig.STAFF_LINE_THICKNESS)
         # Finally, build the bottom virtual lines.
         staff.virtual_lines += self.build_lines(bottom_virtual_items_param)     
-       
+        
+        # We need to add action buttons for edit mode here.
+        staff.action_buttons = self.build_staff_action_buttons(staff)
+
         # Record these as staff children for later manipulation.
         staff.add_children(staff.virtual_lines)
         staff.add_children(staff.virtual_intervals)
@@ -129,7 +139,8 @@ class DynamicStaffBuilder:
         staff.add_children(staff.intervals)
         staff.add_children(staff.virtual_intervals)
         staff.add_children(staff.virtual_lines)
-        
+        staff.add_children(staff.action_buttons)
+
         self.all_staves.append(staff)
         return staff
        
@@ -142,6 +153,58 @@ class DynamicStaffBuilder:
             next_y_offset = last_staff_bottom_line.start_position.y + StaffConfig.STAFF_SPACING
             self.next_staff_position = Position(self.staff_original_position.x, next_y_offset)
 
+    def build_staff_action_buttons(self, staff):
+        all_buttons = []
+
+        # Group configs by StaffActionButtonPosition
+        right_buttons = self.build_staff_action_buttons_by_position(staff, 
+                    StaffActionButtonPosition.RIGHT, self.build_staff_action_right)
+        all_buttons += right_buttons
+        top_buttons =  self.build_staff_action_buttons_by_position(staff, 
+                    StaffActionButtonPosition.TOP, self.build_staff_action_top)
+        all_buttons += top_buttons
+        return all_buttons
+
+       
+
+    def build_staff_action_buttons_by_position(self, staff, position:StaffActionButtonPosition, 
+                                               position_action: Callable[[list, object], object]):
+        buttons = [
+            button
+            for button in STAFF_ACTION_BUTTON_CONFIG
+            if button.position == position # 
+        ]
+
+        return position_action(buttons, staff)
+
+    def build_staff_action_top(self, buttons_config, staff):
+        buttons = []
+        # Loop through the config array and build ActionButton
+        button_offset_x = 0
+        for config in buttons_config:           
+            start_position = (staff.rect.topleft[0] + button_offset_x, staff.rect.topright[1] - 5)
+            button_offset_x += config.size.width + 5           
+            button_rect = (start_position[0], start_position[1], config.size.width, config.size.height)
+            action_button = ActionButton(button_rect, config, staff)
+            buttons.append(action_button)
+        return buttons
+
+    def build_staff_action_right(self, buttons_config, staff):
+        buttons = []
+        # Loop through the config array and build ActionButton
+        button_offset_y = 0
+        for config in buttons_config:           
+            start_position = (staff.rect.topright[0] + 10, staff.rect.topright[1] + button_offset_y)
+            button_offset_y += config.size.height + 5            
+            button_rect = pygame.Rect(start_position[0], start_position[1], config.size.width, config.size.height)
+            action_button = ActionButton(button_rect, config, staff)
+            buttons.append(action_button)
+            
+            # register button for relevant events
+            self.event_handler.subscribe(pygame.MOUSEMOTION, action_button)
+            self.event_handler.subscribe(pygame.MOUSEBUTTONDOWN, action_button)
+            
+        return buttons
 
     def build_intervals(self, params: StaffItemBuildParams):
         intervals = []

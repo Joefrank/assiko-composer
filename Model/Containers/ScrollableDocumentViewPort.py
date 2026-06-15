@@ -69,19 +69,19 @@ class ScrollableDocumentViewport(Control):
             + 150
         )
 
-        page1 = self.children[0]
+        # page1 = self.children[0]
 
-        page1.children.append(
-            TextItem(pygame.Rect(page1.rect.x + 50, page1.rect.y + 50, 160, 50), "Button 1", self)
-        )
+        # page1.children.append(
+        #     TextItem(pygame.Rect(page1.rect.x + 50, page1.rect.y + 50, 160, 50), "Button 1", self)
+        # )
 
-        page1.children.append(
-            TextItem(pygame.Rect(page1.rect.x + 50, page1.rect.y + 150, 160, 50), "Button 1", self)
-        )
-        page2 = self.children[1]
-        page2.children.append(
-            TextItem(pygame.Rect(page2.rect.x + 50, page2.rect.y + 50, 160, 50), "Button 2", self)
-        )
+        # page1.children.append(
+        #     TextItem(pygame.Rect(page1.rect.x + 50, page1.rect.y + 150, 160, 50), "Button 1", self)
+        # )
+        # page2 = self.children[1]
+        # page2.children.append(
+        #     TextItem(pygame.Rect(page2.rect.x + 50, page2.rect.y + 50, 160, 50), "Button 2", self)
+        # )
               
     # ------------------------------------------------
 
