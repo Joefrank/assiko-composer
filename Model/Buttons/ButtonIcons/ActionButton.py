@@ -21,10 +21,11 @@ class ActionButton(Control):
     def move_y(self, offset_y):
         self.rect.y += offset_y
 
-    def on_mouse_motion(self, event):     
-         
-        if self.rect.collidepoint(event.pos):
-            print(f"mouse over") 
+    def on_mouse_motion(self, event):    
+        # This call cascades to parent viewport to map coordinates
+        real_coordinates = self.parent.map_coordinates_in_viewport(event.pos)  
+
+        if self.rect.collidepoint(real_coordinates):         
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND))
             return True
         else:  
@@ -32,5 +33,10 @@ class ActionButton(Control):
             return False 
         
     def on_left_mouse_down(self, event):
-        if self.rect.collidepoint(event.pos):
+        real_coordinates = self.parent.map_coordinates_in_viewport(event.pos)    
+
+        if self.rect.collidepoint(real_coordinates):
             print(f"click event: {event.pos}")
+            function = getattr(self.parent, self.action, None)
+            if function:
+                function(self)

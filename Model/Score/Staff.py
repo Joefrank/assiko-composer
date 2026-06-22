@@ -11,7 +11,7 @@ from Renderers.StaffRenderer import StaffRenderer
 
 class Staff(ScoreControl):   
     
-    def __init__(self, rect, staff_number, staff_renderer, clef=None, time_signature=None, key_signature=None, tempo:int=None, velocity:int=None):
+    def __init__(self, rect, staff_number, staff_renderer, parent_page, clef=None, time_signature=None, key_signature=None, tempo:int=None, velocity:int=None):
         super().__init__(rect, ControlType.SCORE_ITEM, f"Staff {staff_number}", parent=None)
        
          # position attributes
@@ -43,10 +43,10 @@ class Staff(ScoreControl):
 
         self.velocity:int = velocity
         self.tempo:int = tempo  
-
+       
         self.staff_renderer:StaffRenderer = staff_renderer
         self.staff_number = staff_number   
-        self.parent_page = None
+        self.parent_page = parent_page
         self.action_icon_rects = {}
       
     def set_notes_boundaries(self):
@@ -228,7 +228,10 @@ class Staff(ScoreControl):
         finally:
             self.staff_renderer.vertical_offset = previous_vertical_offset
  
-
+    
+    def map_coordinates_in_viewport(self, coordinates:tuple) -> tuple:
+        return self.parent_page.map_coordinates_in_viewport(coordinates)
+    
     """Staff override move because it needs to move all its children.
         Staff offset_x should not change otherwise the alignment get messed up on page.
     """
@@ -256,6 +259,12 @@ class Staff(ScoreControl):
         super().move_y(actual_offset_y)        
         for child in self.get_children():
             child.move_y(actual_offset_y)
+
+    def duplicate_staff_below(self, caller):
+        print(f"duplicating staff from: {caller}")
+
+    def delete_staff(self, caller):
+        print("deleteing staff")
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

@@ -47,9 +47,10 @@ class StaffRenderer(BaseRenderer):
 
         return Position(
             position.x,
-            position.y + self.vertical_offset
+            position.y - self.vertical_offset
         )
-
+  
+    
     def render_grand_staff(self, grand_staff, screen):
         previous_staff = None
         for staff in grand_staff.staves:

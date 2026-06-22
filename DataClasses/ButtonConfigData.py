@@ -66,14 +66,14 @@ STAFF_ACTION_BUTTON_CONFIG = [
     ActionButtonConfig(
         name="Staff Add",
         tooltip="Add staff",
-        action="AddStaff",
+        action="duplicate_staff_below",
         icon_path="add.png",
         position=StaffActionButtonPosition.RIGHT
     ),
     ActionButtonConfig(
         name="Staff Delete",
         tooltip="Delete staff",
-        action="DeleteStaff",
+        action="delete_staff",
         icon_path="red-bin.png",
         position=StaffActionButtonPosition.RIGHT
     )

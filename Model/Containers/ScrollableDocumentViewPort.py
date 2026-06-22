@@ -265,10 +265,11 @@ class ScrollableDocumentViewport(Control):
         if self.viewport.collidepoint(
                 pygame.mouse.get_pos()
             ):
-
+            
             self.scroll(
                 -event.y * 60
             )
+                        
     
     def on_mouse_motion(self, event):
          if self.drag_item:

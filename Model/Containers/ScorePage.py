@@ -7,12 +7,16 @@ from Model.Control import Control
 class ScorePage(Control):
 
     def __init__(self, rect, page_number, main_screen, font, parent_container, show_page_number=True):
-        super().__init__(rect, ControlType.CONTAINER, f"Score Page {page_number}")
+        super().__init__(rect, ControlType.CONTAINER, f"Score Page {page_number}", parent_container)
         self.number = page_number
         self.main_screen = main_screen
         self.font = font
         self.show_page_number = show_page_number
-        self.parent_container = parent_container    
+        #self.parent_container = parent_container    
+
+    #(coordinates[0], coordinates[1] - self.staff_renderer.vertical_offset)
+    def map_coordinates_in_viewport(self, coordinates:tuple) -> tuple:
+        return self.parent.get_coordinates_in_viewport(coordinates)
 
     def draw(self, scrollable_screen=None):
         if scrollable_screen is None:
@@ -20,7 +24,7 @@ class ScorePage(Control):
 
         page_rect = self.rect.move(
                 0,
-                -self.parent_container.scroll_y
+                -self.parent.scroll_y
             )
 
         shadow = page_rect.move(
@@ -65,5 +69,5 @@ class ScorePage(Control):
 
         # Draw items on page
         for child_item in self.children:
-            child_item.parent_container = self.parent_container
+            child_item.parent = self.parent
             child_item.draw(scrollable_screen)

@@ -98,7 +98,7 @@ class DynamicStaffBuilder:
         # Prepare parameters for building staff components (lines and intervals) and virtual components (lines and intervals above and below the staff)
         staff_rect = self.build_staff_rect(top_left_position, staff_width_percentage, parent_page)
         staff_top_left = Position(staff_rect.x, staff_rect.y)
-        staff = Staff(staff_rect, len(self.all_staves) + 1, self.staff_renderer) 
+        staff = Staff(staff_rect, len(self.all_staves) + 1, self.staff_renderer, parent_page) 
         staff.parent_page = parent_page
         top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param =\
         self.create_staff_build_params(staff_top_left, staff)
