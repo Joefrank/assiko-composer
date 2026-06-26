@@ -264,7 +264,7 @@ class Staff(ScoreControl):
         print(f"duplicating staff from: {caller}")
 
     def delete_staff(self, caller):
-        print("deleteing staff")
+        self.delete()
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

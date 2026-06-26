@@ -4,11 +4,11 @@ import pygame
 
 from DataClasses.ButtonConfigData import ActionButtonConfig
 from DataClasses.ControlData import ControlType
-from Model.Control import Control
 from Model.Geometry.Size import Size
+from Model.Score.ScoreControl import ScoreControl
 
 
-class ActionButton(Control):
+class ActionButton(ScoreControl):
 
     def __init__(self, rect, button_config: ActionButtonConfig, target_control):
         super().__init__(rect, ControlType.ACTION_BUTTON, button_config.name, target_control)
@@ -35,8 +35,7 @@ class ActionButton(Control):
     def on_left_mouse_down(self, event):
         real_coordinates = self.parent.map_coordinates_in_viewport(event.pos)    
 
-        if self.rect.collidepoint(real_coordinates):
-            print(f"click event: {event.pos}")
+        if self.rect.collidepoint(real_coordinates):          
             function = getattr(self.parent, self.action, None)
             if function:
                 function(self)

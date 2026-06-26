@@ -5,7 +5,7 @@
 from typing import Any, Callable
 
 import pygame
-
+import gc
 from Builders.Params.BuildStaffItemParams import StaffItemBuildParams
 from DataClasses.ButtonConfigData import STAFF_ACTION_BUTTON_CONFIG, StaffActionButtonPosition
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
@@ -248,6 +248,11 @@ class DynamicStaffBuilder:
         #         staves.append(self.build_empty_staff(top_left_position, staff_width))
             
         return staves
+
+    def delete_staff(self, staff):
+        self.all_staves.remove(staff)
+        refs = gc.get_referrers(staff)
+        print(refs)
 
     """Because staff is inside a scrollable container, the container for score is at position (0,0) and we work out all 
     staff positions based on this. So, we need to calculate the first staff position based on the container position and then calculate the next staff positions based on the first staff position and the spacing we want between staves."""

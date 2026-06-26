@@ -1,10 +1,10 @@
 import pygame
 
 from DataClasses.ControlData import ControlType
-from Model.Control import Control
+from Model.Score.ScoreControl import ScoreControl
 
 
-class ScorePage(Control):
+class ScorePage(ScoreControl):
 
     def __init__(self, rect, page_number, main_screen, font, parent_container, show_page_number=True):
         super().__init__(rect, ControlType.CONTAINER, f"Score Page {page_number}", parent_container)
