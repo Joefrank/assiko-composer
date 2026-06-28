@@ -15,7 +15,7 @@ class Control:
         self.position = (rect.x, rect.y)  # (x, y)
         self.size = (rect.width, rect.height)          # (width, height)
         self.visible = True
-        self.parent:Control = parent
+        self.__parent:Control = parent
         self.children = []
         self.supported_events = []
         self.z_index = 0
@@ -24,15 +24,30 @@ class Control:
         self.grid_spacing = (0, 0)  # (horizontal_spacing, vertical_spacing)
         self.app_state = None
 
+    @property
+    def parent(self):
+        return self.__parent
+
+    @parent.setter
+    def parent(self, value):        
+        self.__parent = value
+
+    @property
+    def main_window(self):
+        return self.app_state.get_main_window()
+    
+    def get_app_state(self):
+        return self.app_state
+    
     def set_app_state(self, app_state):
         # State doesn't get ovewritten but modified.
         if self.app_state is None:
             self.app_state = app_state
-
+        
         if len(self.children) > 0:
             for child in self.children:
-                child.set_app_state(app_state)
-        
+                child.set_app_state(app_state)                
+
     def add_child(self, child):
         child.parent = self
         self.children.append(child)

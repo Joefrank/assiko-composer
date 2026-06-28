@@ -4,11 +4,13 @@ from Builders.ContainerBuilder import ContainerBuilder
 from Builders.MenuBuilder import MenuBuilder
 from Builders.ToolbarsBuilder import ToolbarBuilder
 from DataClasses.Config.EventsConfig import TextInputBlinkTimer
+from DataClasses.DialogConfigData import CommonDialogsConfig, ConfirmDialogsConfig
 from DataClasses.MainWindowData import MainWindowConfig, MainWindowDimensions
 from DataClasses.MainWindowData import MainWindowText
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Helpers.FileHelper import FileHelper
 from Helpers.ScreeHelper import ScreenHelper
+from Model.Dialogs.ConfirmDialog import ConfirmDialog
 from Model.Timer import Timer
 from Model.ApplicationState import ApplicationState
 from Model.Dialogs.BasicDialog import BasicDialog
@@ -33,6 +35,7 @@ class MainWindowBuilder:
             .build_containers()\
             .build_menus() \
             .build_common_dialog()\
+            .build_confirm_dialog()\
             .build_timers()\
          .init_app_state()
          return self.main_window
@@ -76,14 +79,38 @@ class MainWindowBuilder:
         return self
 
     def build_common_dialog(self):        
-        font = pygame.font.SysFont("segoeui", MainWindowConfig.COMMON_DIALOG_FONT)
-        dialog_surface = pygame.Surface(MainWindowConfig.COMMON_DIALOG_SIZE)
+        title_font = pygame.font.SysFont(CommonDialogsConfig.DIALOG_TITLE_FONT[0], 
+                                        CommonDialogsConfig.DIALOG_TITLE_FONT[1])
+        text_font = pygame.font.SysFont(CommonDialogsConfig.DIALOG_MESSAGE_FONT[0], 
+                                        CommonDialogsConfig.DIALOG_MESSAGE_FONT[1])
+        dialog_surface = pygame.Surface((400, 240))
         dialog_rect = dialog_surface.get_rect()
         dialog_rect.center = self.main_window.rect.center
-        common_dialog = BasicDialog(MainWindowConfig.COMMON_DIALOG_NAME, dialog_surface,
-                                    dialog_rect, self.main_window.get_canvass(), font)
+        common_dialog = BasicDialog(CommonDialogsConfig.DIALOG_NAME, dialog_surface,
+                                    dialog_rect, self.main_window.get_canvass(), title_font,text_font)
         self.main_window.set_common_dialog(common_dialog)
         self.main_window.add_child(common_dialog)
+        return self
+    
+    def build_confirm_dialog(self):
+        title_font = pygame.font.SysFont(ConfirmDialogsConfig.DIALOG_TITLE_FONT[0], 
+                                        ConfirmDialogsConfig.DIALOG_TITLE_FONT[1])
+        text_font = pygame.font.SysFont(ConfirmDialogsConfig.DIALOG_MESSAGE_FONT[0], 
+                                        ConfirmDialogsConfig.DIALOG_MESSAGE_FONT[1])
+        window_size = self.main_window.get_size()
+        dialog_width = int((ConfirmDialogsConfig.DIALOG_SIZE_PERCENT[0] * window_size.width) / 100)
+        dialog_height = int((ConfirmDialogsConfig.DIALOG_SIZE_PERCENT[1] * window_size.height) / 100)
+
+        dialog_surface = pygame.Surface((dialog_width, dialog_height))
+        dialog_rect = dialog_surface.get_rect()
+        dialog_rect.center = self.main_window.rect.center
+
+        confirm_dialog = ConfirmDialog(ConfirmDialogsConfig, dialog_surface,
+                                       dialog_rect, self.main_window.get_canvass(), title_font, text_font, 
+                                       self.main_window)
+        
+        self.main_window.set_confirm_dialog(confirm_dialog)
+        self.main_window.add_child(confirm_dialog)
         return self
 
     def build_timers(self):

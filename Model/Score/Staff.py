@@ -1,8 +1,11 @@
+from Assets.Languages.enGB.DialogButtonText import DialogButtonText
+from Assets.Languages.enGB.StaffEditMessages import StaffEditMessages
 from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.Config.MusicConfig import supported_time_signatures,TREBLE_CLEF, BARITON_CLEF
 from DataClasses.ControlData import ControlType
 from Model.Geometry.Position import Position
 from Model.Geometry.Line import Line
+from Model.Geometry.Size import Size
 from Model.Score.IntervalRect import IntervalRect
 from Model.Score.Note import Note
 from Model.Score.ScoreControl import ScoreControl
@@ -264,8 +267,12 @@ class Staff(ScoreControl):
         print(f"duplicating staff from: {caller}")
 
     def delete_staff(self, caller):
-        self.delete()
-
+        self.main_window.show_common_dialog("This is just a test","Dialog Test", Size(200, 200))
+        # confirm_message = StaffEditMessages.Confirm_Delete_Staff_Message.format(confirm=DialogButtonText.Confirm_Button_Label,
+        #                                                                          cancel=DialogButtonText.Cancel_Button_Label)
+        # self.main_window.show_confirm_dialog(confirm_message, title=StaffEditMessages.Confirm_Delete_Staff_title, size=Size(400, 250))
+        #self.delete()
+        
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)
         intervals_str = "-> ".join(str(interval) for interval in self.intervals)

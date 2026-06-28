@@ -39,3 +39,4 @@ class ActionButton(ScoreControl):
             function = getattr(self.parent, self.action, None)
             if function:
                 function(self)
+    

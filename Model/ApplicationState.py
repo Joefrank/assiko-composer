@@ -21,8 +21,8 @@ from Model.Score.Staff import Staff
 class ApplicationState:
     """Manages the current state of the application.""" 
 
-    def __init__(self, screen=None):
-        self.screen = screen
+    def __init__(self, main_window):
+        self.screen = main_window.screen
         self.pending_dropped_item = None
         self.sound_player = SoundPlayer() 
         self.staff_renderer = None
@@ -44,8 +44,15 @@ class ApplicationState:
         self.score_navigator = None
         self.events_queue = []
         self.pending_chord: Chord = None
+        self.main_window = main_window
+        self.main_window_event_handler = main_window.get_event_handler()
 
-        
+    def get_main_window(self):
+        return self.main_window
+    
+    def get_window_event_handler(self):
+        return self.main_window_event_handler
+     
     def save_dropped_symbol(self, rect, action, params_input):
         self.pending_dropped_item = (rect, action, params_input)
 

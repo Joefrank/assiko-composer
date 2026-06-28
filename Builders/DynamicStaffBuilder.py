@@ -99,7 +99,8 @@ class DynamicStaffBuilder:
         staff_rect = self.build_staff_rect(top_left_position, staff_width_percentage, parent_page)
         staff_top_left = Position(staff_rect.x, staff_rect.y)
         staff = Staff(staff_rect, len(self.all_staves) + 1, self.staff_renderer, parent_page) 
-        staff.parent_page = parent_page
+       # parent_page.children.append(staff)
+        #staff.parent_page = parent_page
         top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param =\
         self.create_staff_build_params(staff_top_left, staff)
         
@@ -141,7 +142,9 @@ class DynamicStaffBuilder:
         staff.add_children(staff.virtual_lines)
         staff.add_children(staff.action_buttons)
 
-        self.all_staves.append(staff)
+        staff.set_app_state(self.app_state)
+        
+        #self.all_staves.append(staff)
         return staff
        
     def set_next_staff_position(self):

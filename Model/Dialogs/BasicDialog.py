@@ -9,11 +9,12 @@ from Model.Control import Control
 
 class BasicDialog(Control):
 
-    def __init__(self, name, surface, rect, screen, font):
+    def __init__(self, name, surface, rect, screen, title_font, content_font):
         super().__init__(rect, ControlType.DIALOG, name) 
         self.surface = surface
         self.screen = screen  
-        self.font = font     
+        self.title_font = title_font 
+        self.content_font= content_font    
         self.title = None
         self.content = None
         self.set_z_index(ControlZIndex.LEVEL4) 
@@ -40,7 +41,7 @@ class BasicDialog(Control):
         pygame.draw.rect(self.surface, (200, 200, 200), self.rect, 2)
 
         # draw text
-        text = self.font.render(self.content, True, (255, 255, 255))
+        text = self.content_font.render(self.content, True, (255, 255, 255))
         self.surface.blit(text, (20, 60))
 
         # draw dialog onto main screen

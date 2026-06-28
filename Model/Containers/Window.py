@@ -5,6 +5,7 @@ from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Model.ApplicationState import ApplicationState
 from Model.Control import Control
 from Model.Dialogs.BasicDialog import BasicDialog
+from Model.Dialogs.ConfirmDialog import ConfirmDialog
 from Model.Geometry.Size import Size
 
 
@@ -22,9 +23,10 @@ class Window(Control):
         self.bg_image_path = bg_image_path
         self.icon_path = icon_path
         self.common_dialog:BasicDialog  = None
-        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE) 
-        self.app_state = ApplicationState(self.screen)
+        self.confirm_dialog:ConfirmDialog = None
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)         
         self.event_handler = MainWindowEventHandler()
+        self.app_state = ApplicationState(self)
 
     def get_state(self):
         return self.app_state    
@@ -76,6 +78,15 @@ class Window(Control):
     def set_common_dialog(self, dialog:BasicDialog):
         self.common_dialog = dialog
 
+    def get_common_dialog(self):
+        return self.common_dialog
+
+    def set_confirm_dialog(self, dialog:ConfirmDialog):
+        self.confirm_dialog = dialog
+    
+    def get_confirm_dialog(self):
+        return self.confirm_dialog
+    
     # Event handlers for window-level events
     def on_video_resize(self, event):
         width_ratio = event.w / self.width
@@ -93,6 +104,12 @@ class Window(Control):
         if not size is None:
             self.common_dialog.set_size(size.width, size.height)
         self.common_dialog.show()
+
+    def show_confirm_dialog(self, content, title:str ="", size:Size=None):
+        self.confirm_dialog.set_content(title, main_content=content) 
+        if not size is None:
+            self.confirm_dialog.set_size(size.width, size.height)
+        self.confirm_dialog.show()
 
     def propagate_state(self):
         for child in self.children:

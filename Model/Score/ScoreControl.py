@@ -22,7 +22,10 @@ class ScoreControl(Control):
     def delete(self):
         self.parent.unlink(self)
         self.parent = None
-        
+        # Unsubscribe to events if any
+        if self.supported_events:
+            self.get_app_state().get_window_event_handler().unsubscribe(self)
+
         if not self.children or len(self.children) == 0:
             return
         

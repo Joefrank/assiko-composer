@@ -174,9 +174,7 @@ class MusicScore:
         staff_builder = self.get_child_item_builder("staff")
         if staff_builder:
             parent_page = input_dict["parent_page"]
-            new_staff = staff_builder.build_empty_staff((rect.x, rect.y), StaffConfig.STAFF_WIDTH_PERCENT, parent_page)
-            self.add_staff(new_staff)
-            return new_staff
+            return staff_builder.build_empty_staff((rect.x, rect.y), StaffConfig.STAFF_WIDTH_PERCENT, parent_page)            
         return None
 
 
