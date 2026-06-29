@@ -27,7 +27,7 @@ class Window(Control):
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)         
         self.event_handler = MainWindowEventHandler()
         self.app_state = ApplicationState(self)
-
+       
     def get_state(self):
         return self.app_state    
 

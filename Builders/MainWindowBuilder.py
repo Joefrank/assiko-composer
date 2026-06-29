@@ -80,14 +80,15 @@ class MainWindowBuilder:
 
     def build_common_dialog(self):        
         title_font = pygame.font.SysFont(CommonDialogsConfig.DIALOG_TITLE_FONT[0], 
-                                        CommonDialogsConfig.DIALOG_TITLE_FONT[1])
+                                        CommonDialogsConfig.DIALOG_TITLE_FONT[1], bold=CommonDialogsConfig.DIALOG_TITLE_FONT[2])
         text_font = pygame.font.SysFont(CommonDialogsConfig.DIALOG_MESSAGE_FONT[0], 
                                         CommonDialogsConfig.DIALOG_MESSAGE_FONT[1])
         dialog_surface = pygame.Surface((400, 240))
         dialog_rect = dialog_surface.get_rect()
         dialog_rect.center = self.main_window.rect.center
-        common_dialog = BasicDialog(CommonDialogsConfig.DIALOG_NAME, dialog_surface,
-                                    dialog_rect, self.main_window.get_canvass(), title_font,text_font)
+        common_dialog = BasicDialog(CommonDialogsConfig, dialog_surface,
+                                    dialog_rect, self.main_window.get_canvass(), 
+                                    title_font,text_font, self.main_window)
         self.main_window.set_common_dialog(common_dialog)
         self.main_window.add_child(common_dialog)
         return self

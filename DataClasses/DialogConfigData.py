@@ -47,6 +47,9 @@ class CommonDialogsConfig:
     DIALOG_TITLE_FONT = ("Segoe UI", 34, True) # (font-name, size, bold)
     DIALOG_MESSAGE_FONT = ("Segoe UI", 24)
     DIALOG_BUTTONS_CONFIG = [DialogButtonsConfigs.OK_BUTTON]
+    BACKGROUND_COLOR = (135, 138, 45)
+    BORDER_COLOR = (100, 100, 100)
+    TEXT_COLOR = (255, 255, 255)
 
 @dataclass
 class ConfirmDialogsConfig:

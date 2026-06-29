@@ -267,7 +267,7 @@ class Staff(ScoreControl):
         print(f"duplicating staff from: {caller}")
 
     def delete_staff(self, caller):
-        self.main_window.show_common_dialog("This is just a test","Dialog Test", Size(200, 200))
+        self.main_window.show_common_dialog("This is just a testxx","Dialog Test", Size(400, 240))
         # confirm_message = StaffEditMessages.Confirm_Delete_Staff_Message.format(confirm=DialogButtonText.Confirm_Button_Label,
         #                                                                          cancel=DialogButtonText.Cancel_Button_Label)
         # self.main_window.show_confirm_dialog(confirm_message, title=StaffEditMessages.Confirm_Delete_Staff_title, size=Size(400, 250))
