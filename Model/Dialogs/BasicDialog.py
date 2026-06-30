@@ -4,6 +4,7 @@ import pygame
 
 from DataClasses.ControlData import ControlType
 from DataClasses.MainWindowData import ControlZIndex
+from Model.Buttons.DialogButton import DialogButton
 from Model.Control import Control
 
 class BasicDialog(Control):
@@ -29,6 +30,36 @@ class BasicDialog(Control):
 
         self.overlay.fill((0, 0, 0, 160))
 
+        button_y = self.rect.bottom - 70
+        
+        self.yes_button = DialogButton(
+            pygame.Rect(
+                self.rect.width // 2 - 140,
+                button_y,
+                110,
+                45
+            ),
+            "Yes",
+            self.text_font,
+            self.surface,
+            "Yes button",
+            (50, 170, 80)
+        )
+
+        self.no_button = DialogButton(
+             pygame.Rect(
+                self.rect.width // 2 + 30,
+                button_y,
+                110,
+                45
+            ),
+            "No",
+            self.text_font,
+            self.surface,
+            "No button",
+            (190, 70, 70)
+        )
+
     def set_position(self, x, y):
         self.rect.x = x
         self.rect.y = y
@@ -47,31 +78,15 @@ class BasicDialog(Control):
         self.surface.fill(self.config.BACKGROUND_COLOR)
 
         # draw border
-        #pygame.draw.rect(self.surface, self.config.BORDER_COLOR, self.rect, 10, 10)
-
+        #pygame.draw.rect(self.surface, self.config.BORDER_COLOR, self.rect, 10, 10)     
         
-
-        # Shadow
-        # shadow = self.rect.move(5, 5)
-        # pygame.draw.rect(
-        #     self.surface,
-        #     (0, 0, 0),
-        #     shadow,
-        #     border_radius=18
-        # )
-        # print(self.rect)
-
-        # # Main dialog
-        # pygame.draw.rect(
-        #     self.screen,
-        #     (35, 38, 45),
-        #     self.rect,
-        #     border_radius=18
-        # )
 
         # draw title text
         title_font = self.title_font.render(self.title, True, self.config.TEXT_COLOR)
         self.surface.blit(title_font, (20, 10))
+
+        self.yes_button.draw()
+        self.no_button.draw()
 
         # draw message text
         message_font = self.text_font.render(self.message, True, self.config.TEXT_COLOR)
@@ -79,57 +94,4 @@ class BasicDialog(Control):
 
         # draw dialog onto main screen
         self.screen.blit(self.surface, self.rect)
-
-    # def draw(self):
-        # self.surface.blit(self.overlay, (0, 0))
-
-        # # Shadow
-        # shadow = self.rect.move(5, 5)
-        # pygame.draw.rect(
-        #     self.surface,
-        #     (0, 0, 0),
-        #     shadow,
-        #     border_radius=18
-        # )
-
-        # # Main dialog
-        # pygame.draw.rect(
-        #     self.surface,
-        #     (35, 38, 45),
-        #     self.rect,
-        #     border_radius=18
-        # )
-
-        # pygame.draw.rect(
-        #     self.surface,
-        #     (80, 140, 255),
-        #     self.rect,
-        #     2,
-        #     border_radius=18
-        # )
-
-        # title_content = self.title_font.render(
-        #     self.title,
-        #     True,
-        #     (255, 255, 255)
-        # )
-
-        # message_content = self.text_font.render(
-        #     self.message,
-        #     True,
-        #     (220, 220, 220)
-        # )
-
-        # self.surface.blit(
-        #     title_content,
-        #     (self.rect.x + 25, self.rect.y + 20)
-        # )
-
-        # self.surface.blit(
-        #     message_content,
-        #     (self.rect.x + 25, self.rect.y + 90)
-        # )
-
-
-
-
+       

@@ -20,9 +20,11 @@ class DialogButton(Control):
         self.action = None
 
     def draw(self):
-        color = tuple(min(c + 25, 255) for c in self.color) \
+        color = tuple(min(c + 25, 255) for c in self.background_color) \
             if self.hover else self.background_color
 
+        print(f"Drawing {self.text} at {self.rect}")
+        
         pygame.draw.rect(
             self.surface,
             color,
