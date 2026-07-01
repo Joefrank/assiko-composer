@@ -22,7 +22,8 @@ class Control:
         self.is_resizable = False
         self.grid_coordinates = None  # (row, col) if using grid layout. None means it's not placed in a grid
         self.grid_spacing = (0, 0)  # (horizontal_spacing, vertical_spacing)
-        self.app_state = None
+        self.app_state = None        
+        
 
     @property
     def parent(self):
@@ -35,6 +36,19 @@ class Control:
     @property
     def main_window(self):
         return self.app_state.get_main_window()
+    
+    @property
+    def main_window_event_handler(self):
+        return self.main_window.get_event_handler()
+
+    @property
+    def translator(self):
+        return self.app_state.translator
+    
+    def translate(self, key, language=None):
+        if self.translator is None:
+            return key  # No translator set, return the key as is
+        return self.translator.t(key, language)
     
     def get_app_state(self):
         return self.app_state
@@ -119,4 +133,4 @@ class Control:
         if len(self.children) == 0:
             return
         for child in self.children:
-            child.hide()
+            child.show()

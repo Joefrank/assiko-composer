@@ -4,7 +4,7 @@ from typing import List
 
 from pygame import Surface
 
-from DataClasses.Config.ScreenConfig import Color, MouseEventType
+from DataClasses.Config.ScreenConfig import Color, MouseEventType, SupportedLanguages
 from DataClasses.Config.MusicConfig import valid_note_durations, note_modifiers, default_note_duration
 
 from Model.Events.MouseEvent import MouseEvent
@@ -46,7 +46,13 @@ class ApplicationState:
         self.pending_chord: Chord = None
         self.main_window = main_window
         self.main_window_event_handler = main_window.get_event_handler()
+        self.user_language = SupportedLanguages.ENGLISH # this will be chosen by user at startup.
+        self.translator = None
 
+    def set_translator(self, translator):
+        self.translator = translator
+        self.translator.default_language = self.user_language
+        
     def get_main_window(self):
         return self.main_window
     

@@ -7,6 +7,7 @@ from Assets.Languages.enGB.DialogButtonText import DialogButtonText
 @dataclass(frozen=True)
 class DialogButtonConfig:
     text: str
+    name: str
     size_percent: tuple[int, int] # percentage width, height
     font: tuple[str, int] # font-name and size
     text_color: tuple[int, int, int]
@@ -17,6 +18,7 @@ class DialogButtonConfig:
 class DialogButtonsConfigs:
     OK_BUTTON = DialogButtonConfig(
         text=DialogButtonText.OK_Button_Label,
+        name="OK Button",
         size_percent=(20, 22),
         font=("Segoe UI", 24),
         text_color=(255, 255, 255),
@@ -25,6 +27,7 @@ class DialogButtonsConfigs:
     )
     CANCEL_BUTTON = DialogButtonConfig(
         text=DialogButtonText.Cancel_Button_Label,
+        name="Cancel Button",
         size_percent=(20, 22),
         font=("Segoe UI", 24),
         text_color=(255, 255, 255),
@@ -33,6 +36,7 @@ class DialogButtonsConfigs:
     )
     CONFIRM_BUTTON = DialogButtonConfig(
         text=DialogButtonText.Confirm_Button_Label,
+        name="Confirm Button",
         size_percent=(20, 22),
         font=("Segoe UI", 24),
         text_color=(255, 255, 255),

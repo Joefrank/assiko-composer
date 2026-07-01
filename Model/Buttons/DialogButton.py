@@ -9,7 +9,7 @@ class DialogButton(Control):
     def __init__(self, rect, text, font, surface, name, 
                  background_color=(100,100,100), 
                  text_color=(255, 255, 255)):
-        super().__init__(rect, ControlType.DIALOG, name) 
+        super().__init__(rect, ControlType.DIALOG_BUTTON, name) 
         self.rect = pygame.Rect(rect)
         self.text = text
         self.background_color = background_color
@@ -23,7 +23,7 @@ class DialogButton(Control):
         color = tuple(min(c + 25, 255) for c in self.background_color) \
             if self.hover else self.background_color
 
-        print(f"Drawing {self.text} at {self.rect}")
+        #print(f"Drawing {self.text} at {self.rect}")
         
         pygame.draw.rect(
             self.surface,
@@ -47,7 +47,8 @@ class DialogButton(Control):
     def set_action(self, action):
         self.action = action
 
-    def on_mouse_motion(self, event):      
+    def on_mouse_motion(self, event):  
+        print(f"Mouse motion event at {event.pos} for button {self.name}")    
         if self.rect.collidepoint(event.pos):
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND))
             self.hover = True

@@ -1,0 +1,6 @@
+{
+  "CONFIRM_DELETE_STAFF_TITLE": "Confirmer la suppression de la portée",
+  "CONFIRM_DELETE_STAFF_MESSAGE": "Êtes-vous sûr de vouloir supprimer cette portée ? Cette action est irréversible.",
+  "CONFIRM_BUTTON_LABEL": "Confirmer",
+  "CANCEL_BUTTON_LABEL": "Annuler"
+}

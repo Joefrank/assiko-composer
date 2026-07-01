@@ -1,8 +1,9 @@
 from Assets.Languages.enGB.DialogButtonText import DialogButtonText
 from Assets.Languages.enGB.StaffEditMessages import StaffEditMessages
-from DataClasses.Config.ScreenConfig import StaffConfig
+from DataClasses.Config.ScreenConfig import StaffConfig, SupportedLanguages
 from DataClasses.Config.MusicConfig import supported_time_signatures,TREBLE_CLEF, BARITON_CLEF
 from DataClasses.ControlData import ControlType
+from DataClasses.DialogConfigData import ConfirmDialogsConfig
 from Model.Geometry.Position import Position
 from Model.Geometry.Line import Line
 from Model.Geometry.Size import Size
@@ -14,6 +15,8 @@ from Renderers.StaffRenderer import StaffRenderer
 
 class Staff(ScoreControl):   
     
+    CONFIRM_DELETION_DIALOG_KEY = "CONFIRM_STAFF_DELETION_DIALOG"
+
     def __init__(self, rect, staff_number, staff_renderer, parent_page, clef=None, time_signature=None, key_signature=None, tempo:int=None, velocity:int=None):
         super().__init__(rect, ControlType.SCORE_ITEM, f"Staff {staff_number}", parent=None)
        
@@ -216,21 +219,28 @@ class Staff(ScoreControl):
         self.position_rect = IntervalRect(self.top_line.start_position,  self.top_line.end_position,
                                         self.bottom_line.end_position, self.bottom_line.start_position)
         self.top_position = self.top_line.start_position
-        self.bottom_position = self.bottom_line.start_position  
-    
+        self.bottom_position = self.bottom_line.start_position      
+  
+ 
     def draw(self, scrollable_screen=None):
         if scrollable_screen is not None:
             self.staff_renderer.set_screen(scrollable_screen)
         
-        parent_container = getattr(self, "parent_container", None)
+        # Get scroll offset from parent page
+        parent_page = self.parent_page
         previous_vertical_offset = self.staff_renderer.vertical_offset
-        self.staff_renderer.vertical_offset = 0 if parent_container is None else getattr(parent_container, "scroll_y", 0)
+ 
+        # Apply the parent page's scroll offset (which comes from scrollview:parent_container)
+        if parent_page and hasattr(parent_page, 'parent') and hasattr(parent_page.parent, 'scroll_y'):
+            self.staff_renderer.vertical_offset = parent_page.parent.scroll_y
+        else:
+            self.staff_renderer.vertical_offset = 0
 
+        # Let a special renderer display the staff because it's complex
         try:
             self.staff_renderer.render_staff(self)
         finally:
             self.staff_renderer.vertical_offset = previous_vertical_offset
- 
     
     def map_coordinates_in_viewport(self, coordinates:tuple) -> tuple:
         return self.parent_page.map_coordinates_in_viewport(coordinates)
@@ -267,11 +277,17 @@ class Staff(ScoreControl):
         print(f"duplicating staff from: {caller}")
 
     def delete_staff(self, caller):
-        self.main_window.show_common_dialog("This is just a testxx","Dialog Test", Size(400, 240))
-        # confirm_message = StaffEditMessages.Confirm_Delete_Staff_Message.format(confirm=DialogButtonText.Confirm_Button_Label,
-        #                                                                          cancel=DialogButtonText.Cancel_Button_Label)
-        # self.main_window.show_confirm_dialog(confirm_message, title=StaffEditMessages.Confirm_Delete_Staff_title, size=Size(400, 250))
-        #self.delete()
+        common_dialog = self.main_window.common_dialog
+        confirm_message = self.translate("CONFIRM_DELETE_STAFF_MESSAGE", SupportedLanguages.FRENCH)
+        title = self.translate("CONFIRM_DELETE_STAFF_TITLE")
+        #StaffEditMessages.Confirm_Delete_Staff_Message.format\
+               # (confirm=DialogButtonText.Confirm_Button_Label,cancel=DialogButtonText.Cancel_Button_Label) 
+        common_dialog.set_content(title, confirm_message)
+        dialog_buttons = self.main_window.dialog_builder.create_dialog_buttons(ConfirmDialogsConfig.DIALOG_BUTTONS_CONFIG, common_dialog.surface)
+        common_dialog.set_buttons(dialog_buttons)
+        common_dialog.show()
+      
+         #self.delete()
         
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

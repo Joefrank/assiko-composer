@@ -1,7 +1,10 @@
 import sys
 import pygame
+from DataClasses.Config.ScreenConfig import SupportedLanguages
 from DataClasses.ControlData import ControlType
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
+from Helpers.FileHelper import FileHelper
+from Helpers.Translator import Translator
 from Model.ApplicationState import ApplicationState
 from Model.Control import Control
 from Model.Dialogs.BasicDialog import BasicDialog
@@ -22,18 +25,41 @@ class Window(Control):
         self.is_open = False
         self.bg_image_path = bg_image_path
         self.icon_path = icon_path
-        self.common_dialog:BasicDialog  = None
-        self.confirm_dialog:ConfirmDialog = None
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)         
         self.event_handler = MainWindowEventHandler()
-        self.app_state = ApplicationState(self)
+        self.app_state = ApplicationState(self)        
+        self.__dialogs_cache = {}
+        self.dialog_builder = None
+        language_path = FileHelper.get_path("Assets\\Languages")
+        self.__translator = Translator(root = language_path, default_language=SupportedLanguages.FRENCH)
+        self.app_state.set_translator(self.__translator)
        
+    @property
+    def common_dialog(self):        
+        return next(
+            (child for child in self.children if isinstance(child, BasicDialog)),
+                None
+            )
+    
+    @property
+    def translator(self):
+        return self.__translator
+    
+    def get_dialog(self, dialog_id):
+        return self.__dialogs_cache.get(dialog_id)
+    
+    def add_dialog(self, dialog_id, dialog):
+        self.__dialogs_cache[dialog_id] = dialog
+
     def get_state(self):
         return self.app_state    
 
     def get_canvass(self):
         return self.screen   
    
+    def set_dialog_builder(self, dialog_builder):
+        self.dialog_builder = dialog_builder
+
     def draw(self) -> pygame.Surface:       
         pygame.display.set_caption(self.title)
         self.draw_icon()   
@@ -67,26 +93,14 @@ class Window(Control):
         pygame.display.set_icon(icon)        
    
     def add_child(self, control:Control):
-        self.children.append(control)        
-  
+        self.children.append(control) 
+    
     def get_size(self):
         return Size(self.width, self.height)
     
     def get_dimensions(self):
-        return self.width, self.height
-    
-    def set_common_dialog(self, dialog:BasicDialog):
-        self.common_dialog = dialog
+        return self.width, self.height   
 
-    def get_common_dialog(self):
-        return self.common_dialog
-
-    def set_confirm_dialog(self, dialog:ConfirmDialog):
-        self.confirm_dialog = dialog
-    
-    def get_confirm_dialog(self):
-        return self.confirm_dialog
-    
     # Event handlers for window-level events
     def on_video_resize(self, event):
         width_ratio = event.w / self.width
@@ -99,17 +113,17 @@ class Window(Control):
         pygame.quit()
         sys.exit()
 
-    def show_common_dialog(self, content, title:str ="", size:Size=None):
-        self.common_dialog.set_content(title, main_content=content) 
-        if not size is None:
-            self.common_dialog.set_size(size.width, size.height)
-        self.common_dialog.show()
+    # def show_common_dialog(self, content, title:str ="", size:Size=None):
+    #     self.common_dialog.set_content(title, main_content=content) 
+    #     if not size is None:
+    #         self.common_dialog.set_size(size.width, size.height)
+    #     self.common_dialog.show()
 
-    def show_confirm_dialog(self, content, title:str ="", size:Size=None):
-        self.confirm_dialog.set_content(title, main_content=content) 
-        if not size is None:
-            self.confirm_dialog.set_size(size.width, size.height)
-        self.confirm_dialog.show()
+    # def show_confirm_dialog(self, content, title:str ="", size:Size=None):
+    #     self.confirm_dialog.set_content(title, main_content=content) 
+    #     if not size is None:
+    #         self.confirm_dialog.set_size(size.width, size.height)
+    #     self.confirm_dialog.show()
 
     def propagate_state(self):
         for child in self.children:

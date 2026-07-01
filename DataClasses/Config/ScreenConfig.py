@@ -106,6 +106,11 @@ staff_generic_settings = {
     "TIME_SIGNATURE_FONT_SIZE": 35,
 }
 
+@dataclass
+class SupportedLanguages:
+    ENGLISH = "enGB"
+    FRENCH = "frFR"  
+
 score_font_size ={
     "HEADER_FONT_SIZE": 40,
 }
