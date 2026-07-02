@@ -31,45 +31,7 @@ class BasicDialog(Control):
             pygame.SRCALPHA
         )
 
-        self.overlay.fill((0, 0, 0, 160))
-
-        # Use relative position within the surface (not absolute screen position)
-        self.button_y = self.rect.height - 70  # Changed from self.rect.bottom
-    
-        # self.yes_button = DialogButton(
-        #     pygame.Rect(
-        #         self.rect.width // 2 - 140,
-        #         self.button_y,
-        #         110,
-        #         45
-        #     ),
-        #     "Yes",
-        #     self.text_font,
-        #     self.surface,
-        #     "Yes button",
-        #     (50, 170, 80)
-        # )
-
-        # # Set action for Yes button
-        # self.yes_button.set_action(lambda: self.on_button_click("yes"))
-        # self.yes_button.subscribe_to_event(pygame.MOUSEBUTTONDOWN)
-        # self.yes_button.subscribe_to_event(pygame.MOUSEMOTION)
-
-        # self.no_button = DialogButton(
-        #      pygame.Rect(
-        #         self.rect.width // 2 + 30,
-        #         self.button_y,
-        #         110,
-        #         45
-        #     ),
-        #     "No",
-        #     self.text_font,
-        #     self.surface,
-        #     "No button",
-        #     (190, 70, 70)
-        # )
-        # # Set action for No button
-        # self.no_button.set_action(lambda: self.on_button_click("no"))
+        self.overlay.fill((0, 0, 0, 160))        
 
     def set_buttons(self, buttons):
         self.action_buttons = buttons        
@@ -83,12 +45,7 @@ class BasicDialog(Control):
        
             
     def add_button(self, button):
-        self.children.append(button)
-
-    def clone(self):
-        dialog_copy = copy.deepcopy(self)
-        dialog_copy.name += "-copy" 
-        return dialog_copy
+        self.children.append(button)  
     
     def set_position(self, x, y):
         self.rect.x = x
@@ -101,32 +58,12 @@ class BasicDialog(Control):
 
     def set_content(self, title, main_content):
         self.title = title
-        self.message = main_content
+        self.message = main_content   
 
-    def set_callback(self, callback):
-        """Set a callback function to be called when a button is clicked"""
-        self.callback = callback
-
-    def on_button_click(self, value):
-        """Handle button clicks"""
-        self.result = value
-        self.visible = False
-        print("click called.")
-        
-        # Call the callback if set
-        if self.callback:
-            self.callback(value)
-        
-        return value
-
-    def get_result(self):
-        """Get the dialog result"""
-        return self.result
-
-    def show(self):
-        """Show the dialog and reset result"""
-        self.result = None
-        self.visible = True
+    def close(self):
+        """Handle button clicks"""       
+        self.visible = False        
+        # Call the callback if set 
 
     def on_left_mouse_down(self, event):
         """Handle mouse clicks on buttons"""
@@ -135,16 +72,16 @@ class BasicDialog(Control):
         adjusted_event = pygame.event.Event(event.type, pos=relative_pos)
         
         # Check button clicks
-        if self.yes_button.rect.collidepoint(relative_pos):
-            self.yes_button.on_left_mouse_down(adjusted_event)
-            if self.yes_button.action:
-                self.yes_button.action()
-            return True
-        elif self.no_button.rect.collidepoint(relative_pos):
-            self.no_button.on_left_mouse_down(adjusted_event)
-            if self.no_button.action:
-                self.no_button.action()
-            return True
+        # if self.yes_button.rect.collidepoint(relative_pos):
+        #     self.yes_button.on_left_mouse_down(adjusted_event)
+        #     if self.yes_button.action:
+        #         self.yes_button.action()
+        #     return True
+        # elif self.no_button.rect.collidepoint(relative_pos):
+        #     self.no_button.on_left_mouse_down(adjusted_event)
+        #     if self.no_button.action:
+        #         self.no_button.action()
+        #     return True
         
         return False
 
@@ -155,7 +92,32 @@ class BasicDialog(Control):
         adjusted_event = pygame.event.Event(event.type, pos=relative_pos)
         
         self.yes_button.on_mouse_motion(adjusted_event)
-        self.no_button.on_mouse_motion(adjusted_event)
+        #self.no_button.on_mouse_motion(adjusted_event)
+
+    def _wrap_text(self, text, max_width):
+        if not text:
+            return []
+
+        words = text.split()
+        if not words:
+            return []
+
+        lines = []
+        current_line = ""
+
+        for word in words:
+            candidate = f"{current_line} {word}".strip()
+            if self.text_font.size(candidate)[0] <= max_width:
+                current_line = candidate
+            else:
+                if current_line:
+                    lines.append(current_line)
+                current_line = word
+
+        if current_line:
+            lines.append(current_line)
+
+        return lines
 
     def draw(self):
         # Draw the dark overlay first (on the main screen)
@@ -182,15 +144,24 @@ class BasicDialog(Control):
         )
 
         # draw title text
-        title_font = self.title_font.render(self.title, True, self.config.TEXT_COLOR)
-        self.surface.blit(title_font, (20, 10))
+        if self.title:
+            title_font = self.title_font.render(self.title, True, self.config.TEXT_COLOR)
+            self.surface.blit(title_font, (20, 10))
+
+        max_text_width = self.rect.width - 40
+        message_y = 70
+        line_height = self.text_font.get_height() + 4
+        wrapped_lines = self._wrap_text(self.message, max_text_width)
+
+        for line in wrapped_lines:
+            if message_y + line_height > self.rect.height - 90:
+                break
+            message_font = self.text_font.render(line, True, self.config.TEXT_COLOR)
+            self.surface.blit(message_font, (20, message_y))
+            message_y += line_height
 
         for child in self.children:
             child.draw()
-
-        # draw message text
-        message_font = self.text_font.render(self.message, True, self.config.TEXT_COLOR)
-        self.surface.blit(message_font, (20, (self.rect.height // 3) - 10))
 
         # draw dialog onto main screen
         self.screen.blit(self.surface, self.rect)

@@ -11,7 +11,7 @@ from DataClasses.ButtonConfigData import STAFF_ACTION_BUTTON_CONFIG, StaffAction
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
 from Model.Buttons.ButtonIcons.ActionButton import ActionButton
 from Model.Containers.ScorePage import ScorePage
-from Model.Containers.Window import Window
+#from Model.Containers.Window import Window
 from Model.Geometry.Position import Position
 from Model.Score.CollateralBoundary import CollateralBoundary
 from Model.Score.Interval import Interval
@@ -23,7 +23,7 @@ from Renderers.StaffRenderer import StaffRenderer
 
 class DynamicStaffBuilder:
 
-    def __init__(self, main_window:Window):        
+    def __init__(self, main_window):        
         self.all_staves = []
         self.main_window = main_window
         self.app_state = main_window.get_state()

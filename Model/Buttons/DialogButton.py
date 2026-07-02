@@ -6,7 +6,7 @@ from Model.Control import Control
 
 class DialogButton(Control):
     
-    def __init__(self, rect, text, font, surface, name, 
+    def __init__(self, rect, text, font, name, parent_dialog,
                  background_color=(100,100,100), 
                  text_color=(255, 255, 255)):
         super().__init__(rect, ControlType.DIALOG_BUTTON, name) 
@@ -15,7 +15,8 @@ class DialogButton(Control):
         self.background_color = background_color
         self.text_color = text_color
         self.font = font
-        self.surface = surface
+        self.surface = parent_dialog.surface
+        self.parent = parent_dialog
         self.hover = False
         self.action = None
 
@@ -48,8 +49,9 @@ class DialogButton(Control):
         self.action = action
 
     def on_mouse_motion(self, event):  
-        print(f"Mouse motion event at {event.pos} for button {self.name}")    
-        if self.rect.collidepoint(event.pos):
+        actual_position = self.map_coordinates_to_parent(event.pos)
+
+        if self.rect.collidepoint(actual_position):
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND))
             self.hover = True
             return True
@@ -60,6 +62,17 @@ class DialogButton(Control):
         return self.hover 
         
     def on_left_mouse_down(self, event):
-        if self.rect.collidepoint(event.pos):
-            # check this is set self.action and call it.
-            print("left mouse called on dialog button")
+        actual_position = self.map_coordinates_to_parent(event.pos)
+
+        if self.rect.collidepoint(actual_position):
+            if self.action:
+                self.action()
+            return True
+
+        return False
+
+    def map_coordinates_to_parent(self, position):
+        if self.parent:
+            parent_position = (position[0] - self.parent.rect.x, position[1] - self.parent.rect.y)
+            return parent_position
+        return position

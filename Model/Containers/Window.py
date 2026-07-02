@@ -1,5 +1,6 @@
 import sys
 import pygame
+from Builders.DynamicStaffBuilder import DynamicStaffBuilder
 from DataClasses.Config.ScreenConfig import SupportedLanguages
 from DataClasses.ControlData import ControlType
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
@@ -8,7 +9,6 @@ from Helpers.Translator import Translator
 from Model.ApplicationState import ApplicationState
 from Model.Control import Control
 from Model.Dialogs.BasicDialog import BasicDialog
-from Model.Dialogs.ConfirmDialog import ConfirmDialog
 from Model.Geometry.Size import Size
 
 
@@ -33,6 +33,8 @@ class Window(Control):
         language_path = FileHelper.get_path("Assets\\Languages")
         self.__translator = Translator(root = language_path, default_language=SupportedLanguages.FRENCH)
         self.app_state.set_translator(self.__translator)
+        self.score_document = None
+        self.__dynamic_staff_builder = DynamicStaffBuilder(self)
        
     @property
     def common_dialog(self):        
@@ -45,6 +47,16 @@ class Window(Control):
     def translator(self):
         return self.__translator
     
+    @property
+    def staff_builder(self):
+        return self.__dynamic_staff_builder
+    
+    def set_score_document(self, score_document):
+        self.score_document = score_document
+
+    def get_score_document(self):
+        return self.score_document
+
     def get_dialog(self, dialog_id):
         return self.__dialogs_cache.get(dialog_id)
     

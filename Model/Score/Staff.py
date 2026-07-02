@@ -54,6 +54,7 @@ class Staff(ScoreControl):
         self.staff_number = staff_number   
         self.parent_page = parent_page
         self.action_icon_rects = {}
+        self.last_opened_dialog = None
       
     def set_notes_boundaries(self):
         self.notes_left_offset = self.top_line.line_collateral_boundaries.left_boundary
@@ -274,21 +275,59 @@ class Staff(ScoreControl):
             child.move_y(actual_offset_y)
 
     def duplicate_staff_below(self, caller):
-        print(f"duplicating staff from: {caller}")
+        self.add_new_staff_below(self)
+        print(f"duplicating staff from: {caller} - parent no of staves: {len(self.parent_page.children)}")
 
-    def delete_staff(self, caller):
-        common_dialog = self.main_window.common_dialog
-        confirm_message = self.translate("CONFIRM_DELETE_STAFF_MESSAGE", SupportedLanguages.FRENCH)
-        title = self.translate("CONFIRM_DELETE_STAFF_TITLE")
-        #StaffEditMessages.Confirm_Delete_Staff_Message.format\
-               # (confirm=DialogButtonText.Confirm_Button_Label,cancel=DialogButtonText.Cancel_Button_Label) 
-        common_dialog.set_content(title, confirm_message)
-        dialog_buttons = self.main_window.dialog_builder.create_dialog_buttons(ConfirmDialogsConfig.DIALOG_BUTTONS_CONFIG, common_dialog.surface)
-        common_dialog.set_buttons(dialog_buttons)
-        common_dialog.show()
-      
-         #self.delete()
+    def add_new_staff_below(self, staff):
+        staff_builder = self.main_window.staff_builder
+       
+        if staff_builder is None:
+            return None
+
+        new_staff_top_left = (
+            self.rect.x,
+            self.rect.bottom + StaffConfig.STAFF_SPACING
+        )
+
+        new_staff = staff_builder.build_empty_staff(
+            new_staff_top_left,
+            StaffConfig.STAFF_WIDTH_PERCENT,
+            self.parent_page
+        )
         
+        self.parent_page.add_child(new_staff)  # Add the new staff to the parent page
+        #return new_staff
+
+    def confirm_delete(self, caller):
+        common_dialog = self.main_window.common_dialog
+        confirm_message = self.translate("CONFIRM_DELETE_STAFF_MESSAGE")
+        title = self.translate("CONFIRM_DELETE_STAFF_TITLE")
+       
+        common_dialog.set_content(title, confirm_message)       
+        
+        dialog_buttons = self.main_window.dialog_builder.create_dialog_buttons(
+            ConfirmDialogsConfig.DIALOG_BUTTONS_CONFIG,
+            common_dialog,
+            callbacks=[self.delete_staff, self.cancel_dialog]
+        )
+
+        common_dialog.set_buttons(dialog_buttons)
+        common_dialog.set_app_state(self.app_state)
+        common_dialog.show()
+        self.last_opened_dialog = common_dialog
+        ## when you open dialog, you need to disable all actions and events apart from the dialog.
+      
+    def delete_staff(self):
+         self.delete()
+         if self.last_opened_dialog:
+             self.last_opened_dialog.close()
+             self.last_opened_dialog = None        
+        
+    def cancel_dialog(self):
+        if self.last_opened_dialog:
+            self.last_opened_dialog.close()
+            self.last_opened_dialog = None
+
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)
         intervals_str = "-> ".join(str(interval) for interval in self.intervals)

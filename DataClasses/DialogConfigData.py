@@ -19,7 +19,7 @@ class DialogButtonsConfigs:
     OK_BUTTON = DialogButtonConfig(
         text=DialogButtonText.OK_Button_Label,
         name="OK Button",
-        size_percent=(20, 22),
+        size_percent=(10, 12),
         font=("Segoe UI", 24),
         text_color=(255, 255, 255),
         bg_color=(125, 25, 25),
@@ -28,8 +28,8 @@ class DialogButtonsConfigs:
     CANCEL_BUTTON = DialogButtonConfig(
         text=DialogButtonText.Cancel_Button_Label,
         name="Cancel Button",
-        size_percent=(20, 22),
-        font=("Segoe UI", 24),
+        size_percent=(20, 15),
+        font=("Segoe UI", 20, True),
         text_color=(255, 255, 255),
         bg_color=(25, 25, 25),
         border_radius=10,
@@ -37,8 +37,8 @@ class DialogButtonsConfigs:
     CONFIRM_BUTTON = DialogButtonConfig(
         text=DialogButtonText.Confirm_Button_Label,
         name="Confirm Button",
-        size_percent=(20, 22),
-        font=("Segoe UI", 24),
+        size_percent=(20, 15),
+        font=("Segoe UI", 20, True),
         text_color=(255, 255, 255),
         bg_color=(125, 80, 80),
         border_radius=10,
@@ -46,7 +46,7 @@ class DialogButtonsConfigs:
 
 @dataclass
 class CommonDialogsConfig:
-    DIALOG_SIZE_PERCENT = (40, 20) # these are percentages
+    DIALOG_SIZE_PERCENT = (40, 40) # these are percentages
     DIALOG_NAME = "Common Dialog"
     DIALOG_TITLE_FONT = ("Segoe UI", 34, True) # (font-name, size, bold)
     DIALOG_MESSAGE_FONT = ("Segoe UI", 24)
