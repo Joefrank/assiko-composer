@@ -4,6 +4,7 @@ from DataClasses.Config.ScreenConfig import StaffConfig, SupportedLanguages
 from DataClasses.Config.MusicConfig import supported_time_signatures,TREBLE_CLEF, BARITON_CLEF
 from DataClasses.ControlData import ControlType
 from DataClasses.DialogConfigData import ConfirmDialogsConfig
+from Model.Dialogs.DialogModifyStruct import DialogModifyStruct
 from Model.Geometry.Position import Position
 from Model.Geometry.Line import Line
 from Model.Geometry.Size import Size
@@ -18,7 +19,7 @@ class Staff(ScoreControl):
     CONFIRM_DELETION_DIALOG_KEY = "CONFIRM_STAFF_DELETION_DIALOG"
 
     def __init__(self, rect, staff_number, staff_renderer, parent_page, clef=None, time_signature=None, key_signature=None, tempo:int=None, velocity:int=None):
-        super().__init__(rect, ControlType.SCORE_ITEM, f"Staff {staff_number}", parent=None)
+        super().__init__(rect, ControlType.STAFF, f"Staff {staff_number}", parent=None)
        
          # position attributes
         self.position_rect = rect
@@ -53,9 +54,24 @@ class Staff(ScoreControl):
         self.staff_renderer:StaffRenderer = staff_renderer
         self.staff_number = staff_number   
         self.parent_page = parent_page
-        self.action_icon_rects = {}
-        self.last_opened_dialog = None
+        self.action_icon_rects = {}        
       
+    @property
+    def top_left_position(self):
+        return self.rect.topleft
+    
+    @property
+    def bottom_right_position(self):
+        return self.rect.bottomright
+    
+    @property
+    def bottom_left_position(self):
+        return self.rect.bottomleft
+    
+    @property
+    def top_right_position(self):
+        return self.rect.topright
+    
     def set_notes_boundaries(self):
         self.notes_left_offset = self.top_line.line_collateral_boundaries.left_boundary
         self.notes_right_offset = self.top_line.line_collateral_boundaries.right_boundary
@@ -214,13 +230,14 @@ class Staff(ScoreControl):
             default=None
         )
     
-    def set_positions(self):       
-        self.top_line = self.lines[0]
-        self.bottom_line = self.lines[-1]
-        self.position_rect = IntervalRect(self.top_line.start_position,  self.top_line.end_position,
-                                        self.bottom_line.end_position, self.bottom_line.start_position)
-        self.top_position = self.top_line.start_position
-        self.bottom_position = self.bottom_line.start_position      
+    # No longer needed since we have get_bottom_virtual_line and get_staff_bottom_line
+    # def set_positions(self):       
+    #     self.top_line = self.lines[0]
+    #     self.bottom_line = self.lines[-1]
+    #     self.position_rect = IntervalRect(self.top_line.start_position,  self.top_line.end_position,
+    #                                     self.bottom_line.end_position, self.bottom_line.start_position)
+    #     self.top_position = self.rect.start_position
+    #     self.bottom_position = self.rect.bottom_left    
   
  
     def draw(self, scrollable_screen=None):
@@ -249,7 +266,7 @@ class Staff(ScoreControl):
     """Staff override move because it needs to move all its children.
         Staff offset_x should not change otherwise the alignment get messed up on page.
     """
-    def move(self, offset_x, offset_y):
+    def move(self, _, offset_y):
         actual_offset_y = offset_y
 
         parent_page = self.get_parent()
@@ -276,19 +293,15 @@ class Staff(ScoreControl):
 
     def duplicate_staff_below(self, caller):
         self.add_new_staff_below(self)
-        print(f"duplicating staff from: {caller} - parent no of staves: {len(self.parent_page.children)}")
-
+       
     def add_new_staff_below(self, staff):
         staff_builder = self.main_window.staff_builder
-       
-        if staff_builder is None:
-            return None
-
+        # get top left position for new staff based on the bottom of the current staff and spacing
         new_staff_top_left = (
             self.rect.x,
             self.rect.bottom + StaffConfig.STAFF_SPACING
         )
-
+        # build the staff and add it to the parent page
         new_staff = staff_builder.build_empty_staff(
             new_staff_top_left,
             StaffConfig.STAFF_WIDTH_PERCENT,
@@ -296,37 +309,90 @@ class Staff(ScoreControl):
         )
         
         self.parent_page.add_child(new_staff)  # Add the new staff to the parent page
-        #return new_staff
+        self.shift_objects_below_staff(staff)
+
+        return new_staff
+
+        
+    """ Do this in parent page  because it has better control of all children objecst."""
+    def shift_objects_below_staff(self, staff):
+        # find all staves below the current staff
+        all_staves_below = [s for s in self.parent_page.children if isinstance(s, Staff) and s.rect.y > staff.rect.y]
+        
+        if all_staves_below:
+            # push all staves below down by the height of the new staff plus spacing
+            parent_container = getattr(self.parent_page, "parent_container", None)
+            for s in all_staves_below:
+                # we need to check that after moving down staff sits within a page. If not, we need to create a new page and move the staff to that page.
+                last_staff_bottom = s.rect.bottom + StaffConfig.STAFF_SPACING               
+                if parent_container and hasattr(parent_container, "rect"):
+                    container_bottom = parent_container.rect.bottom
+                    if last_staff_bottom > container_bottom:
+                        # Create a new page and move the staff to that page
+                        new_page = self.main_window.page_builder.build_new_page(parent_container)
+                        new_page.add_child(s)
+                        s.set_parent(new_page)
+                        s.set_position(s.rect.x, new_page.rect.y + StaffConfig.STAFF_SPACING)
+                    else:
+                        s.move(0, last_staff_bottom - s.rect.y)        
 
     def confirm_delete(self, caller):
-        common_dialog = self.main_window.common_dialog
-        confirm_message = self.translate("CONFIRM_DELETE_STAFF_MESSAGE")
-        title = self.translate("CONFIRM_DELETE_STAFF_TITLE")
-       
-        common_dialog.set_content(title, confirm_message)       
-        
-        dialog_buttons = self.main_window.dialog_builder.create_dialog_buttons(
-            ConfirmDialogsConfig.DIALOG_BUTTONS_CONFIG,
-            common_dialog,
-            callbacks=[self.delete_staff, self.cancel_dialog]
+        dialog_config = DialogModifyStruct(
+            main_window=self.main_window,
+            dialog_title=self.translate("CONFIRM_DELETE_STAFF_TITLE"),
+            dialog_message=self.translate("CONFIRM_DELETE_STAFF_MESSAGE"),
+            target=caller.parent            
         )
-
-        common_dialog.set_buttons(dialog_buttons)
-        common_dialog.set_app_state(self.app_state)
-        common_dialog.show()
-        self.last_opened_dialog = common_dialog
+        callbacks = [self.delete_staff, self.cancel_dialog]         
+        dialog = self.build_delete_confirm_dialog(caller, dialog_config, callbacks) 
+        dialog.show()
+       
         ## when you open dialog, you need to disable all actions and events apart from the dialog.
       
-    def delete_staff(self):
-         self.delete()
-         if self.last_opened_dialog:
-             self.last_opened_dialog.close()
-             self.last_opened_dialog = None        
+    def delete_staff(self, target):
+         target.delete()
+         if target.last_opened_dialog:
+             target.last_opened_dialog.close()
+             target.last_opened_dialog = None  
+
+    def change_action_button_target_control(self, new_target):
+        for button in self.action_buttons:
+            button.change_target_control(new_target)
+
+    """Converts current staff to a grand staff by creating a new staff below it and combining them into a grand staff."""
+    def convert_to_grand_staff(self, caller):
+        original_staff = caller.parent
         
-    def cancel_dialog(self):
-        if self.last_opened_dialog:
-            self.last_opened_dialog.close()
-            self.last_opened_dialog = None
+        # Work out position of new staff
+        new_staff_top_left = (
+            original_staff.rect.x,
+            original_staff.rect.bottomleft[1] + StaffConfig.STAFF_SPACING
+        )
+
+        # Create a new staff below the current staff
+        new_staff = self.main_window.staff_builder.build_empty_staff(
+            new_staff_top_left,StaffConfig.STAFF_WIDTH_PERCENT, parent_page=self.parent_page, add_action_buttons=False
+        )
+
+        # create a grand staff by combining the current staff and the new staff. 
+        grand_staff = self.main_window.staff_builder.convert_staff_to_grand(
+            original_staff,
+            new_staff,
+            self.parent_page
+        )
+        
+        # Replace the current staff with the grand staff in the parent page's children list
+        self.parent_page.children.remove(caller.parent)
+        self.parent_page.children.append(grand_staff)
+
+        # repoint parents of both staffs to the grand staff
+        original_staff.set_parent(grand_staff)
+        new_staff.set_parent(grand_staff)
+        
+        # change the original staff target control to the new grand staff. This is important for the dialog to know which staff to operate on.
+        original_staff.change_action_button_target_control(grand_staff)
+
+        # re-adjust the positions of the staffs below the grand staff to accommodate the new grand staff height.
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

@@ -15,6 +15,8 @@ class ControlType(Enum):
     DIALOG_BUTTON = auto()
     SCORE_ITEM = auto()
     TEXT = auto()
+    STAFF = auto()
+    GRAND_STAFF = auto()
     
 
 

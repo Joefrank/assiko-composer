@@ -13,6 +13,10 @@ class ScorePage(ScoreControl):
         self.font = font
         self.show_page_number = show_page_number
 
+    @property
+    def scroll_y(self):
+        return self.parent.scroll_y
+    
     def map_coordinates_in_viewport(self, coordinates:tuple) -> tuple:
         return self.parent.get_coordinates_in_viewport(coordinates)
 

@@ -1,6 +1,6 @@
 
 from Model.Geometry.Position import Position
-from Model.Score import Note
+from Model.Score.Note import Note
 from Model.Score.StaffItem import StaffItem
 
 

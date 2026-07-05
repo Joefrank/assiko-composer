@@ -3,7 +3,8 @@
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP
 from DataClasses.Config.MusicConfig import supported_clef_settings
 from Model.Geometry.Position import Position
-from Model.Score import Interval, IntervalRect
+from Model.Score.Interval import Interval
+from Model.Score.IntervalRect import IntervalRect
 from Model.Score.CollateralBoundary import CollateralBoundary
 from Model.Score.Staff import Staff
 from Model.Score.StaffLine import Line

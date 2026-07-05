@@ -66,7 +66,8 @@ class DialogButton(Control):
 
         if self.rect.collidepoint(actual_position):
             if self.action:
-                self.action()
+                print(f"Executing action target: {self.parent.target.name}")
+                self.action(self.parent.target)
             return True
 
         return False

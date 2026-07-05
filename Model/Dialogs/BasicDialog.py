@@ -24,6 +24,7 @@ class BasicDialog(Control):
         self.callback = None  # Optional callback function
         parent_size = self.parent.get_size()        
         self.action_buttons = []
+        self.target = None
 
         # Dark transparent background
         self.overlay = pygame.Surface(
@@ -59,6 +60,13 @@ class BasicDialog(Control):
     def set_content(self, title, main_content):
         self.title = title
         self.message = main_content   
+
+    def instantiate(self, dialog_config):
+        self.set_content(dialog_config.dialog_title, dialog_config.dialog_message)
+        self.set_buttons(dialog_config.buttons)  # Assuming buttons are provided in the config
+        self.target = dialog_config.target  # Set the target if needed
+        self.set_app_state(self.app_state)
+        # You can add more configuration settings here as needed
 
     def close(self):
         """Handle button clicks"""       
