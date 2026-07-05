@@ -11,9 +11,10 @@ from DataClasses.ButtonConfigData import STAFF_ACTION_BUTTON_CONFIG, StaffAction
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
 from Model.Buttons.ButtonIcons.ActionButton import ActionButton
 from Model.Containers.ScorePage import ScorePage
-from Model.Containers.Window import Window
+#from Model.Containers.Window import Window
 from Model.Geometry.Position import Position
 from Model.Score.CollateralBoundary import CollateralBoundary
+from Model.Score.GrandStaff import GrandStaff
 from Model.Score.Interval import Interval
 from Model.Score.Rect import Rect
 from Model.Score.Staff import Staff
@@ -23,7 +24,7 @@ from Renderers.StaffRenderer import StaffRenderer
 
 class DynamicStaffBuilder:
 
-    def __init__(self, main_window:Window):        
+    def __init__(self, main_window):        
         self.all_staves = []
         self.main_window = main_window
         self.app_state = main_window.get_state()
@@ -94,12 +95,14 @@ class DynamicStaffBuilder:
         x_offset = parent_page.rect.x + ((parent_page.rect.width - staff_width) // 2)
         return pygame.Rect(x_offset, click_position[1], staff_width, self.staff_height)
 
-    def build_empty_staff(self, top_left_position, staff_width_percentage, parent_page:ScorePage):            
+    def build_empty_staff(self, top_left_position, staff_width_percentage, parent_page:ScorePage, 
+                          add_action_buttons=True):            
         # Prepare parameters for building staff components (lines and intervals) and virtual components (lines and intervals above and below the staff)
         staff_rect = self.build_staff_rect(top_left_position, staff_width_percentage, parent_page)
         staff_top_left = Position(staff_rect.x, staff_rect.y)
-        staff = Staff(staff_rect, len(self.all_staves) + 1, self.staff_renderer, parent_page) 
-        staff.parent_page = parent_page
+        staff = Staff(staff_rect, len(parent_page.children) + 1, self.staff_renderer, parent_page) 
+       # parent_page.children.append(staff)
+        #staff.parent_page = parent_page
         top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param =\
         self.create_staff_build_params(staff_top_left, staff)
         
@@ -130,7 +133,9 @@ class DynamicStaffBuilder:
         staff.virtual_lines += self.build_lines(bottom_virtual_items_param)     
         
         # We need to add action buttons for edit mode here.
-        staff.action_buttons = self.build_staff_action_buttons(staff)
+        if add_action_buttons:
+            staff.action_buttons = self.build_staff_action_buttons(staff)
+            staff.add_children(staff.action_buttons)
 
         # Record these as staff children for later manipulation.
         staff.add_children(staff.virtual_lines)
@@ -139,11 +144,21 @@ class DynamicStaffBuilder:
         staff.add_children(staff.intervals)
         staff.add_children(staff.virtual_intervals)
         staff.add_children(staff.virtual_lines)
-        staff.add_children(staff.action_buttons)
-
-        self.all_staves.append(staff)
+        
+        staff.set_app_state(self.app_state)
+        
         return staff
        
+    def convert_staff_to_grand(self, original_staff:Staff, new_staff:Staff, parent_page:ScorePage):
+        staves = [original_staff, new_staff]
+        grand_staff_name = f"GrandStaff_{len(parent_page.children)}"
+        grand_staff_rect = pygame.Rect(original_staff.rect.x, original_staff.rect.y, original_staff.rect.width, 
+                                       new_staff.rect.bottomleft[1] - original_staff.rect.y)
+        grand_staff = GrandStaff(grand_staff_rect, grand_staff_name, staves, parent_page)      
+        grand_staff.set_app_state(original_staff.get_app_state())
+
+        return grand_staff
+    
     def set_next_staff_position(self):
         if not self.all_staves:
             self.next_staff_position = self.staff_original_position

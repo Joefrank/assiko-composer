@@ -1,14 +1,17 @@
 
 import pygame
 from Builders.ContainerBuilder import ContainerBuilder
+from Builders.DialogBuilder import DialogBuilder
 from Builders.MenuBuilder import MenuBuilder
 from Builders.ToolbarsBuilder import ToolbarBuilder
 from DataClasses.Config.EventsConfig import TextInputBlinkTimer
+from DataClasses.DialogConfigData import CommonDialogsConfig, ConfirmDialogsConfig
 from DataClasses.MainWindowData import MainWindowConfig, MainWindowDimensions
 from DataClasses.MainWindowData import MainWindowText
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Helpers.FileHelper import FileHelper
 from Helpers.ScreeHelper import ScreenHelper
+from Model.Dialogs.ConfirmDialog import ConfirmDialog
 from Model.Timer import Timer
 from Model.ApplicationState import ApplicationState
 from Model.Dialogs.BasicDialog import BasicDialog
@@ -26,13 +29,14 @@ class MainWindowBuilder:
         self.toolbar_grid = None
         self.window_canvass:pygame.Surface = None # main screen  
         self.app_state = None # singleton needed
+        self.dialog_builder = None
         
     def build(self):
          self.init_window()\
             .build_toolbars()\
             .build_containers()\
             .build_menus() \
-            .build_common_dialog()\
+            .build_dialogs()\
             .build_timers()\
          .init_app_state()
          return self.main_window
@@ -48,6 +52,8 @@ class MainWindowBuilder:
         icon_path = asset_path / "icon.png"
 
         self.main_window = Window(pygame.Rect(x, y, WIDTH, HEIGHT), bg_image_path, icon_path, MainWindowText.TITLE)
+        self.dialog_builder = DialogBuilder(self.main_window)
+        self.main_window.set_dialog_builder(self.dialog_builder)
         # This is needed early because some components need to subscribe to window events during their build process, and they need access to the event handler for that. We can get the event handler from the main window since it's created in the main window's constructor.
         self.event_handler = self.main_window.get_event_handler()
         self.window_canvass = self.main_window.get_canvass()
@@ -75,16 +81,34 @@ class MainWindowBuilder:
         self.main_window.add_child(self.menu_bar)
         return self
 
-    def build_common_dialog(self):        
-        font = pygame.font.SysFont("segoeui", MainWindowConfig.COMMON_DIALOG_FONT)
-        dialog_surface = pygame.Surface(MainWindowConfig.COMMON_DIALOG_SIZE)
-        dialog_rect = dialog_surface.get_rect()
-        dialog_rect.center = self.main_window.rect.center
-        common_dialog = BasicDialog(MainWindowConfig.COMMON_DIALOG_NAME, dialog_surface,
-                                    dialog_rect, self.main_window.get_canvass(), font)
-        self.main_window.set_common_dialog(common_dialog)
-        self.main_window.add_child(common_dialog)
+    def build_dialogs(self):
+        # first check that main_window doesn't have a child of type BasicDialog. we're only allowed one.
+        if not any(isinstance(child, BasicDialog) for child in self.main_window.children):
+             self.main_window.add_child(self.main_window.dialog_builder.build())        
+       
         return self
+    
+    
+    # def build_confirm_dialog(self):
+    #     title_font = pygame.font.SysFont(ConfirmDialogsConfig.DIALOG_TITLE_FONT[0], 
+    #                                     ConfirmDialogsConfig.DIALOG_TITLE_FONT[1])
+    #     text_font = pygame.font.SysFont(ConfirmDialogsConfig.DIALOG_MESSAGE_FONT[0], 
+    #                                     ConfirmDialogsConfig.DIALOG_MESSAGE_FONT[1])
+    #     window_size = self.main_window.get_size()
+    #     dialog_width = int((ConfirmDialogsConfig.DIALOG_SIZE_PERCENT[0] * window_size.width) / 100)
+    #     dialog_height = int((ConfirmDialogsConfig.DIALOG_SIZE_PERCENT[1] * window_size.height) / 100)
+
+    #     dialog_surface = pygame.Surface((dialog_width, dialog_height))
+    #     dialog_rect = dialog_surface.get_rect()
+    #     dialog_rect.center = self.main_window.rect.center
+
+    #     confirm_dialog = ConfirmDialog(ConfirmDialogsConfig, dialog_surface,
+    #                                    dialog_rect, self.main_window.get_canvass(), title_font, text_font, 
+    #                                    self.main_window)
+        
+    #     self.main_window.set_confirm_dialog(confirm_dialog)
+    #     self.main_window.add_child(confirm_dialog)
+    #     return self
 
     def build_timers(self):
         text_input_blink_timer = Timer(TextInputBlinkTimer.NAME, TextInputBlinkTimer.INTERVAL)

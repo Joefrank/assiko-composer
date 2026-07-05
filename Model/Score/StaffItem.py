@@ -19,6 +19,7 @@ class StaffItem:
         self.tempo: int = tempo
         self.notes = []
         self.parent_staff = parent_staff
+        self.app_state = None
 
 
     def set_parent_staff(self, parent_staff):
@@ -33,5 +34,16 @@ class StaffItem:
             if x_offset is None or note.position.x == x_offset
     ] 
 
-   
+    def delete(self):
+        if self.parent_staff == None:
+            return
+        
+        self.parent_staff.unlink(self)
+        self.parent_staff = None
+
+    def set_app_state(self, app_state):        
+        if self.app_state is None:
+            self.app_state = app_state
+        
+       
 

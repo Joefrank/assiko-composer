@@ -16,6 +16,7 @@ class ActionButton(ScoreControl):
         self.action = button_config.action
         self.icon_path = button_config.icon_path   
         self.size: Size = button_config.size  
+        self.target_control = target_control  # The control this button is associated with
                
 
     def move_y(self, offset_y):
@@ -39,3 +40,8 @@ class ActionButton(ScoreControl):
             function = getattr(self.parent, self.action, None)
             if function:
                 function(self)
+
+    def change_target_control(self, new_target_control):
+        self.target_control = new_target_control
+        self.parent = new_target_control  # Update the parent to the new target control
+    

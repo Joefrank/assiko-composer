@@ -73,8 +73,15 @@ STAFF_ACTION_BUTTON_CONFIG = [
     ActionButtonConfig(
         name="Staff Delete",
         tooltip="Delete staff",
-        action="delete_staff",
+        action="confirm_delete",
         icon_path="red-bin.png",
+        position=StaffActionButtonPosition.RIGHT
+    ),
+    ActionButtonConfig(
+        name="Grand Staff",
+        tooltip="Convert to grand staff",
+        action="convert_to_grand_staff",
+        icon_path="grand-staff.png",
         position=StaffActionButtonPosition.RIGHT
     )
 ]

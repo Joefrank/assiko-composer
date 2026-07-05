@@ -28,6 +28,15 @@ class MainWindowEventHandler:
         if event_type not in subscriber.supported_events:
             subscriber.supported_events.append(event_type)     
 
+    """Unsubscribe object from all events handlers."""
+    def unsubscribe(self, subscriber):
+        print(f"unsubscriping: {subscriber.name}")
+        # Loop through all subscriptions and remove specified subscriber.
+        for subscription in self.event_subscriptions:
+            if subscriber in subscription.subscribers:
+                subscription.subscribers.remove(subscriber)
+
+
     def add_timer(self, timer: Timer):
         self.timers.append(timer)
         

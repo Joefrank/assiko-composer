@@ -1,17 +1,12 @@
 
 import pygame
 from Builders.MusicScoreBuilder import MusicScoreBuilder
-from DataClasses.Config.ScreenConfig import ScoreConfig
 from DataClasses.MainBoxData import MainBoxConfig
 from DataClasses.MainWindowData import MainWindowConfig
-from Model.Containers.ScoreDocument import ScoreDocument
 from Model.Containers.ScrollableDocumentViewPort import ScrollableDocumentViewport
-from Model.Containers.ScrollableScoreContainer import ScrollableScoreContainer
 from Model.Containers.ScoreContainer import ScoreContainer
 from Model.Containers.Window import Window
 from Builders.DynamicStaffBuilder import DynamicStaffBuilder
-from Model.DragAndDrop.DraggableItem import DraggableItem
-from Model.DragAndDrop.TextItem import TextItem
 
 
 class ContainerBuilder:
@@ -47,7 +42,7 @@ class ContainerBuilder:
         )
         
         # Set staff builder. This will build new staffs dynamically when we call CreateStaff method on the music score. 
-        music_score.add_child_item_builder("staff", DynamicStaffBuilder(self.main_window))
+        music_score.add_child_item_builder("staff", self.main_window.staff_builder)
         music_score.add_child_item_builder("score", self.score_builder)
 
         score_document = ScrollableDocumentViewport(
@@ -57,7 +52,8 @@ class ContainerBuilder:
             music_score,
             no_of_pages=2
         )
-
+        
+        self.main_window.set_score_document(score_document)
         music_score.set_parent_container(score_document)
 
        
