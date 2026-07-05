@@ -355,7 +355,8 @@ class ScrollableDocumentViewport(Control):
 
     def _process_state_change_on_left_mouse_up(self, drop_coordinates, target_page):      
        dragged_symbol = self.app_state.get_dropped_symbol()
-       if dragged_symbol:
+       # drop coordinates have to be on a valid page to process the drop action. If not, we just ignore the drop.
+       if target_page and dragged_symbol:       
            rect, action, params_input = dragged_symbol
            # run the action by calling the function with the parameters
            function = getattr(self.music_score, action, None)
