@@ -1,5 +1,6 @@
 {
   "CONFIRM_DELETE_STAFF_TITLE": "Confirmer la suppression de la portée",
+  "CONFIRM_DELETE_GRANDSTAFF_TITLE": "Confirmer la suppression de la grand staff",
   "CONFIRM_DELETE_STAFF_MESSAGE": "Êtes-vous sûr de vouloir supprimer cette portée ? Cette action est irréversible.",
   "CONFIRM_DELETE_GRANDSTAFF_MESSAGE": "Êtes-vous sûr de vouloir supprimer cette grand staff ? Cette action est irréversible.",
   "CONFIRM_BUTTON_LABEL": "Confirmer",

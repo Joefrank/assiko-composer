@@ -1,5 +1,6 @@
 {
   "CONFIRM_DELETE_STAFF_TITLE": "Confirm Staff Deletion",
+  "CONFIRM_DELETE_GRANDSTAFF_TITLE": "Confirm Grand Staff Deletion",
   "CONFIRM_DELETE_STAFF_MESSAGE": "Are you sure you want to delete this staff? This action cannot be undone.",
   "CONFIRM_DELETE_GRANDSTAFF_MESSAGE": "Are you sure you want to delete this grand staff? This action cannot be undone.",
   "CONFIRM_BUTTON_LABEL": "Confirm",
