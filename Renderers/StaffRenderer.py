@@ -85,6 +85,9 @@ class StaffRenderer(BaseRenderer):
     def draw_staff_action_icons(self, staff):
        
         for button in staff.action_buttons:
+            if not button.visible:
+                continue
+
             # Display button icon in rect
             icon_path = FileHelper.get_asset_images_paths() / "Buttons" / button.icon_path         
             adjusted_coordinates = self._to_staff_space_position(
@@ -95,7 +98,8 @@ class StaffRenderer(BaseRenderer):
                                    button.rect.width, button.rect.height) )
       
 
-    def build_image_icon(self, icon_path, rect):       
+    def build_image_icon(self, icon_path, rect):   
+        print(f"Imag rect:{rect}")    
         try:
             image = pygame.image.load(str(icon_path)).convert_alpha()
             # Scale the image to fit the button rect (100% of rect size)

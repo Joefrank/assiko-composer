@@ -392,7 +392,25 @@ class Staff(ScoreControl):
         # change the original staff target control to the new grand staff. This is important for the dialog to know which staff to operate on.
         original_staff.change_action_button_target_control(grand_staff)
 
+        # Once converted to grandstaff, we can now extend it so we need to hide the create button and display the extend button
+        original_staff.adjust_action_buttons()
+
         # re-adjust the positions of the staffs below the grand staff to accommodate the new grand staff height.
+
+    def adjust_action_buttons(self):
+        # Hide create-grand-staff button because we already have a grand staff
+        create_grand_staff_button = next((button for button in self.action_buttons if button.action == "convert_to_grand_staff"), None)
+        extend_grand_staff_button = next((button for button in self.action_buttons if button.action == "extend_grand_staff"), None)
+
+        # we assume that these buttons must be available for a visible grand staff.
+        if create_grand_staff_button:
+            create_grand_staff_button.hide()
+
+        if extend_grand_staff_button:
+            extend_grand_staff_button.show()
+
+    def extend_grand_staff(self):
+        print("Extending below grand staff by another staff below")
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

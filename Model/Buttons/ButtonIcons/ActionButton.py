@@ -10,13 +10,17 @@ from Model.Score.ScoreControl import ScoreControl
 
 class ActionButton(ScoreControl):
 
-    def __init__(self, rect, button_config: ActionButtonConfig, target_control):
+    def __init__(self, rect, button_config: ActionButtonConfig, target_control, ignore_previous_offset_x=False,
+                 ignore_previous_offset_y=False):
         super().__init__(rect, ControlType.ACTION_BUTTON, button_config.name, target_control)
         self.tooltip = button_config.tooltip
         self.action = button_config.action
         self.icon_path = button_config.icon_path   
         self.size: Size = button_config.size  
         self.target_control = target_control  # The control this button is associated with
+        self.visible = button_config.visible
+        self.ignore_previous_offset_x = ignore_previous_offset_x
+        self.ignore_previous_offset_y = ignore_previous_offset_y
                
 
     def move_y(self, offset_y):

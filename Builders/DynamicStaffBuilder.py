@@ -207,17 +207,32 @@ class DynamicStaffBuilder:
     def build_staff_action_right(self, buttons_config, staff):
         buttons = []
         # Loop through the config array and build ActionButton
-        button_offset_y = 0
+        button_offset_x = staff.rect.topright[0] + 10
+        button_offset_y = staff.rect.topright[1]
+        additional_offset = 0
+
         for config in buttons_config:           
-            start_position = (staff.rect.topright[0] + 10, staff.rect.topright[1] + button_offset_y)
-            button_offset_y += config.size.height + 5            
-            button_rect = pygame.Rect(start_position[0], start_position[1], config.size.width, config.size.height)
-            action_button = ActionButton(button_rect, config, staff)
+           
+            print(f"button_offset_x: {button_offset_x} - button_offset_y:{button_offset_y} - additional_offset:{additional_offset}")
+
+            # Check if config contains this attribute ignore_previous_offset_y and it has been set 
+            if config.ignore_previous_offset_y is None or not config.ignore_previous_offset_y:
+                button_offset_y += additional_offset
+                # update additoinal offset for next button
+                additional_offset +=  config.size.height + 5 
+                print(f"config:{config.name}")
+
+            button_rect = pygame.Rect(button_offset_x,  button_offset_y, config.size.width, config.size.height)
+            action_button = ActionButton(button_rect, config, staff, config.ignore_previous_offset_x, config.ignore_previous_offset_y)
             buttons.append(action_button)
             
             # register button for relevant events
             self.event_handler.subscribe(pygame.MOUSEMOTION, action_button)
             self.event_handler.subscribe(pygame.MOUSEBUTTONDOWN, action_button)
+
+            
+
+            
             
         return buttons
 

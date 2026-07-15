@@ -59,7 +59,11 @@ class ActionButtonConfig:
     action: str
     icon_path: str
     position: StaffActionButtonPosition
+    visible: bool
+    ignore_previous_offset_x: bool | None = None
+    ignore_previous_offset_y: bool | None = None
     size: Size=Size(20,20)
+   
 
 # Icons are from this site: https://www.flaticon.com/search?word=Add
 STAFF_ACTION_BUTTON_CONFIG = [
@@ -68,22 +72,36 @@ STAFF_ACTION_BUTTON_CONFIG = [
         tooltip="Add staff",
         action="duplicate_staff_below",
         icon_path="add.png",
-        position=StaffActionButtonPosition.RIGHT
+        position=StaffActionButtonPosition.RIGHT,
+        visible = True
     ),
     ActionButtonConfig(
         name="Staff Delete",
         tooltip="Delete staff",
         action="confirm_delete",
         icon_path="red-bin.png",
-        position=StaffActionButtonPosition.RIGHT
+        position=StaffActionButtonPosition.RIGHT,
+        visible = True
     ),
     ActionButtonConfig(
-        name="Grand Staff",
+        name="Create Grand Staff",
         tooltip="Convert to grand staff",
         action="convert_to_grand_staff",
-        icon_path="grand-staff.png",
-        position=StaffActionButtonPosition.RIGHT
-    )
+        icon_path="create-grand-staff.png",
+        position=StaffActionButtonPosition.RIGHT,
+        visible = True,
+        size = Size(20,33)
+    ),
+    # ActionButtonConfig(
+    #     name="Extent Grand Staff",
+    #     tooltip="Extend grand staff",
+    #     action="extend_grand_staff",
+    #     icon_path="x-grand-staff.png",
+    #     position=StaffActionButtonPosition.RIGHT,
+    #     visible = True,
+    #     ignore_previous_offset_y = True,
+    #     size = Size(20,40)
+    # )
 ]
 
     
