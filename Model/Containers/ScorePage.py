@@ -20,6 +20,28 @@ class ScorePage(ScoreControl):
     def map_coordinates_in_viewport(self, coordinates:tuple) -> tuple:
         return self.parent.get_coordinates_in_viewport(coordinates)
 
+    def order_children(self):
+        print("re-ordering children")
+        ordered_children = sorted(self.children, key=lambda child: child.rect.topleft, reverse=False)
+
+        # for each child, check it's top and bottom positions.
+        for child in ordered_children:
+            child_rect = child.rect            
+            for child2 in ordered_children:
+                if child == child2:
+                    continue
+                if child.rect.colliderect(child2.rect):
+                    print(f"{child.name} - bottom: {child.rect.bottomleft} - collides with {child2.name} - bottom:{child2.rect.topleft} ")
+                    print(f"Should move to y:{child.rect.bottomleft[1]}")
+                    y_offset = child.rect.bottomleft[1] - child2.rect.y + 20
+                    child2.move(0, y_offset)
+                    
+                    
+
+
+        # check if any other items collides with it. if it does, move it below the current item with a gap. 
+
+
     def draw(self, scrollable_screen=None):
         if scrollable_screen is None:
             scrollable_screen = self.main_screen

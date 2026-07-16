@@ -45,6 +45,11 @@ class Control:
     def translator(self):
         return self.app_state.translator
     
+    """Counts the number of children controls of specific type."""
+    @staticmethod
+    def number_children_of_type(parent, control_type:ControlType):
+        return sum(1 for child in parent.children if child.type == control_type)
+
     def translate(self, key, language=None):
         if self.translator is None:
             return key  # No translator set, return the key as is
@@ -60,7 +65,12 @@ class Control:
         
         if len(self.children) > 0:
             for child in self.children:
-                child.set_app_state(app_state)                
+                child.set_app_state(app_state) 
+
+    def reset_app_state(self):
+        if len(self.children) > 0:
+            for child in self.children:
+                child.set_app_state(self.app_state) 
 
     def add_child(self, child):
         child.parent = self

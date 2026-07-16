@@ -98,8 +98,8 @@ class StaffRenderer(BaseRenderer):
                                    button.rect.width, button.rect.height) )
       
 
-    def build_image_icon(self, icon_path, rect):   
-        print(f"Imag rect:{rect}")    
+    def build_image_icon(self, icon_path, rect): 
+       
         try:
             image = pygame.image.load(str(icon_path)).convert_alpha()
             # Scale the image to fit the button rect (100% of rect size)

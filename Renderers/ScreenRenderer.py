@@ -15,8 +15,7 @@ class ScreenRenderer(BaseRenderer):
         self.score_renderer = MusicScoreRenderer(state) 
         #self.menu_renderer = MenuRenderer(state)
 
-    def init_screen(self, width, height, caption, background_color=(30, 30, 30)):
-        pygame.init()
+    def init_screen(self, width, height, caption, background_color=(30, 30, 30)):       
         self.main_canvas = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         self.main_canvas.fill(background_color)
         pygame.display.set_caption(caption)

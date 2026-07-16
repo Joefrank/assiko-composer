@@ -65,7 +65,7 @@ class MainWindowEventHandler:
                         if handler:
                             is_event_handled = handler(event)
                             if is_event_handled:
-                                break               
+                                break  # this will cancel the bubbling of event if you return True.             
             
             #except Exception as e:
                # print(f"Error handling event {event.type}: {e}")

@@ -11,3 +11,12 @@ Toolbars:
 - Key signatures (done)
 - Rests (done)
 - Clefs (done)
+
+Bugs:
+
+- When you roll mouse over icons, it creates new staves
+
+Next to do:
+
+- Add delete buttons for secondary staves of grand staff
+- add expand/reduce buttons on left of grand staff gaps

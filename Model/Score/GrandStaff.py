@@ -6,6 +6,7 @@ import copy
 
 import pygame
 
+from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.ControlData import ControlType
 from Model.Dialogs.DialogModifyStruct import DialogModifyStruct
 from Model.Score.ScoreControl import ScoreControl
@@ -24,6 +25,8 @@ class GrandStaff(ScoreControl):
         if len(self.staves) > 0:
             self.top_left_position = self.staves[0].top_left_position
             self.bottom_right_position = self.staves[-1].bottom_right_position
+            self.rect.height =  self.bottom_right_position[1] - self.top_left_position[1] # vertical amplitude
+            print(f"grand staff height: {self.rect.height}")
 
     def add_staff(self, staff):
         self.staves.append(staff)
@@ -141,6 +144,30 @@ class GrandStaff(ScoreControl):
         if target.last_opened_dialog:
              target.last_opened_dialog.close()
              target.last_opened_dialog = None  
+
+    def extend_grand_staff(self, caller):
+       target_grand_staff = caller.parent # target grand_staff
+       bottom_left = self.get_bottom_left()
+
+       # Work out position of new staff
+       new_staff_top_left = (
+           bottom_left[0],
+           bottom_left[1] + (StaffConfig.STAFF_SPACING // 2)
+       )
+       
+       # Create a new staff below the current staff
+       new_staff = self.main_window.staff_builder.build_empty_staff(
+            new_staff_top_left,StaffConfig.STAFF_WIDTH_PERCENT, parent_page=self.parent, add_action_buttons=False
+        )
+       
+       self.add_staff(new_staff)       
+       # Update state object for all children and grand staff
+       target_grand_staff.reset_app_state()
+
+       self.set_positions()
+       self.parent.order_children() 
+
+
 
     def draw(self, scrollable_screen):       
         previous_staff = None

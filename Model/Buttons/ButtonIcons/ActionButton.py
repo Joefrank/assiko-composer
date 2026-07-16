@@ -38,12 +38,12 @@ class ActionButton(ScoreControl):
             return False 
         
     def on_left_mouse_down(self, event):
-        real_coordinates = self.parent.map_coordinates_in_viewport(event.pos)    
-
-        if self.rect.collidepoint(real_coordinates):          
-            function = getattr(self.parent, self.action, None)
+        real_coordinates = self.parent.map_coordinates_in_viewport(event.pos)  
+        if self.rect.collidepoint(real_coordinates) and self.visible:    
+            function = getattr(self.parent, self.action, None)      
             if function:
                 function(self)
+                return True # this is to cancel bubble
 
     def change_target_control(self, new_target_control):
         self.target_control = new_target_control

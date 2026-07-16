@@ -5,19 +5,17 @@ from Builders.DialogBuilder import DialogBuilder
 from Builders.MenuBuilder import MenuBuilder
 from Builders.ToolbarsBuilder import ToolbarBuilder
 from DataClasses.Config.EventsConfig import TextInputBlinkTimer
-from DataClasses.DialogConfigData import CommonDialogsConfig, ConfirmDialogsConfig
-from DataClasses.MainWindowData import MainWindowConfig, MainWindowDimensions
+from DataClasses.MainWindowData import MainWindowDimensions
 from DataClasses.MainWindowData import MainWindowText
-from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Helpers.FileHelper import FileHelper
 from Helpers.ScreeHelper import ScreenHelper
-from Model.Dialogs.ConfirmDialog import ConfirmDialog
 from Model.Timer import Timer
-from Model.ApplicationState import ApplicationState
 from Model.Dialogs.BasicDialog import BasicDialog
 from Model.Menu.MenuBar import MenuBar
 from Model.Containers.ScrollableContainer import ScrollableContainer
 from Model.Containers.Window import Window
+from screeninfo import get_monitors
+import os
 
 class MainWindowBuilder: 
     
@@ -41,6 +39,13 @@ class MainWindowBuilder:
          .init_app_state()
          return self.main_window
 
+    # def position_window(self):
+    #     monitor = get_monitors()[0]
+    #     x = monitor.x + (monitor.width - width) // 2
+    #     y = monitor.y + (monitor.height - height) // 2
+    #     os.environ["SDL_VIDEO_WINDOW_POS"] = f"{x},{y}"
+
+       
     """This must be first function to be called when building window and components."""
     def init_window(self):    
         WIDTH, HEIGHT, x, y = ScreenHelper.get_dimensions_by_ratio(
@@ -60,7 +65,7 @@ class MainWindowBuilder:
         # register window for resize and quit events
         self.event_handler.subscribe(pygame.VIDEORESIZE, self.main_window)
         self.event_handler.subscribe(pygame.QUIT, self.main_window)        
-        
+       
         return self
    
     """This builds all toolbars and assigns them to main_window."""

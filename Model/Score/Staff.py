@@ -1,14 +1,9 @@
-from Assets.Languages.enGB.DialogButtonText import DialogButtonText
-from Assets.Languages.enGB.StaffEditMessages import StaffEditMessages
-from DataClasses.Config.ScreenConfig import StaffConfig, SupportedLanguages
+from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.Config.MusicConfig import supported_time_signatures,TREBLE_CLEF, BARITON_CLEF
 from DataClasses.ControlData import ControlType
-from DataClasses.DialogConfigData import ConfirmDialogsConfig
 from Model.Dialogs.DialogModifyStruct import DialogModifyStruct
 from Model.Geometry.Position import Position
 from Model.Geometry.Line import Line
-from Model.Geometry.Size import Size
-from Model.Score.IntervalRect import IntervalRect
 from Model.Score.Note import Note
 from Model.Score.ScoreControl import ScoreControl
 from Model.Score.StaffBar import StaffBar
@@ -18,7 +13,8 @@ class Staff(ScoreControl):
     
     CONFIRM_DELETION_DIALOG_KEY = "CONFIRM_STAFF_DELETION_DIALOG"
 
-    def __init__(self, rect, staff_number, staff_renderer, parent_page, clef=None, time_signature=None, key_signature=None, tempo:int=None, velocity:int=None):
+    def __init__(self, rect, staff_number, staff_renderer, parent_page, clef=None, time_signature=None, 
+                 key_signature=None, tempo:int=None, velocity:int=None):
         super().__init__(rect, ControlType.STAFF, f"Staff {staff_number}", parent=None)
        
          # position attributes
@@ -263,8 +259,10 @@ class Staff(ScoreControl):
     def map_coordinates_in_viewport(self, coordinates:tuple) -> tuple:
         return self.parent_page.map_coordinates_in_viewport(coordinates)
     
-    """Staff override move because it needs to move all its children.
+    """
+        Staff override move because it needs to move all its children.
         Staff offset_x should not change otherwise the alignment get messed up on page.
+        offset_y: is the difference between original position and target one.
     """
     def move(self, _, offset_y):
         actual_offset_y = offset_y
@@ -396,6 +394,7 @@ class Staff(ScoreControl):
         original_staff.adjust_action_buttons()
 
         # re-adjust the positions of the staffs below the grand staff to accommodate the new grand staff height.
+        self.parent_page.order_children() 
 
     def adjust_action_buttons(self):
         # Hide create-grand-staff button because we already have a grand staff
@@ -407,10 +406,7 @@ class Staff(ScoreControl):
             create_grand_staff_button.hide()
 
         if extend_grand_staff_button:
-            extend_grand_staff_button.show()
-
-    def extend_grand_staff(self):
-        print("Extending below grand staff by another staff below")
+            extend_grand_staff_button.show()    
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

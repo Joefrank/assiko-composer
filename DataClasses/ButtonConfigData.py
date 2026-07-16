@@ -92,16 +92,16 @@ STAFF_ACTION_BUTTON_CONFIG = [
         visible = True,
         size = Size(20,33)
     ),
-    # ActionButtonConfig(
-    #     name="Extent Grand Staff",
-    #     tooltip="Extend grand staff",
-    #     action="extend_grand_staff",
-    #     icon_path="x-grand-staff.png",
-    #     position=StaffActionButtonPosition.RIGHT,
-    #     visible = True,
-    #     ignore_previous_offset_y = True,
-    #     size = Size(20,40)
-    # )
+    ActionButtonConfig(
+        name="Extent Grand Staff",
+        tooltip="Extend grand staff",
+        action="extend_grand_staff",
+        icon_path="x-grand-staff.png",
+        position=StaffActionButtonPosition.RIGHT,
+        visible = False,
+        ignore_previous_offset_y = True,
+        size = Size(20,40)
+    )
 ]
 
     

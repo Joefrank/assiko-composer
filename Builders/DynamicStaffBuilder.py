@@ -9,9 +9,10 @@ import gc
 from Builders.Params.BuildStaffItemParams import StaffItemBuildParams
 from DataClasses.ButtonConfigData import STAFF_ACTION_BUTTON_CONFIG, StaffActionButtonPosition
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
+from DataClasses.ControlData import ControlType
+from Model.Control import Control
 from Model.Buttons.ButtonIcons.ActionButton import ActionButton
 from Model.Containers.ScorePage import ScorePage
-#from Model.Containers.Window import Window
 from Model.Geometry.Position import Position
 from Model.Score.CollateralBoundary import CollateralBoundary
 from Model.Score.GrandStaff import GrandStaff
@@ -148,10 +149,11 @@ class DynamicStaffBuilder:
         staff.set_app_state(self.app_state)
         
         return staff
-       
+    
     def convert_staff_to_grand(self, original_staff:Staff, new_staff:Staff, parent_page:ScorePage):
         staves = [original_staff, new_staff]
-        grand_staff_name = f"GrandStaff_{len(parent_page.children)}"
+        grand_staff_count = Control.number_children_of_type(parent_page, ControlType.GRAND_STAFF) 
+        grand_staff_name = f"GrandStaff_{grand_staff_count + 1}"
         grand_staff_rect = pygame.Rect(original_staff.rect.x, original_staff.rect.y, original_staff.rect.width, 
                                        new_staff.rect.bottomleft[1] - original_staff.rect.y)
         grand_staff = GrandStaff(grand_staff_rect, grand_staff_name, staves, parent_page)      
@@ -209,19 +211,16 @@ class DynamicStaffBuilder:
         # Loop through the config array and build ActionButton
         button_offset_x = staff.rect.topright[0] + 10
         button_offset_y = staff.rect.topright[1]
-        additional_offset = 0
+        previous_item_height = 0
 
-        for config in buttons_config:           
+        for config in buttons_config:
            
-            print(f"button_offset_x: {button_offset_x} - button_offset_y:{button_offset_y} - additional_offset:{additional_offset}")
-
             # Check if config contains this attribute ignore_previous_offset_y and it has been set 
             if config.ignore_previous_offset_y is None or not config.ignore_previous_offset_y:
-                button_offset_y += additional_offset
+                button_offset_y += previous_item_height
                 # update additoinal offset for next button
-                additional_offset +=  config.size.height + 5 
-                print(f"config:{config.name}")
-
+                previous_item_height =  config.size.height + 5               
+           
             button_rect = pygame.Rect(button_offset_x,  button_offset_y, config.size.width, config.size.height)
             action_button = ActionButton(button_rect, config, staff, config.ignore_previous_offset_x, config.ignore_previous_offset_y)
             buttons.append(action_button)
@@ -229,10 +228,6 @@ class DynamicStaffBuilder:
             # register button for relevant events
             self.event_handler.subscribe(pygame.MOUSEMOTION, action_button)
             self.event_handler.subscribe(pygame.MOUSEBUTTONDOWN, action_button)
-
-            
-
-            
             
         return buttons
 
