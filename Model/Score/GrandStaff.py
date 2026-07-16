@@ -152,7 +152,7 @@ class GrandStaff(ScoreControl):
        # Work out position of new staff
        new_staff_top_left = (
            bottom_left[0],
-           bottom_left[1] + (StaffConfig.STAFF_SPACING // 2)
+           bottom_left[1] + (StaffConfig.GRAND_STAFF_SUBSEQUENT_SPACING)
        )
        
        # Create a new staff below the current staff

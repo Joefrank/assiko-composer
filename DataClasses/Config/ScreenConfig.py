@@ -62,7 +62,9 @@ class StaffConfig:
     STAFF_LINE_GAP: int = 10
     STAFF_LINE_THICKNESS: int = 1
     STAFF_BAR_THICKNESS: int = 2
-    STAFF_SPACING: int = 160  # space between two staves within grandstaff
+    STAFF_SPACING: int = 80  # space between two staves within grandstaff
+    GRAND_STAFF_ORIGINAL_SPACING = 100
+    GRAND_STAFF_SUBSEQUENT_SPACING = 50
     STAFF_CLEF_LEFT: int =  20
     STAFF_NO_LINES: int =  5
     STAFF_NO_INTERVALS: int =  4

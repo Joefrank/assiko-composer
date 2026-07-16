@@ -1,5 +1,6 @@
 import pygame
 
+from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.ControlData import ControlType
 from Model.Score.ScoreControl import ScoreControl
 
@@ -33,7 +34,7 @@ class ScorePage(ScoreControl):
                 if child.rect.colliderect(child2.rect):
                     print(f"{child.name} - bottom: {child.rect.bottomleft} - collides with {child2.name} - bottom:{child2.rect.topleft} ")
                     print(f"Should move to y:{child.rect.bottomleft[1]}")
-                    y_offset = child.rect.bottomleft[1] - child2.rect.y + 20
+                    y_offset = child.rect.bottomleft[1] - child2.rect.y + StaffConfig.STAFF_SPACING
                     child2.move(0, y_offset)
                     
                     

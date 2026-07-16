@@ -20,3 +20,4 @@ Next to do:
 
 - Add delete buttons for secondary staves of grand staff
 - add expand/reduce buttons on left of grand staff gaps
+- Add grand staff doesn't work
