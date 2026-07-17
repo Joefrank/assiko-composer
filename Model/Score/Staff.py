@@ -1,3 +1,4 @@
+from DataClasses.ButtonConfigData import StaffActionButtonConfig, StaffActionButtonPosition, StaffActionIdentifiers
 from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.Config.MusicConfig import supported_time_signatures,TREBLE_CLEF, BARITON_CLEF
 from DataClasses.ControlData import ControlType
@@ -299,11 +300,18 @@ class Staff(ScoreControl):
             self.rect.x,
             self.rect.bottom + StaffConfig.STAFF_SPACING
         )
+
         # build the staff and add it to the parent page
+        staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, 
+                                                 [StaffActionIdentifiers.ADD_STAFF_ACTION, 
+                                                  StaffActionIdentifiers.DELETE_STAFF_ACTION,
+                                                  StaffActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
+                                                  StaffActionIdentifiers.EXTEND_GRAND_STAFF_ACTION])]
         new_staff = staff_builder.build_empty_staff(
             new_staff_top_left,
             StaffConfig.STAFF_WIDTH_PERCENT,
-            self.parent_page
+            self.parent_page,
+            staff_actions
         )
         
         self.parent_page.add_child(new_staff)  # Add the new staff to the parent page
@@ -334,7 +342,7 @@ class Staff(ScoreControl):
                     else:
                         s.move(0, last_staff_bottom - s.rect.y)        
 
-    def confirm_delete(self, caller):
+    def confirm_delete(self, caller):        
         dialog_config = DialogModifyStruct(
             main_window=self.main_window,
             dialog_title=self.translate("CONFIRM_DELETE_STAFF_TITLE"),
@@ -347,7 +355,7 @@ class Staff(ScoreControl):
        
         ## when you open dialog, you need to disable all actions and events apart from the dialog.
       
-    def delete_staff(self, target):
+    def delete_staff(self, target):         
          target.delete()
          if target.last_opened_dialog:
              target.last_opened_dialog.close()
@@ -369,7 +377,7 @@ class Staff(ScoreControl):
 
         # Create a new staff below the current staff
         new_staff = self.main_window.staff_builder.build_empty_staff(
-            new_staff_top_left,StaffConfig.STAFF_WIDTH_PERCENT, parent_page=self.parent_page, add_action_buttons=False
+            new_staff_top_left,StaffConfig.STAFF_WIDTH_PERCENT, parent_page=self.parent_page
         )
 
         # create a grand staff by combining the current staff and the new staff. 
@@ -381,22 +389,18 @@ class Staff(ScoreControl):
         
         # Replace the current staff with the grand staff in the parent page's children list
         self.parent_page.children.remove(caller.parent)
-        self.parent_page.children.append(grand_staff)
-
-        # repoint parents of both staffs to the grand staff
-        original_staff.set_parent(grand_staff)
-        new_staff.set_parent(grand_staff)
+        self.parent_page.children.append(grand_staff)       
         
         # change the original staff target control to the new grand staff. This is important for the dialog to know which staff to operate on.
         original_staff.change_action_button_target_control(grand_staff)
 
         # Once converted to grandstaff, we can now extend it so we need to hide the create button and display the extend button
-        original_staff.adjust_action_buttons()
+        original_staff.adjust_staff_generation_buttons()
 
         # re-adjust the positions of the staffs below the grand staff to accommodate the new grand staff height.
         self.parent_page.order_children() 
 
-    def adjust_action_buttons(self):
+    def adjust_staff_generation_buttons(self):
         # Hide create-grand-staff button because we already have a grand staff
         create_grand_staff_button = next((button for button in self.action_buttons if button.action == "convert_to_grand_staff"), None)
         extend_grand_staff_button = next((button for button in self.action_buttons if button.action == "extend_grand_staff"), None)
@@ -407,6 +411,13 @@ class Staff(ScoreControl):
 
         if extend_grand_staff_button:
             extend_grand_staff_button.show()    
+
+    """
+        This is to be called on first staff of grand staff only. Cause subsequent staves don't affect the grand staff.
+    """
+    def point_action_to_parent_grand_staff(self, grand_staff):
+        for button in self.action_buttons:
+            button.change_target_control(grand_staff)
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

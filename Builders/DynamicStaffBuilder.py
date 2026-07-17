@@ -7,7 +7,7 @@ from typing import Any, Callable
 import pygame
 import gc
 from Builders.Params.BuildStaffItemParams import StaffItemBuildParams
-from DataClasses.ButtonConfigData import STAFF_ACTION_BUTTON_CONFIG, StaffActionButtonPosition
+from DataClasses.ButtonConfigData import STAFF_ACTION_BUTTON_CONFIG, StaffActionButtonConfig, StaffActionButtonPosition, StaffActionIdentifiers
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
 from DataClasses.ControlData import ControlType
 from Model.Control import Control
@@ -91,19 +91,28 @@ class DynamicStaffBuilder:
         return top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param
     
     def build_staff_rect(self, click_position, staff_width_percentage, parent_page:ScorePage):
+        if not parent_page:
+            return None
+        
         # All staves should be horizontally-aligned and resize based on parent_page.  
         staff_width = int((parent_page.rect.width * staff_width_percentage)/100)
         x_offset = parent_page.rect.x + ((parent_page.rect.width - staff_width) // 2)
         return pygame.Rect(x_offset, click_position[1], staff_width, self.staff_height)
 
+    """
+        Builds staff from scratch.
+        parent_page: page in which the staff will be built
+        action_buttons: array of button groups used as action for the new staff
+        parent_staff: This is only used when we are creating or extending a grand staff with the new one.
+    """
     def build_empty_staff(self, top_left_position, staff_width_percentage, parent_page:ScorePage, 
-                          add_action_buttons=True):            
+                          action_buttons=[], parent_staff=None):            
         # Prepare parameters for building staff components (lines and intervals) and virtual components (lines and intervals above and below the staff)
         staff_rect = self.build_staff_rect(top_left_position, staff_width_percentage, parent_page)
         staff_top_left = Position(staff_rect.x, staff_rect.y)
-        staff = Staff(staff_rect, len(parent_page.children) + 1, self.staff_renderer, parent_page) 
-       # parent_page.children.append(staff)
-        #staff.parent_page = parent_page
+        staff_parent = parent_page if parent_staff == None else parent_staff  
+        staff = Staff(staff_rect, len(parent_page.children) + 1, self.staff_renderer, staff_parent) 
+      
         top_virtual_items_param, staff_lines_params, staff_intervals_params, bottom_virtual_items_param =\
         self.create_staff_build_params(staff_top_left, staff)
         
@@ -134,8 +143,8 @@ class DynamicStaffBuilder:
         staff.virtual_lines += self.build_lines(bottom_virtual_items_param)     
         
         # We need to add action buttons for edit mode here.
-        if add_action_buttons:
-            staff.action_buttons = self.build_staff_action_buttons(staff)
+        if action_buttons and len(action_buttons) > 0:
+            staff.action_buttons = self.build_staff_action_buttons(staff, action_buttons)
             staff.add_children(staff.action_buttons)
 
         # Record these as staff children for later manipulation.
@@ -158,7 +167,7 @@ class DynamicStaffBuilder:
                                        new_staff.rect.bottomleft[1] - original_staff.rect.y)
         grand_staff = GrandStaff(grand_staff_rect, grand_staff_name, staves, parent_page)      
         grand_staff.set_app_state(original_staff.get_app_state())
-
+        
         return grand_staff
     
     def set_next_staff_position(self):
@@ -170,16 +179,22 @@ class DynamicStaffBuilder:
             next_y_offset = last_staff_bottom_line.start_position.y + StaffConfig.STAFF_SPACING
             self.next_staff_position = Position(self.staff_original_position.x, next_y_offset)
 
-    def build_staff_action_buttons(self, staff):
+    def build_staff_action_buttons(self, staff, action_buttons):
         all_buttons = []
-
-        # Group configs by StaffActionButtonPosition
-        right_buttons = self.build_staff_action_buttons_by_position(staff, 
-                    StaffActionButtonPosition.RIGHT, self.build_staff_action_right)
-        all_buttons += right_buttons
-        top_buttons =  self.build_staff_action_buttons_by_position(staff, 
-                    StaffActionButtonPosition.TOP, self.build_staff_action_top)
-        all_buttons += top_buttons
+        
+        if not action_buttons or len(action_buttons) == 0:
+            return
+        
+        # Loop through actions
+        for action_config in action_buttons:
+            id_set = set(action_config.ConfigIds)
+            button_config_list = [config for config in STAFF_ACTION_BUTTON_CONFIG if config.Id in id_set]
+           
+            if action_config.Position == StaffActionButtonPosition.RIGHT:
+                all_buttons += self.build_staff_action_right(button_config_list, staff)
+            elif action_config.Position == StaffActionButtonPosition.TOP:
+                all_buttons +=  self.build_staff_action_top(button_config_list, staff)           
+       
         return all_buttons
 
        
@@ -230,6 +245,75 @@ class DynamicStaffBuilder:
             self.event_handler.subscribe(pygame.MOUSEBUTTONDOWN, action_button)
             
         return buttons
+
+    def duplicate_grand_staff_below(self, grand_staff):
+        # Work out position of new grand-staff
+        new_staves = []
+        parent_page = grand_staff.parent
+
+        top_staff_top_left = (
+           grand_staff.rect.x,
+           grand_staff.staves[-1].bottom_left_position[1] + StaffConfig.STAFF_SPACING
+        )   
+
+        # prepare top staff action
+        staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, 
+                                                 [StaffActionIdentifiers.ADD_STAFF_ACTION, 
+                                                  StaffActionIdentifiers.DELETE_STAFF_ACTION,
+                                                  StaffActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
+                                                  StaffActionIdentifiers.EXTEND_GRAND_STAFF_ACTION])]
+        
+        # Create a top staff
+        top_staff = self.build_empty_staff(
+            top_staff_top_left,
+            StaffConfig.STAFF_WIDTH_PERCENT, 
+            parent_page=parent_page,
+            action_buttons = staff_actions
+        )
+
+        new_staves.append(top_staff)
+
+        # loop through all other staves of the grand_staff we are duplicating.
+        index = 0
+        for original_staff in grand_staff.staves[1:]:
+            original_top_staff = grand_staff.staves[0]
+            offset_y = original_staff.top_left_position[1] - original_top_staff.bottom_left_position[1]
+
+            next_staff_top_left = (
+                top_staff.rect.x,
+                top_staff.bottom_left_position[1] + offset_y
+            )
+
+            if index == 0:
+                staff_actions = None
+            else:
+                staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, 
+                                                 [StaffActionIdentifiers.DELETE_STAFF_ACTION])]
+
+            # create subsequent staff
+            next_staff = self.build_empty_staff(
+                next_staff_top_left,
+                StaffConfig.STAFF_WIDTH_PERCENT,
+                parent_page=parent_page, 
+                action_buttons = staff_actions
+            )
+        
+            new_staves.append(next_staff)  
+        
+        grand_staff_count = Control.number_children_of_type(parent_page, ControlType.GRAND_STAFF) 
+        grand_staff_name = f"GrandStaff_{grand_staff_count + 1}"
+        grand_staff_rect = pygame.Rect(top_staff_top_left[0], top_staff_top_left[1], grand_staff.rect.width, 
+                                       grand_staff.rect.height)
+        
+        new_grand_staff = GrandStaff(grand_staff_rect, grand_staff_name, new_staves, parent_page)
+        top_staff.point_action_to_parent_grand_staff(new_grand_staff)
+
+        for staff in new_staves:
+            staff.set_parent(new_grand_staff)
+
+        new_grand_staff.set_app_state(original_staff.get_app_state())
+        
+        return new_grand_staff
 
     def build_intervals(self, params: StaffItemBuildParams):
         intervals = []

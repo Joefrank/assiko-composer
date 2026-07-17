@@ -44,6 +44,7 @@ class ContainerBuilder:
         # Set staff builder. This will build new staffs dynamically when we call CreateStaff method on the music score. 
         music_score.add_child_item_builder("staff", self.main_window.staff_builder)
         music_score.add_child_item_builder("score", self.score_builder)
+        music_score.add_child_item_builder("text_input", self.main_window.text_item_builder)
 
         score_document = ScrollableDocumentViewport(
             rect,

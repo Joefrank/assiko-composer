@@ -15,8 +15,9 @@ class MainWindowEventHandler:
         self.init_event_subscriptions()
 
     def init_event_subscriptions(self):
-        for supported_event, _, handler_name in EVENT_TYPES:
-            self.event_subscriptions.append(EventSubscription(supported_event, handler_name))           
+        for supported_event, event_name, handler_name, filter in EVENT_TYPES:
+            self.event_subscriptions.append(EventSubscription(supported_event, handler_name,
+                                                              event_name, filter))           
 
     def subscribe(self, event_type, subscriber):
         # Find the subscription for the event type and add the subscriber to it
@@ -29,8 +30,7 @@ class MainWindowEventHandler:
             subscriber.supported_events.append(event_type)     
 
     """Unsubscribe object from all events handlers."""
-    def unsubscribe(self, subscriber):
-        print(f"unsubscriping: {subscriber.name}")
+    def unsubscribe(self, subscriber):       
         # Loop through all subscriptions and remove specified subscriber.
         for subscription in self.event_subscriptions:
             if subscriber in subscription.subscribers:
@@ -45,8 +45,11 @@ class MainWindowEventHandler:
         timer = next((t for t in self.timers if t.timer_name == timer_id), None)
         if timer:
             timer.subscribe(subscriber)      
-        
-        
+
+    @staticmethod 
+    def has_attribute_value(obj, attr, value):
+        return getattr(obj, attr, None) == value
+
     def handle_events(self, dt: int) -> None:
         """Process all pygame events."""
         for event in pygame.event.get():
@@ -54,6 +57,11 @@ class MainWindowEventHandler:
                 # find corresponding subscription for event.type
                 subscription = next((s for s in self.event_subscriptions if s.event_type == event.type), None)
                 if subscription:
+                    # check if we need to apply a filter for event subscription
+                    if subscription.filter and not self.has_attribute_value(event, 
+                                                subscription.filter[0], subscription.filter[1]):
+                        continue
+                        
                     # notify all subscribers of the event in order of their z-index (higher z-index first)
                     ordered_subscribers = sorted(subscription.subscribers, key=lambda s: s.z_index, reverse=True)
                     for subscriber in ordered_subscribers: 

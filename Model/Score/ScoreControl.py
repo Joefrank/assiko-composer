@@ -1,15 +1,21 @@
 
+from typing import TYPE_CHECKING
 
 from DataClasses.DialogConfigData import ConfirmDialogsConfig
 from Model.Control import Control
 from Model.Dialogs import DialogModifyStruct
 
+if TYPE_CHECKING:
+    from Model.Score.GrandStaff import GrandStaff
+    from Model.Score.Staff import Staff
 
 class ScoreControl(Control):
 
     def __init__(self, rect, control_type, name, parent):
         super().__init__(rect, control_type=control_type, name=name, parent=parent) 
         self.last_opened_dialog = None
+        self.bg_color = (255,255,255)
+        self.text_color = (40,40,40)
 
     def move(self, offset_x:int, offset_y:int):
         self.rect.x += offset_x
@@ -21,11 +27,16 @@ class ScoreControl(Control):
     def unlink(self, control):
         if control in self.children:
             self.children.remove(control)
+
+            from Model.Score.GrandStaff import GrandStaff
+            from Model.Score.Staff import Staff
+
+            if isinstance(control, Staff) and isinstance(self, GrandStaff):
+                self.staves.remove(control)
         
     """Score control can be deleted. All references should be set to null."""
-    def delete(self):
+    def delete(self):      
         self.parent.unlink(self)
-        #self.parent = None
         # Unsubscribe to events if any
         if self.supported_events and self.get_app_state() is not None:
             self.get_app_state().get_window_event_handler().unsubscribe(self)

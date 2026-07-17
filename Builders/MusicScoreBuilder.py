@@ -76,9 +76,9 @@ class MusicScoreBuilder:
        
         return music_score
     
-    def build_score_text_item(self, rect, parent_page):
-        item_rect = pygame.Rect(rect.x, rect.y, 160, 50)
-        return TextItem(item_rect, "...", parent_page)
+    # def build_score_text_item(self, rect, parent_page):
+    #     item_rect = pygame.Rect(rect.x, rect.y, 160, 50)
+    #     return TextItem(item_rect, "...", parent_page)
 
     def build(self):
         return self.music_score 

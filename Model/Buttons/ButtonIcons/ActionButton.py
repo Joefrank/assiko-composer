@@ -37,7 +37,7 @@ class ActionButton(ScoreControl):
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW))
             return False 
         
-    def on_left_mouse_down(self, event):
+    def on_left_mouse_down(self, event):       
         real_coordinates = self.parent.map_coordinates_in_viewport(event.pos)  
         if self.rect.collidepoint(real_coordinates) and self.visible:    
             function = getattr(self.parent, self.action, None)      

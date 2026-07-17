@@ -1,5 +1,6 @@
 import sys
 import pygame
+from Builders.TextItemBuilder import TextItemBuilder
 from Builders.DynamicStaffBuilder import DynamicStaffBuilder
 from DataClasses.Config.ScreenConfig import SupportedLanguages
 from DataClasses.ControlData import ControlType
@@ -35,6 +36,7 @@ class Window(Control):
         self.app_state.set_translator(self.__translator)
         self.score_document = None
         self.__dynamic_staff_builder = DynamicStaffBuilder(self)
+        self.__text_item_builder = TextItemBuilder(self)
        
     @property
     def common_dialog(self):        
@@ -50,6 +52,10 @@ class Window(Control):
     @property
     def staff_builder(self):
         return self.__dynamic_staff_builder
+    
+    @property
+    def text_item_builder(self):
+        return self.__text_item_builder
     
     def set_score_document(self, score_document):
         self.score_document = score_document

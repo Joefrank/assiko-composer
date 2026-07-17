@@ -81,7 +81,8 @@ class Control:
         
     def set_parent(self, parent):
         self.parent = parent
-        parent.add_child(self)
+        if not self in parent.children:
+            parent.add_child(self)
 
     def get_children(self):
         return self.children

@@ -21,8 +21,7 @@ class ScorePage(ScoreControl):
     def map_coordinates_in_viewport(self, coordinates:tuple) -> tuple:
         return self.parent.get_coordinates_in_viewport(coordinates)
 
-    def order_children(self):
-        print("re-ordering children")
+    def order_children(self):        
         ordered_children = sorted(self.children, key=lambda child: child.rect.topleft, reverse=False)
 
         # for each child, check it's top and bottom positions.
@@ -31,17 +30,17 @@ class ScorePage(ScoreControl):
             for child2 in ordered_children:
                 if child == child2:
                     continue
-                if child.rect.colliderect(child2.rect):
-                    print(f"{child.name} - bottom: {child.rect.bottomleft} - collides with {child2.name} - bottom:{child2.rect.topleft} ")
-                    print(f"Should move to y:{child.rect.bottomleft[1]}")
+                if child.rect.colliderect(child2.rect):                   
                     y_offset = child.rect.bottomleft[1] - child2.rect.y + StaffConfig.STAFF_SPACING
                     child2.move(0, y_offset)
-                    
-                    
-
 
         # check if any other items collides with it. if it does, move it below the current item with a gap. 
 
+    def insert_object(self, object):
+        print(f"inserting object: {object.name}")
+        self.add_child(object)
+        # find any children objects that could potentially collide with this one and move them out of the way.
+        
 
     def draw(self, scrollable_screen=None):
         if scrollable_screen is None:

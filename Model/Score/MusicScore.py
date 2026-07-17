@@ -1,5 +1,6 @@
 import pygame
 
+from DataClasses.ButtonConfigData import StaffActionButtonConfig, StaffActionButtonPosition, StaffActionIdentifiers
 from DataClasses.Config.ScreenConfig import StaffConfig
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Model.Score.GrandStaff import GrandStaff
@@ -92,10 +93,17 @@ class MusicScore:
             staff.rect.x,
             staff.rect.bottom + StaffConfig.STAFF_SPACING
         )
+
+        staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, 
+                                                 [StaffActionIdentifiers.ADD_STAFF_ACTION, 
+                                                  StaffActionIdentifiers.DELETE_STAFF_ACTION,
+                                                  StaffActionIdentifiers.CREATE_GRAND_STAFF_ACTION])]
+
         new_staff = staff_builder.build_empty_staff(
             new_staff_top_left,
             StaffConfig.STAFF_WIDTH_PERCENT,
-            parent_page
+            parent_page,
+            staff_actions
         )
         self.add_staff(new_staff)
         return new_staff
@@ -174,14 +182,20 @@ class MusicScore:
         staff_builder = self.get_child_item_builder("staff")
         if staff_builder:
             parent_page = input_dict["parent_page"]
-            return staff_builder.build_empty_staff((rect.x, rect.y), StaffConfig.STAFF_WIDTH_PERCENT, parent_page)            
+            staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, 
+                                                 [StaffActionIdentifiers.ADD_STAFF_ACTION, 
+                                                  StaffActionIdentifiers.DELETE_STAFF_ACTION,
+                                                  StaffActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
+                                                  StaffActionIdentifiers.EXTEND_GRAND_STAFF_ACTION])]
+            return staff_builder.build_empty_staff((rect.x, rect.y), StaffConfig.STAFF_WIDTH_PERCENT, parent_page, staff_actions)            
         return None
 
 
     def CreateTextInput(self, input_dict, rect):        
         parent_page = input_dict["parent_page"]
-        score_builder = self.get_child_item_builder("score")
-        text_item =  score_builder.build_score_text_item(rect, parent_page=parent_page)
+        # score_builder = self.get_child_item_builder("score")
+        text_builder = parent_page.main_window.text_item_builder
+        text_item =  text_builder.build_text_item(rect, parent_page=parent_page)
         parent_page.children.append(text_item)
         return text_item
     

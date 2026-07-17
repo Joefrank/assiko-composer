@@ -1,8 +1,10 @@
 
 class EventSubscription:
-    def __init__(self, event_type, handler_name):
+    def __init__(self, event_type, handler_name, event_name, filter:tuple=None):
+        self.event_name = event_name
         self.event_type = event_type
         self.handler_name = handler_name
+        self.filter = filter
         self.subscribers = []
 
     def subscribe(self, subscriber):

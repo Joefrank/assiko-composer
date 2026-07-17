@@ -6,6 +6,7 @@ import copy
 
 import pygame
 
+from DataClasses.ButtonConfigData import StaffActionButtonConfig, StaffActionButtonPosition, StaffActionIdentifiers
 from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.ControlData import ControlType
 from Model.Dialogs.DialogModifyStruct import DialogModifyStruct
@@ -15,10 +16,12 @@ class GrandStaff(ScoreControl):
    
     def __init__(self, rect, name, staves=None, parent_page=None):
         super().__init__(rect=rect, control_type=ControlType.GRAND_STAFF, name=name, parent=parent_page)
-        self.staves = [] if staves is None else list(staves)
+        self.staves = [] 
         self.children = []
-        for staff in self.staves:
-            self.children.append(staff)
+        
+        if staves and len(staves) > 0:
+            self.add_staves(staves)
+            
         self.set_positions()  # Set the top-left and bottom-right positions based on the staves
 
     def set_positions(self):
@@ -26,12 +29,21 @@ class GrandStaff(ScoreControl):
             self.top_left_position = self.staves[0].top_left_position
             self.bottom_right_position = self.staves[-1].bottom_right_position
             self.rect.height =  self.bottom_right_position[1] - self.top_left_position[1] # vertical amplitude
-            print(f"grand staff height: {self.rect.height}")
-
+            
     def add_staff(self, staff):
         self.staves.append(staff)
         self.children.append(staff)  # Add staff as a child control
+        staff.parent = self
         self.set_positions()  # Update positions after adding a new staff
+
+    def add_staves(self, staves):
+        self.staves += staves
+        self.children += staves
+        
+        for staff in self.staves:
+            staff.parent = self
+
+        self.set_positions() 
 
     def delete(self):
         children = list(self.children)
@@ -129,6 +141,7 @@ class GrandStaff(ScoreControl):
             staff.move(0, offset_y) 
     
     def confirm_delete(self, caller):
+        print(f"Grand Staff delete {self.name}")
         dialog_config = DialogModifyStruct(
             main_window=self.main_window,
             dialog_title=self.translate("CONFIRM_DELETE_GRANDSTAFF_TITLE"),
@@ -156,8 +169,12 @@ class GrandStaff(ScoreControl):
        )
        
        # Create a new staff below the current staff
+       staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, [StaffActionIdentifiers.DELETE_STAFF_ACTION])]
        new_staff = self.main_window.staff_builder.build_empty_staff(
-            new_staff_top_left,StaffConfig.STAFF_WIDTH_PERCENT, parent_page=self.parent, add_action_buttons=False
+            new_staff_top_left,StaffConfig.STAFF_WIDTH_PERCENT, 
+            parent_page=self.parent, 
+            action_buttons=staff_actions,
+            parent_staff=target_grand_staff
         )
        
        self.add_staff(new_staff)       
@@ -167,7 +184,9 @@ class GrandStaff(ScoreControl):
        self.set_positions()
        self.parent.order_children() 
 
-
+    def duplicate_staff_below(self, caller):        
+        grand_staff = self.main_window.staff_builder.duplicate_grand_staff_below(self)
+        self.parent.insert_object(grand_staff)
 
     def draw(self, scrollable_screen):       
         previous_staff = None

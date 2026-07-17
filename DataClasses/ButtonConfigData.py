@@ -52,8 +52,15 @@ class StaffActionButtonPosition(Enum):
     BOTTOM = auto()
     LEFT = auto()
 
+class StaffActionIdentifiers(Enum):
+    ADD_STAFF_ACTION= auto()
+    DELETE_STAFF_ACTION= auto()
+    CREATE_GRAND_STAFF_ACTION=auto()
+    EXTEND_GRAND_STAFF_ACTION=auto()
+
 @dataclass
 class ActionButtonConfig:
+    Id: StaffActionIdentifiers
     name: str
     tooltip: str
     action: str
@@ -64,10 +71,15 @@ class ActionButtonConfig:
     ignore_previous_offset_y: bool | None = None
     size: Size=Size(20,20)
    
+@dataclass
+class StaffActionButtonConfig:
+    Position: StaffActionButtonPosition
+    ConfigIds: list[StaffActionIdentifiers]
 
 # Icons are from this site: https://www.flaticon.com/search?word=Add
 STAFF_ACTION_BUTTON_CONFIG = [
     ActionButtonConfig(
+        Id=StaffActionIdentifiers.ADD_STAFF_ACTION,
         name="Staff Add",
         tooltip="Add staff",
         action="duplicate_staff_below",
@@ -76,6 +88,7 @@ STAFF_ACTION_BUTTON_CONFIG = [
         visible = True
     ),
     ActionButtonConfig(
+        Id=StaffActionIdentifiers.DELETE_STAFF_ACTION,
         name="Staff Delete",
         tooltip="Delete staff",
         action="confirm_delete",
@@ -84,6 +97,7 @@ STAFF_ACTION_BUTTON_CONFIG = [
         visible = True
     ),
     ActionButtonConfig(
+        Id=StaffActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
         name="Create Grand Staff",
         tooltip="Convert to grand staff",
         action="convert_to_grand_staff",
@@ -93,6 +107,7 @@ STAFF_ACTION_BUTTON_CONFIG = [
         size = Size(20,33)
     ),
     ActionButtonConfig(
+        Id=StaffActionIdentifiers.EXTEND_GRAND_STAFF_ACTION,
         name="Extent Grand Staff",
         tooltip="Extend grand staff",
         action="extend_grand_staff",

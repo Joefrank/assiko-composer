@@ -14,12 +14,12 @@ KEYBOARD_EVENTS = [
 ]
 
 EVENT_TYPES = [
-        (pygame.MOUSEBUTTONDOWN, "Mouse Button Down", "on_left_mouse_down"),
-        (pygame.MOUSEBUTTONUP, "Mouse Button Up", "on_left_mouse_up"),
-        (pygame.MOUSEMOTION, "Mouse Motion", "on_mouse_motion"),  
-        (pygame.MOUSEWHEEL, "Mouse Wheel", "on_mouse_wheel"),      
-        (pygame.VIDEORESIZE, "Video Resize", "on_video_resize"),
-        (pygame.KEYDOWN, "Key Down", "on_key_down"),
-        (pygame.KEYUP, "Key Up", "on_key_up"),
-        (pygame.QUIT, "Quit", "on_quit")
+        (pygame.MOUSEBUTTONDOWN, "Mouse Button Down", "on_left_mouse_down", ("button", 1)),
+        (pygame.MOUSEBUTTONUP, "Mouse Button Up", "on_left_mouse_up", ("button", 1)),
+        (pygame.MOUSEMOTION, "Mouse Motion", "on_mouse_motion", None),  
+        (pygame.MOUSEWHEEL, "Mouse Wheel", "on_mouse_wheel", None),      
+        (pygame.VIDEORESIZE, "Video Resize", "on_video_resize", None),
+        (pygame.KEYDOWN, "Key Down", "on_key_down", None),
+        (pygame.KEYUP, "Key Up", "on_key_up", None),
+        (pygame.QUIT, "Quit", "on_quit", None)
     ]

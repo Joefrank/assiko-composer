@@ -18,6 +18,11 @@ Bugs:
 
 Next to do:
 
-- Add delete buttons for secondary staves of grand staff
+
 - add expand/reduce buttons on left of grand staff gaps
 - Add grand staff doesn't work
+- Grand staff is not able to be dragged again when dragged and dropped below visible port
+
+- staff extended, new staff can't be deleted (done)
+- Add delete buttons for secondary staves of grand staff (done)
+- scrolling while adding staff adds multiple staves (Done)
