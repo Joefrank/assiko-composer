@@ -4,7 +4,7 @@ import math
 import pygame
 
 from Model.Containers.Window import Window
-from Model.DragAndDrop.TextItem import TextItem
+from Model.Inputs.TextItem import TextItem
 from Model.Geometry.Position import Position
 from Model.Inputs.TextInput import TextInput
 from Model.Score.MusicScore import MusicScore

@@ -20,9 +20,12 @@ Next to do:
 
 
 - add expand/reduce buttons on left of grand staff gaps
-- Add grand staff doesn't work
 - Grand staff is not able to be dragged again when dragged and dropped below visible port
+- Key down s or other menu shortcut are being intercepted without Ctrl key press
+- Implement delete for TextInput (use delete key)
+- resize button as text length increases
 
 - staff extended, new staff can't be deleted (done)
 - Add delete buttons for secondary staves of grand staff (done)
 - scrolling while adding staff adds multiple staves (Done)
+- Add grand staff doesn't work (Done)

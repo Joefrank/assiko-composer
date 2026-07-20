@@ -7,7 +7,7 @@ import pygame
 from DataClasses.ControlData import ControlType
 from Model.Containers.ScorePage import ScorePage
 from Model.Control import Control
-from Model.DragAndDrop.TextItem import TextItem
+from Model.Inputs.TextItem import TextItem
 from Model.Score.GrandStaff import GrandStaff
 from Model.Score.Staff import Staff
 

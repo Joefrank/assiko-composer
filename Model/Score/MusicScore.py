@@ -190,12 +190,16 @@ class MusicScore:
             return staff_builder.build_empty_staff((rect.x, rect.y), StaffConfig.STAFF_WIDTH_PERCENT, parent_page, staff_actions)            
         return None
 
-
+    """
+        Creates an input item used to edit text on the score page.
+        input_dict: dictionary of objects needed to create the input
+        rect: coordinates and size of symbol being dropped.
+    """
     def CreateTextInput(self, input_dict, rect):        
         parent_page = input_dict["parent_page"]
-        # score_builder = self.get_child_item_builder("score")
+        input_rect = pygame.Rect(rect.x, rect.y, 200, 50)
         text_builder = parent_page.main_window.text_item_builder
-        text_item =  text_builder.build_text_item(rect, parent_page=parent_page)
+        text_item =  text_builder.build_text_item(input_rect, parent_page=parent_page)
         parent_page.children.append(text_item)
         return text_item
     
