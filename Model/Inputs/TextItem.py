@@ -28,16 +28,23 @@ class TextItem(ScoreControl):
         self.cursor_interval = 500
         self.cursor_pos = 0
         self.padding = 10
-        # drawing width and x_offset
-        self.max_width, self.leftmost_x_offset  = parent_container.get_drawing_boundaries()
-        self.rightmost_x_offset = self.max_width + self.leftmost_x_offset
         self.last_mouse_pos = None
 
+    @property
+    def min_x(self):
+        _, leftmost_x_offset  = self.parent_container.get_drawing_boundaries()
+        return leftmost_x_offset
+    
+    @property
+    def max_x(self):
+        max_width, leftmost_x_offset  = self.parent_container.get_drawing_boundaries()
+        return (leftmost_x_offset + max_width)
+    
     def adjust_position(self):       
-        if self.rect.x < self.leftmost_x_offset:
-            self.rect.x = self.leftmost_x_offset
-        elif self.rect.x > self.rightmost_x_offset:
-            self.rect.x = self.rightmost_x_offset
+        if self.rect.x < self.min_x:
+            self.rect.x = self.min_x
+        elif self.rect.x > self.max_x:
+            self.rect.x = self.max_x
 
     def on_left_mouse_down(self, event):
         self.last_mouse_pos = self.parent_container.map_coordinates_in_viewport(event.pos)         
@@ -110,7 +117,7 @@ class TextItem(ScoreControl):
         if text_width > text_input_threshold:            
             # check that we are not exceeding the parent container's width
             new_width = self.rect.width + width_increment
-            x_diff = self.rect.x - self.leftmost_x_offset
+            x_diff = self.rect.x - self.min_x
             can_extend = self.max_width > (x_diff + new_width)
             
             if can_extend:
@@ -130,7 +137,7 @@ class TextItem(ScoreControl):
     def move(self, offset_x:int, offset_y:int):
         new_offset_x =  self.rect.x + offset_x
 
-        if new_offset_x >= self.leftmost_x_offset and (new_offset_x + self.rect.width) < self.rightmost_x_offset:
+        if new_offset_x >= self.min_x and (new_offset_x + self.rect.width) < self.max_x:
             self.rect.x += offset_x
 
         #### Handle vertical move at page level or even score level
