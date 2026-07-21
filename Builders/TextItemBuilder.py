@@ -13,8 +13,8 @@ class TextItemBuilder:
         self.event_handler = self.main_window.get_event_handler()
 
     def build_text_item(self, rect, parent_page):
-        text_item= TextItem(rect, "Click and type", parent_page, bg_color=(250,250,250), text_color=(100,100,100))
-        #self.event_handler.subscribe(pygame.MOUSEMOTION, text_item)
+        text_item= TextItem(rect, "Click and type", parent_page, bg_color=(255,250,252), text_color=(100,100,100),
+                            inactive_border_thickness=1)
         self.event_handler.subscribe(pygame.MOUSEBUTTONDOWN, text_item)
         self.event_handler.subscribe(pygame.KEYDOWN, text_item)
         self.event_handler.subscribe_timer(TextInputBlinkTimer.NAME, text_item)

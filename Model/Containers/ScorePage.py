@@ -36,8 +36,13 @@ class ScorePage(ScoreControl):
 
         # check if any other items collides with it. if it does, move it below the current item with a gap. 
 
-    def insert_object(self, object):
-        print(f"inserting object: {object.name}")
+    def get_drawing_boundaries(self):
+        drawing_width = int((self.rect.width * StaffConfig.STAFF_WIDTH_PERCENT)/100)
+        x_offset = self.rect.x + ((self.rect.width - drawing_width) // 2)
+        return drawing_width, x_offset
+        
+    
+    def insert_object(self, object):       
         self.add_child(object)
         # find any children objects that could potentially collide with this one and move them out of the way.
         

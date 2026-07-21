@@ -22,9 +22,17 @@ Next to do:
 - add expand/reduce buttons on left of grand staff gaps
 - Grand staff is not able to be dragged again when dragged and dropped below visible port
 - Key down s or other menu shortcut are being intercepted without Ctrl key press
-- Implement delete for TextInput (use delete key)
-- resize button as text length increases
 
+- Implement delete for TextInput (use delete key) -> put delete icon on top and other size, bold icons on top.
+
+- Check vertical movement in parent page so items don't end up out of pages when dragged.
+- show message box for items dropped on non-page location.
+- Also check when duplicating items that they don't end out of pages.
+
+- stop text from being dragged out of boundaries (done)
+- make sure size is validated on key press so no char escapes that validation (done)
+- click needs to place cursor on text where mouse is. (done)
+- resize button as text length increases (Done)
 - staff extended, new staff can't be deleted (done)
 - Add delete buttons for secondary staves of grand staff (done)
 - scrolling while adding staff adds multiple staves (Done)

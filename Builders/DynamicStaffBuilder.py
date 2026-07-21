@@ -92,11 +92,9 @@ class DynamicStaffBuilder:
     
     def build_staff_rect(self, click_position, staff_width_percentage, parent_page:ScorePage):
         if not parent_page:
-            return None
+            return None        
         
-        # All staves should be horizontally-aligned and resize based on parent_page.  
-        staff_width = int((parent_page.rect.width * staff_width_percentage)/100)
-        x_offset = parent_page.rect.x + ((parent_page.rect.width - staff_width) // 2)
+        staff_width, x_offset = parent_page.get_drawing_boundaries()
         return pygame.Rect(x_offset, click_position[1], staff_width, self.staff_height)
 
     """

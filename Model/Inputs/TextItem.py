@@ -8,8 +8,8 @@ from Model.Score.ScoreControl import ScoreControl
 class TextItem(ScoreControl):
 
     def __init__(self, rect, text, parent_container, 
-                 font_size=20, bg_color=(120,190,255), text_color=(20,20,20),
-                 border_color=(200,200,200), border_tickness=2):
+                 font_size=18, bg_color=(120,190,255), inactive_bg_color=(250,240,250), text_color=(20,20,20),
+                 border_color=(200,200,200), border_thickness=2, inactive_border_thickness=1):
         super().__init__(rect, control_type=ControlType.TEXT_INPUT, name="TextItem", parent=parent_container)
 
         self.font = pygame.font.SysFont("segoeui", font_size)
@@ -17,8 +17,10 @@ class TextItem(ScoreControl):
         self.original_text = self.text = text
         self.parent_container = parent_container
         self.bg_color = bg_color
+        self.inactive_bg_color = inactive_bg_color
         self.text_color = text_color
-        self.border_tickness = border_tickness
+        self.border_thickness = border_thickness
+        self.inactive_border_thickness = inactive_border_thickness
         self.border_color = border_color  
         self.active = False
         
@@ -26,10 +28,20 @@ class TextItem(ScoreControl):
         self.cursor_interval = 500
         self.cursor_pos = 0
         self.padding = 10
+        # drawing width and x_offset
+        self.max_width, self.leftmost_x_offset  = parent_container.get_drawing_boundaries()
+        self.rightmost_x_offset = self.max_width + self.leftmost_x_offset
+        self.last_mouse_pos = None
+
+    def adjust_position(self):       
+        if self.rect.x < self.leftmost_x_offset:
+            self.rect.x = self.leftmost_x_offset
+        elif self.rect.x > self.rightmost_x_offset:
+            self.rect.x = self.rightmost_x_offset
 
     def on_left_mouse_down(self, event):
-        actual_pos = self.parent_container.map_coordinates_in_viewport(event.pos)         
-        self.active = self.rect.collidepoint(actual_pos)
+        self.last_mouse_pos = self.parent_container.map_coordinates_in_viewport(event.pos)         
+        self.active = self.rect.collidepoint(self.last_mouse_pos)
 
         if self.active and self.original_text == self.text:
             self.text = ""
@@ -37,13 +49,13 @@ class TextItem(ScoreControl):
             self.text = self.original_text
 
     def on_key_down(self, event):
-        
+        self.last_mouse_pos = None
+
         if not self.active:
             return
 
         if event.type == pygame.KEYDOWN:
-            print(f"key: {event.key}")
-
+          
             if event.key == pygame.K_BACKSPACE:
                 if self.cursor_pos > 0:
                     self.text = (
@@ -72,16 +84,14 @@ class TextItem(ScoreControl):
                 self.cursor_pos = len(self.text)
 
             elif event.key == pygame.K_RETURN:
-                print("Entered:", self.text)
-
+                self.active = False
             else:
                 if event.unicode.isprintable():
-                    self.text = (
+                    self.process_new_input(
                         self.text[:self.cursor_pos]
-                        + event.unicode
-                        + self.text[self.cursor_pos:]
-                    )
-                    self.cursor_pos += 1
+                         + event.unicode
+                         + self.text[self.cursor_pos:]
+                    )                  
 
             # Reset cursor blink on typing
             self.cursor_visible = True
@@ -90,21 +100,57 @@ class TextItem(ScoreControl):
     def on_timer_tick(self, timer):
         self.cursor_visible = not self.cursor_visible
 
-    def draw(self, scrollable_screen=None):
-        text_x = self.rect.x + self.padding
-        text_y = self.rect.y + (self.rect.height // 2) - (self.font.get_height() // 2)
+    def process_new_input(self, input_text):
+        # calculate width of text and resize input box accordingly, with a max width limit
+        text_width = self.font.size(input_text)[0] 
+        width_increment = 2 * self.padding        
+        text_input_threshold = self.rect.width - (width_increment)
+       
+        # When the text content exceeds textitem size (width)
+        if text_width > text_input_threshold:            
+            # check that we are not exceeding the parent container's width
+            new_width = self.rect.width + width_increment
+            x_diff = self.rect.x - self.leftmost_x_offset
+            can_extend = self.max_width > (x_diff + new_width)
+            
+            if can_extend:
+                self.rect.width = new_width
+                self.text = input_text                
+            elif x_diff > 0:
+                self.rect.x -= width_increment
+                self.rect.width = new_width
+                self.text = input_text            
+            else:
+                self.active = False  # Deactivate input if we exceed parent container width
+        else:
+            self.text = input_text
 
+        self.cursor_pos += 1
+
+    def move(self, offset_x:int, offset_y:int):
+        new_offset_x =  self.rect.x + offset_x
+
+        if new_offset_x >= self.leftmost_x_offset and (new_offset_x + self.rect.width) < self.rightmost_x_offset:
+            self.rect.x += offset_x
+
+        #### Handle vertical move at page level or even score level
+        self.rect.y += offset_y
+
+        self.last_mouse_pos = None
+
+    def draw(self, scrollable_screen=None):
         if scrollable_screen is None:
             scrollable_screen = self.main_screen
 
-        r = self.rect.move(
-            0,
-            -self.parent_container.scroll_y
-        )
+        r = self.rect.move(0, -self.parent_container.scroll_y)
+        text_x = r.x + self.padding
+        text_y = r.y + (self.rect.height // 2) - (self.font.get_height() // 2)
+        bg_color = self.bg_color if self.active else self.inactive_bg_color
+        border_thickness = self.border_thickness if self.active else self.inactive_border_thickness
 
         pygame.draw.rect(
             scrollable_screen,
-            self.bg_color,
+            bg_color,
             r,
             border_radius=2
         )
@@ -113,7 +159,7 @@ class TextItem(ScoreControl):
             scrollable_screen,
             self.border_color,
             r,
-            self.border_tickness,
+            border_thickness,
             border_radius=2
         )
 
@@ -127,17 +173,13 @@ class TextItem(ScoreControl):
             txt,
             (
                 r.x + 10,
-                r.y + 15
+                r.y + 10
             )
         )
 
-        # Cursor ONLY when active
         if self.active and self.cursor_visible:
-
-            cursor_text = self.text[:self.cursor_pos]            
-            cursor_x_offset = self.font.size(cursor_text)[0]
-            cursor_x = text_x + cursor_x_offset
-
+            cursor_text = self.text[:self.cursor_pos]
+            cursor_x = text_x + self.font.size(cursor_text)[0]
             pygame.draw.line(
                 scrollable_screen,
                 self.text_color,

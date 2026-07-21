@@ -366,6 +366,9 @@ class ScrollableDocumentViewport(Control):
                    rect.width,
                    rect.height
                )
+               if target_page is None:
+                   print("Item dropped at invalid location. needs to be on a page.")
+                   return
                # build a dictionary for other parameters
                input_dict = {"original_value" : params_input, "parent_page": target_page}
 

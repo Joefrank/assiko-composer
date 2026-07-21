@@ -197,7 +197,7 @@ class MusicScore:
     """
     def CreateTextInput(self, input_dict, rect):        
         parent_page = input_dict["parent_page"]
-        input_rect = pygame.Rect(rect.x, rect.y, 200, 50)
+        input_rect = pygame.Rect(rect.x, rect.y, 150, 40)
         text_builder = parent_page.main_window.text_item_builder
         text_item =  text_builder.build_text_item(input_rect, parent_page=parent_page)
         parent_page.children.append(text_item)
