@@ -1,4 +1,4 @@
-from DataClasses.ButtonConfigData import StaffActionButtonConfig, StaffActionButtonPosition, StaffActionIdentifiers
+from DataClasses.ButtonConfigData import ActionButtonConfig, ActionButtonGroupConfig, ActionButtonPosition, ActionIdentifiers
 from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.Config.MusicConfig import supported_time_signatures,TREBLE_CLEF, BARITON_CLEF
 from DataClasses.ControlData import ControlType
@@ -302,11 +302,11 @@ class Staff(ScoreControl):
         )
 
         # build the staff and add it to the parent page
-        staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, 
-                                                 [StaffActionIdentifiers.ADD_STAFF_ACTION, 
-                                                  StaffActionIdentifiers.DELETE_STAFF_ACTION,
-                                                  StaffActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
-                                                  StaffActionIdentifiers.EXTEND_GRAND_STAFF_ACTION])]
+        staff_actions = [ActionButtonGroupConfig(ActionButtonPosition.RIGHT, 
+                                                 [ActionIdentifiers.ADD_STAFF_ACTION, 
+                                                  ActionIdentifiers.DELETE_STAFF_ACTION,
+                                                  ActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
+                                                  ActionIdentifiers.EXTEND_GRAND_STAFF_ACTION])]
         new_staff = staff_builder.build_empty_staff(
             new_staff_top_left,
             StaffConfig.STAFF_WIDTH_PERCENT,

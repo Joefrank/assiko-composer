@@ -46,76 +46,143 @@ class SimpleButtonParams:
     action_value=None
 
 
-class StaffActionButtonPosition(Enum):
+class ActionButtonPosition(Enum):
     TOP = auto()
     RIGHT = auto()
     BOTTOM = auto()
     LEFT = auto()
 
-class StaffActionIdentifiers(Enum):
+class ActionIdentifiers(Enum):
     ADD_STAFF_ACTION= auto()
     DELETE_STAFF_ACTION= auto()
     CREATE_GRAND_STAFF_ACTION=auto()
     EXTEND_GRAND_STAFF_ACTION=auto()
+    ADD_TEXT_ITEM_ACTION=auto()
+    DELETE_TEXT_ITEM_ACTION=auto()
+    INCREASE_TEXT_SIZE = auto()
+    DECREASE_TEXT_SIZE= auto()   
+    TOGGLE_FONT_BOLD= auto()
+    TOGGLE_ITALIC = auto()
 
 @dataclass
 class ActionButtonConfig:
-    Id: StaffActionIdentifiers
+    Id: ActionIdentifiers
     name: str
     tooltip: str
     action: str
     icon_path: str
-    position: StaffActionButtonPosition
+    position: ActionButtonPosition
     visible: bool
     ignore_previous_offset_x: bool | None = None
     ignore_previous_offset_y: bool | None = None
+    alternate_icon_path: str | None = None
     size: Size=Size(20,20)
    
 @dataclass
-class StaffActionButtonConfig:
-    Position: StaffActionButtonPosition
-    ConfigIds: list[StaffActionIdentifiers]
+class ActionButtonGroupConfig:
+    Position: ActionButtonPosition
+    ConfigIds: list[ActionIdentifiers]
 
 # Icons are from this site: https://www.flaticon.com/search?word=Add
+
 STAFF_ACTION_BUTTON_CONFIG = [
     ActionButtonConfig(
-        Id=StaffActionIdentifiers.ADD_STAFF_ACTION,
+        Id=ActionIdentifiers.ADD_STAFF_ACTION,
         name="Staff Add",
         tooltip="Add staff",
         action="duplicate_staff_below",
         icon_path="add.png",
-        position=StaffActionButtonPosition.RIGHT,
+        position=ActionButtonPosition.RIGHT,
         visible = True
     ),
     ActionButtonConfig(
-        Id=StaffActionIdentifiers.DELETE_STAFF_ACTION,
+        Id=ActionIdentifiers.DELETE_STAFF_ACTION,
         name="Staff Delete",
         tooltip="Delete staff",
         action="confirm_delete",
         icon_path="red-bin.png",
-        position=StaffActionButtonPosition.RIGHT,
+        position=ActionButtonPosition.RIGHT,
         visible = True
     ),
     ActionButtonConfig(
-        Id=StaffActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
+        Id=ActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
         name="Create Grand Staff",
         tooltip="Convert to grand staff",
         action="convert_to_grand_staff",
         icon_path="create-grand-staff.png",
-        position=StaffActionButtonPosition.RIGHT,
+        position=ActionButtonPosition.RIGHT,
         visible = True,
         size = Size(20,33)
     ),
     ActionButtonConfig(
-        Id=StaffActionIdentifiers.EXTEND_GRAND_STAFF_ACTION,
+        Id=ActionIdentifiers.EXTEND_GRAND_STAFF_ACTION,
         name="Extent Grand Staff",
         tooltip="Extend grand staff",
         action="extend_grand_staff",
         icon_path="x-grand-staff.png",
-        position=StaffActionButtonPosition.RIGHT,
+        position=ActionButtonPosition.RIGHT,
         visible = False,
         ignore_previous_offset_y = True,
         size = Size(20,40)
+    )
+]
+
+TEXT_ITEM_ACTION_BUTTON_CONFIG = [
+    ActionButtonConfig(
+        Id=ActionIdentifiers.INCREASE_TEXT_SIZE,
+        name="Text Size Increase",
+        tooltip="Increase size",
+        action="increase_text_size",
+        icon_path="text_size_inc.png",
+        position=ActionButtonPosition.TOP,
+        visible=True           
+    ),
+    ActionButtonConfig(
+        Id=ActionIdentifiers.DECREASE_TEXT_SIZE,
+        name="Text Size Decrease",
+        tooltip="Decrease size",
+        action="decrease_text_size",
+        icon_path="text_size_dec.png",
+        position=ActionButtonPosition.TOP,
+        visible=True           
+    ),
+    ActionButtonConfig(
+        Id=ActionIdentifiers.TOGGLE_FONT_BOLD,
+        name="Toggle font bold",
+        tooltip="Toggle font bold",
+        action="toggle_font_bold",
+        icon_path="bold_on.png",
+        alternate_icon_path = "bold_off.png",
+        position=ActionButtonPosition.TOP,
+        visible=True           
+    ),
+    ActionButtonConfig(
+        Id=ActionIdentifiers.TOGGLE_ITALIC,
+        name="Toggle italic bold",
+        tooltip="Toggle italic bold",
+        action="toggle_font_italic",
+        icon_path="italic_on.png",
+        alternate_icon_path = "italic_off.png",
+        position=ActionButtonPosition.TOP,
+        visible=True           
+    ),
+    ActionButtonConfig(
+        Id=ActionIdentifiers.ADD_TEXT_ITEM_ACTION,
+        name="Text Item Add",
+        tooltip="Add text item",
+        action="add_text_item_below",
+        icon_path="add.png",
+        position=ActionButtonPosition.TOP,
+        visible=True       
+    ),
+    ActionButtonConfig(
+        Id=ActionIdentifiers.DELETE_TEXT_ITEM_ACTION,
+        name="Text Item Delete",
+        tooltip="Delete text item",
+        action="confirm_delete",
+        icon_path="red-bin.png",
+        position=ActionButtonPosition.TOP,
+        visible=True
     )
 ]
 

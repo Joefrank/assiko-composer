@@ -3,6 +3,9 @@
 # -----------------------------
 import pygame
 
+from DataClasses.Config import ScreenConfig
+from Helpers.ScreeHelper import ScreenHelper
+
 
 class DraggableSymbolButton:
     def __init__(self, rect, symbol, font, NOTE_COLOR, NOTE_BG):
@@ -19,7 +22,10 @@ class DraggableSymbolButton:
 
     def draw(self, surface, text_center_position):
         pygame.draw.rect(surface, self.note_bg, self.rect, border_radius=6)
-        font = pygame.font.SysFont("Segoe UI Symbol", 26)
+        # ScreenHelper.create_font
+        #font =  pygame.font.SysFont("Segoe UI Symbol", 26)
+        font = ScreenHelper.create_font((ScreenConfig.FontConfig.BRAVURA_FONT_PATH, 26))
+        
         label = font.render(self.symbol, True, (0, 0, 0))
         label_rect = label.get_rect(center=self.rect.center)
         surface.blit(label, label_rect)

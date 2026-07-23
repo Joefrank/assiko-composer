@@ -91,6 +91,11 @@ class ScoreConfig:
 @dataclass
 class FontConfig:
     BRAVURA_FONT_PATH = "Assets/Fonts/Bravura.otf"
+    NOTOSANS_FONT_PATH = "Assets/Fonts/NotoSansAdlam-Regular.otf"
+    NOTO_SERIFAHOM_REGULAR_FULL = "Assets/Fonts/NotoSerifAhom-Regular Full.ttf"
+    NOTO_SANADLAM_REGULAR = "Assets/Fonts/NotoSansAdlam-Regular.ttf"
+    NOTO_SERIFAHOM_REGULAR = "Assets/Fonts/NotoSerifAhom-Regular.ttf"
+    NOTO_SANS_SYMBOLS2_REGULAR = "Assets/Fonts/NotoSansSymbols2-Regular.ttf"
     
 staff_generic_settings = {
     "STAFF_LINE_GAP": 10,

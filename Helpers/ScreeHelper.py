@@ -31,9 +31,13 @@ class ScreenHelper:
         return event.type in KEYBOARD_EVENTS
     
     @staticmethod
-    def create_font(font_spec):
+    def create_font(font_spec, bold=False, italic=False):
         name, size = font_spec
         try:
-            return pygame.font.Font(name, size)
+            font = pygame.font.Font(name, size)
+            font.set_bold(bold)
+            font.set_italic(italic)
+            return font
         except Exception as e:
+            print(f"Exception on font: {e}")
             return pygame.font.SysFont(name if isinstance(name, str) else None, size)

@@ -1,7 +1,11 @@
 
 import pygame
 
+from DataClasses.ButtonConfigData import TEXT_ITEM_ACTION_BUTTON_CONFIG, ActionButtonGroupConfig, ActionButtonPosition, ActionIdentifiers
+from DataClasses.Config import ScreenConfig
 from DataClasses.ControlData import ControlType
+from Helpers.FileHelper import FileHelper
+from Helpers.ScreeHelper import ScreenHelper
 from Model.Score.ScoreControl import ScoreControl
 
 
@@ -11,8 +15,11 @@ class TextItem(ScoreControl):
                  font_size=18, bg_color=(120,190,255), inactive_bg_color=(250,240,250), text_color=(20,20,20),
                  border_color=(200,200,200), border_thickness=2, inactive_border_thickness=1):
         super().__init__(rect, control_type=ControlType.TEXT_INPUT, name="TextItem", parent=parent_container)
-
-        self.font = pygame.font.SysFont("segoeui", font_size)
+        self.font_path = ScreenConfig.FontConfig.NOTOSANS_FONT_PATH
+        self.font_size = font_size
+        self.font_bold = False
+        self.font_italic = False
+        self.font = ScreenHelper.create_font((self.font_path, self.font_size))
         self.rect = rect
         self.original_text = self.text = text
         self.parent_container = parent_container
@@ -22,13 +29,13 @@ class TextItem(ScoreControl):
         self.border_thickness = border_thickness
         self.inactive_border_thickness = inactive_border_thickness
         self.border_color = border_color  
-        self.active = False
-        
+        self.active = False        
         self.cursor_visible = True       
         self.cursor_interval = 500
         self.cursor_pos = 0
         self.padding = 10
         self.last_mouse_pos = None
+        self.action_buttons = []
 
     @property
     def min_x(self):
@@ -39,7 +46,12 @@ class TextItem(ScoreControl):
     def max_x(self):
         max_width, leftmost_x_offset  = self.parent_container.get_drawing_boundaries()
         return (leftmost_x_offset + max_width)
-    
+
+    @property
+    def max_width(self):
+        _width, _  = self.parent_container.get_drawing_boundaries()
+        return _width
+                
     def adjust_position(self):       
         if self.rect.x < self.min_x:
             self.rect.x = self.min_x
@@ -137,13 +149,91 @@ class TextItem(ScoreControl):
     def move(self, offset_x:int, offset_y:int):
         new_offset_x =  self.rect.x + offset_x
 
-        if new_offset_x >= self.min_x and (new_offset_x + self.rect.width) < self.max_x:
-            self.rect.x += offset_x
+        if new_offset_x < self.min_x or (new_offset_x + self.rect.width) > self.max_x:
+            return
 
         #### Handle vertical move at page level or even score level
+        self.rect.x += offset_x
         self.rect.y += offset_y
 
+        # Move children
+        for child in self.children:
+            child.move(offset_x, offset_y)
+
         self.last_mouse_pos = None
+
+    def add_text_item_below(self, caller):
+        main_window = getattr(self, "main_window", None)
+        if main_window is None and hasattr(self.parent_container, "main_window"):
+            main_window = self.parent_container.main_window
+
+        if main_window is None:
+            return None
+
+        parent_page = self.parent_container
+        if parent_page is None:
+            return None
+
+        new_rect = pygame.Rect(self.rect.x, self.rect.bottom + 50, self.rect.width, self.rect.height)
+
+        action_buttons_config =  [ 
+            ActionButtonGroupConfig(ActionButtonPosition.TOP, 
+                                    [ActionIdentifiers.DECREASE_TEXT_SIZE, ActionIdentifiers.INCREASE_TEXT_SIZE, 
+                                     ActionIdentifiers.TOGGLE_FONT_BOLD, ActionIdentifiers.TOGGLE_ITALIC]),
+            ActionButtonGroupConfig(ActionButtonPosition.RIGHT,[ActionIdentifiers.ADD_TEXT_ITEM_ACTION,
+                                                                ActionIdentifiers.DELETE_TEXT_ITEM_ACTION])
+            ]
+        
+        new_text_item = main_window.text_item_builder.build_text_item(new_rect, parent_page, 
+                                                            action_buttons_config)
+        parent_page.add_child(new_text_item)
+        return new_text_item
+
+    def confirm_delete(self, caller):
+        self.delete()
+
+    def draw_action_buttons(self, scrollable_screen, text_rect):
+        for button in self.action_buttons:
+            if not button.visible:
+                continue
+
+            icon_path = FileHelper.get_asset_images_paths() / "Buttons" / button.icon_path
+            button_rect = pygame.Rect(
+                button.rect.x,
+                button.rect.y - self.parent_container.scroll_y,
+                button.rect.width,
+                button.rect.height
+            )
+
+            try:
+                image = pygame.image.load(str(icon_path)).convert_alpha()
+                scaled_size = (int(button_rect.width * 1), int(button_rect.height * 1))
+                image_item = pygame.transform.scale(image, scaled_size)
+                image_item_rect = image_item.get_rect(center=button_rect.center)
+                scrollable_screen.blit(image_item, image_item_rect)
+            except pygame.error:
+                print("Error building image for text item action icon")
+
+    def increase_text_size(self, caller):
+        self.font_size += 2 
+        self.update_font()
+
+    def toggle_font_bold(self, caller):
+        self.font_bold = not self.font_bold
+        self.update_font()
+
+    def decrease_text_size(self, caller):
+        self.font_size -= 2        
+        self.update_font()
+
+    def toggle_font_italic(self, caller):
+        self.font_italic = not self.font_italic
+        self.update_font()
+
+    def update_font(self):
+        if self.font_bold:
+            self.font = ScreenHelper.create_font((self.font_path, self.font_size),
+                                                 self.font_bold, self.font_italic)
 
     def draw(self, scrollable_screen=None):
         if scrollable_screen is None:
@@ -194,5 +284,7 @@ class TextItem(ScoreControl):
                 (cursor_x, text_y + self.font.get_height()),
                 2
             )
+
+        self.draw_action_buttons(scrollable_screen, r)
 
     

@@ -45,7 +45,7 @@ class PlayToolbar(BaseToolbar):
         ("⏹", "Stop"),
         ("⏭", "Next")         
     ]
-    FONT = ("Segoe UI Symbol", 14)
+    FONT = (ScreenConfig.FontConfig.NOTO_SANS_SYMBOLS2_REGULAR, 14)
     DRAGGABLE_BUTTONS = False
     BG_COLOR = (220, 220, 220, 100)
     BG_HIGHLIGHT = (220, 220, 250)

@@ -4,8 +4,11 @@ import pygame
 import unittest
 from unittest.mock import patch
 
+from DataClasses.ButtonConfigData import TEXT_ITEM_ACTION_BUTTON_CONFIG
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from Builders.TextItemBuilder import TextItemBuilder
 from Model.Inputs.TextItem import TextItem
 
 
@@ -21,7 +24,28 @@ class DummyContainer:
         return coordinates
 
 
+class DummyMainWindow:
+    def __init__(self):
+        self._event_handler = type("EventHandler", (), {"subscribe": lambda self, *args, **kwargs: None, "subscribe_timer": lambda self, *args, **kwargs: None})()
+
+    def get_event_handler(self):
+        return self._event_handler
+
+
 class TextItemTests(unittest.TestCase):
+    def test_build_text_item_adds_overlay_action_buttons(self):
+        pygame.init()
+        pygame.font.init()
+
+        parent_page = DummyContainer()
+        parent_page.main_window = DummyMainWindow()
+        builder = TextItemBuilder(parent_page.main_window)
+        text_item = builder.build_text_item(pygame.Rect(0, 0, 120, 40), parent_page, 
+                                        TEXT_ITEM_ACTION_BUTTON_CONFIG)
+        self.assertEqual(len(text_item.action_buttons), 2)
+        self.assertTrue(any(button.action == "add_text_item_below" for button in text_item.action_buttons))
+        self.assertTrue(any(button.action == "confirm_delete" for button in text_item.action_buttons))
+
     def test_draw_uses_text_based_cursor_position(self):
         pygame.init()
         pygame.font.init()

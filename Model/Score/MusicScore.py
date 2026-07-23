@@ -1,6 +1,6 @@
 import pygame
 
-from DataClasses.ButtonConfigData import StaffActionButtonConfig, StaffActionButtonPosition, StaffActionIdentifiers
+from DataClasses.ButtonConfigData import TEXT_ITEM_ACTION_BUTTON_CONFIG, ActionButtonConfig, ActionButtonGroupConfig, ActionButtonPosition, ActionIdentifiers
 from DataClasses.Config.ScreenConfig import StaffConfig
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Model.Score.GrandStaff import GrandStaff
@@ -94,10 +94,10 @@ class MusicScore:
             staff.rect.bottom + StaffConfig.STAFF_SPACING
         )
 
-        staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, 
-                                                 [StaffActionIdentifiers.ADD_STAFF_ACTION, 
-                                                  StaffActionIdentifiers.DELETE_STAFF_ACTION,
-                                                  StaffActionIdentifiers.CREATE_GRAND_STAFF_ACTION])]
+        staff_actions = [ActionButtonGroupConfig(ActionButtonPosition.RIGHT, 
+                                                 [ActionIdentifiers.ADD_STAFF_ACTION, 
+                                                  ActionIdentifiers.DELETE_STAFF_ACTION,
+                                                  ActionIdentifiers.CREATE_GRAND_STAFF_ACTION])]
 
         new_staff = staff_builder.build_empty_staff(
             new_staff_top_left,
@@ -182,11 +182,11 @@ class MusicScore:
         staff_builder = self.get_child_item_builder("staff")
         if staff_builder:
             parent_page = input_dict["parent_page"]
-            staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, 
-                                                 [StaffActionIdentifiers.ADD_STAFF_ACTION, 
-                                                  StaffActionIdentifiers.DELETE_STAFF_ACTION,
-                                                  StaffActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
-                                                  StaffActionIdentifiers.EXTEND_GRAND_STAFF_ACTION])]
+            staff_actions = [ActionButtonGroupConfig(ActionButtonPosition.RIGHT, 
+                                                 [ActionIdentifiers.ADD_STAFF_ACTION, 
+                                                  ActionIdentifiers.DELETE_STAFF_ACTION,
+                                                  ActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
+                                                  ActionIdentifiers.EXTEND_GRAND_STAFF_ACTION])]
             return staff_builder.build_empty_staff((rect.x, rect.y), StaffConfig.STAFF_WIDTH_PERCENT, parent_page, staff_actions)            
         return None
 
@@ -198,8 +198,16 @@ class MusicScore:
     def CreateTextInput(self, input_dict, rect):        
         parent_page = input_dict["parent_page"]
         input_rect = pygame.Rect(rect.x, rect.y, 150, 40)
-        text_builder = parent_page.main_window.text_item_builder
-        text_item =  text_builder.build_text_item(input_rect, parent_page=parent_page)
+        text_builder = parent_page.main_window.text_item_builder       
+        action_buttons_config =  [ 
+                    ActionButtonGroupConfig(ActionButtonPosition.TOP, 
+                                            [ActionIdentifiers.DECREASE_TEXT_SIZE, ActionIdentifiers.INCREASE_TEXT_SIZE, 
+                                             ActionIdentifiers.TOGGLE_FONT_BOLD, ActionIdentifiers.TOGGLE_ITALIC]),
+                    ActionButtonGroupConfig(ActionButtonPosition.RIGHT,[ActionIdentifiers.ADD_TEXT_ITEM_ACTION,
+                                                                        ActionIdentifiers.DELETE_TEXT_ITEM_ACTION])
+                    ]
+        text_item =  text_builder.build_text_item(input_rect, parent_page, 
+                                                  action_buttons_config)
         parent_page.children.append(text_item)
         return text_item
     

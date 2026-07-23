@@ -6,7 +6,7 @@ import copy
 
 import pygame
 
-from DataClasses.ButtonConfigData import StaffActionButtonConfig, StaffActionButtonPosition, StaffActionIdentifiers
+from DataClasses.ButtonConfigData import ActionButtonConfig, ActionButtonGroupConfig, ActionButtonPosition, ActionIdentifiers
 from DataClasses.Config.ScreenConfig import StaffConfig
 from DataClasses.ControlData import ControlType
 from Model.Dialogs.DialogModifyStruct import DialogModifyStruct
@@ -169,7 +169,7 @@ class GrandStaff(ScoreControl):
        )
        
        # Create a new staff below the current staff
-       staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, [StaffActionIdentifiers.DELETE_STAFF_ACTION])]
+       staff_actions = [ActionButtonGroupConfig(ActionButtonPosition.RIGHT, [ActionIdentifiers.DELETE_STAFF_ACTION])]
        new_staff = self.main_window.staff_builder.build_empty_staff(
             new_staff_top_left,StaffConfig.STAFF_WIDTH_PERCENT, 
             parent_page=self.parent, 

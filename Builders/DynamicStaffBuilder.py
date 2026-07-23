@@ -6,8 +6,9 @@ from typing import Any, Callable
 
 import pygame
 import gc
+from Builders.CommonBuilder import CommonBuilder
 from Builders.Params.BuildStaffItemParams import StaffItemBuildParams
-from DataClasses.ButtonConfigData import STAFF_ACTION_BUTTON_CONFIG, StaffActionButtonConfig, StaffActionButtonPosition, StaffActionIdentifiers
+from DataClasses.ButtonConfigData import STAFF_ACTION_BUTTON_CONFIG, ActionButtonConfig, ActionButtonGroupConfig, ActionButtonPosition, ActionIdentifiers
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
 from DataClasses.ControlData import ControlType
 from Model.Control import Control
@@ -23,21 +24,18 @@ from Model.Score.StaffLine import StaffLine
 from Renderers.StaffRenderer import StaffRenderer
 
 
-class DynamicStaffBuilder:
+class DynamicStaffBuilder(CommonBuilder):
 
-    def __init__(self, main_window):        
-        self.all_staves = []
-        self.main_window = main_window
-        self.app_state = main_window.get_state()
+    def __init__(self, main_window): 
+        super().__init__(main_window)       
+        self.all_staves = []        
         self.next_staff_position = None
         self.staff_height = self.calculate_staff_height()
-        self.staff_renderer = StaffRenderer(self.app_state)
-        self.event_handler = self.main_window.get_event_handler()
-
+        self.staff_renderer = StaffRenderer(self.app_state)     
 
     def calculate_staff_height(self):
         return (StaffConfig.STAFF_NO_LINES * StaffConfig.STAFF_LINE_THICKNESS) + (StaffConfig.STAFF_NO_INTERVALS * StaffConfig.STAFF_LINE_GAP) - 1
-  
+ 
 
     """
     staff_virtual_position is the position where the first virtual line will be placed. 
@@ -104,7 +102,7 @@ class DynamicStaffBuilder:
         parent_staff: This is only used when we are creating or extending a grand staff with the new one.
     """
     def build_empty_staff(self, top_left_position, staff_width_percentage, parent_page:ScorePage, 
-                          action_buttons=[], parent_staff=None):            
+                          action_buttons:list[ActionButtonGroupConfig]=[], parent_staff=None):            
         # Prepare parameters for building staff components (lines and intervals) and virtual components (lines and intervals above and below the staff)
         staff_rect = self.build_staff_rect(top_left_position, staff_width_percentage, parent_page)
         staff_top_left = Position(staff_rect.x, staff_rect.y)
@@ -141,8 +139,8 @@ class DynamicStaffBuilder:
         staff.virtual_lines += self.build_lines(bottom_virtual_items_param)     
         
         # We need to add action buttons for edit mode here.
-        if action_buttons and len(action_buttons) > 0:
-            staff.action_buttons = self.build_staff_action_buttons(staff, action_buttons)
+        if action_buttons and len(action_buttons) > 0:                        
+            staff.action_buttons = self.build_action_buttons(staff, action_buttons, STAFF_ACTION_BUTTON_CONFIG)
             staff.add_children(staff.action_buttons)
 
         # Record these as staff children for later manipulation.
@@ -177,73 +175,6 @@ class DynamicStaffBuilder:
             next_y_offset = last_staff_bottom_line.start_position.y + StaffConfig.STAFF_SPACING
             self.next_staff_position = Position(self.staff_original_position.x, next_y_offset)
 
-    def build_staff_action_buttons(self, staff, action_buttons):
-        all_buttons = []
-        
-        if not action_buttons or len(action_buttons) == 0:
-            return
-        
-        # Loop through actions
-        for action_config in action_buttons:
-            id_set = set(action_config.ConfigIds)
-            button_config_list = [config for config in STAFF_ACTION_BUTTON_CONFIG if config.Id in id_set]
-           
-            if action_config.Position == StaffActionButtonPosition.RIGHT:
-                all_buttons += self.build_staff_action_right(button_config_list, staff)
-            elif action_config.Position == StaffActionButtonPosition.TOP:
-                all_buttons +=  self.build_staff_action_top(button_config_list, staff)           
-       
-        return all_buttons
-
-       
-
-    def build_staff_action_buttons_by_position(self, staff, position:StaffActionButtonPosition, 
-                                               position_action: Callable[[list, object], object]):
-        buttons = [
-            button
-            for button in STAFF_ACTION_BUTTON_CONFIG
-            if button.position == position # 
-        ]
-
-        return position_action(buttons, staff)
-
-    def build_staff_action_top(self, buttons_config, staff):
-        buttons = []
-        # Loop through the config array and build ActionButton
-        button_offset_x = 0
-        for config in buttons_config:           
-            start_position = (staff.rect.topleft[0] + button_offset_x, staff.rect.topright[1] - 5)
-            button_offset_x += config.size.width + 5           
-            button_rect = (start_position[0], start_position[1], config.size.width, config.size.height)
-            action_button = ActionButton(button_rect, config, staff)
-            buttons.append(action_button)
-        return buttons
-
-    def build_staff_action_right(self, buttons_config, staff):
-        buttons = []
-        # Loop through the config array and build ActionButton
-        button_offset_x = staff.rect.topright[0] + 10
-        button_offset_y = staff.rect.topright[1]
-        previous_item_height = 0
-
-        for config in buttons_config:
-           
-            # Check if config contains this attribute ignore_previous_offset_y and it has been set 
-            if config.ignore_previous_offset_y is None or not config.ignore_previous_offset_y:
-                button_offset_y += previous_item_height
-                # update additoinal offset for next button
-                previous_item_height =  config.size.height + 5               
-           
-            button_rect = pygame.Rect(button_offset_x,  button_offset_y, config.size.width, config.size.height)
-            action_button = ActionButton(button_rect, config, staff, config.ignore_previous_offset_x, config.ignore_previous_offset_y)
-            buttons.append(action_button)
-            
-            # register button for relevant events
-            self.event_handler.subscribe(pygame.MOUSEMOTION, action_button)
-            self.event_handler.subscribe(pygame.MOUSEBUTTONDOWN, action_button)
-            
-        return buttons
-
     def duplicate_grand_staff_below(self, grand_staff):
         # Work out position of new grand-staff
         new_staves = []
@@ -255,11 +186,11 @@ class DynamicStaffBuilder:
         )   
 
         # prepare top staff action
-        staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, 
-                                                 [StaffActionIdentifiers.ADD_STAFF_ACTION, 
-                                                  StaffActionIdentifiers.DELETE_STAFF_ACTION,
-                                                  StaffActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
-                                                  StaffActionIdentifiers.EXTEND_GRAND_STAFF_ACTION])]
+        staff_actions = [ActionButtonGroupConfig(ActionButtonPosition.RIGHT, 
+                                                 [ActionIdentifiers.ADD_STAFF_ACTION, 
+                                                  ActionIdentifiers.DELETE_STAFF_ACTION,
+                                                  ActionIdentifiers.CREATE_GRAND_STAFF_ACTION,
+                                                  ActionIdentifiers.EXTEND_GRAND_STAFF_ACTION])]
         
         # Create a top staff
         top_staff = self.build_empty_staff(
@@ -285,8 +216,8 @@ class DynamicStaffBuilder:
             if index == 0:
                 staff_actions = None
             else:
-                staff_actions = [StaffActionButtonConfig(StaffActionButtonPosition.RIGHT, 
-                                                 [StaffActionIdentifiers.DELETE_STAFF_ACTION])]
+                staff_actions = [ActionButtonGroupConfig(ActionButtonPosition.RIGHT, 
+                                                 [ActionIdentifiers.DELETE_STAFF_ACTION])]
 
             # create subsequent staff
             next_staff = self.build_empty_staff(
