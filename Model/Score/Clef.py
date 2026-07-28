@@ -4,6 +4,7 @@ from DataClasses.Config import ScreenConfig
 from DataClasses.ControlData import ControlType
 from Helpers.ScreeHelper import ScreenHelper
 from Model.Control import Control
+from Model.Geometry.Position import Position
 from Model.Score.Helpers.StaffUtils import StaffUtils
 
 
@@ -30,16 +31,25 @@ class Clef(Control):
 
     def move_y(self, offset_y):
         self.rect.y += offset_y
-        print(f'moving cleff:{self.rect.y}')
 
     def move(self, _, offset_y):
        self.move_y(offset_y)
-       print(f'moving cleffxxxx:{self.rect.y}')
+
+    def delete(self):
+        print("Clef overwritten.")
+        pass
 
     def draw(self, scrollable_screen): 
 
         clef_position = StaffUtils.resolve_position_with_margins(self.parent.rect.topleft, 
-                                                                 self.margins)     
+                                                                 self.margins)
+
+        if hasattr(self.parent, "staff_renderer"):
+            clef_position = Position(
+                clef_position.x,
+                clef_position.y - self.parent.staff_renderer.vertical_offset
+            )
+
         clef_font = self.get_renderer()
         clef_rect = clef_font.get_rect()
         clef_rect.center = (clef_position.x, clef_position.y)

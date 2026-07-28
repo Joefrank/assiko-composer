@@ -422,10 +422,13 @@ class Staff(ScoreControl):
 
     def set_clef(self, new_clef):
         self.clef = new_clef
-        existing_clef = self.get_children_of_instance(Clef)
-        if existing_clef:
-            self.children.remove(existing_clef)
-        self.children.append(new_clef)
+        existing_clefs = [child for child in self.children if isinstance(child, Clef)]
+
+        for existing_clef in existing_clefs:
+            if existing_clef in self.children:
+                self.children.remove(existing_clef)
+
+        self.add_child(new_clef)
 
     def set_key_signature(self, key):
         self.key_signature = key

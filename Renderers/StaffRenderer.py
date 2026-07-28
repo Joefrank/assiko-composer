@@ -9,7 +9,7 @@ from DataClasses.Config.MusicConfig import supported_clef_settings, \
 from Helpers.FileHelper import FileHelper
 from Helpers.ScreeHelper import ScreenHelper
 from Model.Geometry.Position import Position
-from Model.Score.Helpers import StaffUtils
+from Model.Score.Helpers.StaffUtils import StaffUtils
 from Model.Score.Interval import Interval
 from Model.Score.Note import Note
 from Model.Score.StaffLine import StaffLine
@@ -73,8 +73,11 @@ class StaffRenderer(BaseRenderer):
         if staff.clef is None:
             return None     
         clef_position = self.draw_staff_clef(staff)
-        key_signature_position = Position(clef_position[0] + 20, clef_position[1])
+        key_signature_position = Position(clef_position.x + 20, clef_position.y)
         #Once clef is placed, we can add signature.
+        if not staff.key_signature:
+            return None
+        
         last_offset_x = self.draw_key_signature(staff, key_signature_position)
         last_offset_x += 30
         _, _, end_offset = self.draw_time_signature(staff.time_signature, Position(last_offset_x, staff.top_position.y))  
@@ -272,20 +275,21 @@ class StaffRenderer(BaseRenderer):
     """
         Draws the clef on the staff.
     """
-    def draw_staff_clef(self, staff, font_color=(0, 0, 0)):
+    def draw_staff_clef(self, staff):
         if staff.clef is None:
             return staff.top_position
-       
-        clef_settings = supported_clef_settings[staff.clef]
-        clef_size = clef_settings["size"]
-        clef_font_size =ScreenHelper.create_font((ScreenConfig.FontConfig.BRAVURA_FONT_PATH, clef_size)) 
-        clef = clef_font_size.render(clef_settings["font_code"], True, font_color)
-        # Get clef rect to position it
-        clef_rect = clef.get_rect()
-        clef_position = StaffUtils.resolve_position_with_margins(staff.rect.topleft, clef_settings["margins"])
-        clef_rect.center = (clef_position.x, clef_position.y)
-        self.screen.blit(clef, clef_rect)
-        return clef_position
+        
+        # actual_position = self._to_staff_space_position(
+        #                         Position(staff.clef.rect.x, staff.clef.rect.y)
+        #                     )
+
+        #staff.clef.rect.y -= staff.parent_page.parent.scroll_y
+
+        staff.clef.draw(self.screen)
+
+        return StaffUtils.resolve_position_with_margins(staff.rect.topleft, 
+                                                                staff.clef.get_margins())
+
     
     """
         Draws the time signature specified for the staff

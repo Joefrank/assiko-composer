@@ -358,6 +358,9 @@ class ScrollableDocumentViewport(Control):
        if dragged_symbol:
            rect, action, params_input = dragged_symbol
            # run the action by calling the function with the parameters
+           
+           ########################  move functions into page from score and handle everything there
+           ####################### create new page event handler where all functions will be.
            function = getattr(self.music_score, action, None)
            if function:
                translated_rect = pygame.Rect(
@@ -370,8 +373,8 @@ class ScrollableDocumentViewport(Control):
                    print("Item dropped at invalid location. needs to be on a page.")
                    return
                # build a dictionary for other parameters
-               input_dict = {"original_value" : params_input, "parent_page": target_page}
-
+               input_dict = {"params_input" : params_input, "parent_page": target_page}
+               print(input_dict)
                created_item = function(input_dict, translated_rect)
                if created_item:
                     # Now we can directly add the created item to the page based on the drop coordinates.                    
