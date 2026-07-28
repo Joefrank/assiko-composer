@@ -2,6 +2,7 @@ import pygame
 
 from DataClasses.ButtonConfigData import TEXT_ITEM_ACTION_BUTTON_CONFIG, ActionButtonConfig, ActionButtonGroupConfig, ActionButtonPosition, ActionIdentifiers
 from DataClasses.Config.ScreenConfig import StaffConfig
+from DataClasses.ControlData import ControlType
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Model.Score.GrandStaff import GrandStaff
 from Model.Score.Staff import Staff
@@ -211,4 +212,19 @@ class MusicScore:
         parent_page.children.append(text_item)
         return text_item
     
-    
+    def PositionClef(self, input_dict, rect):
+        parent_page = input_dict["parent_page"]
+
+        if parent_page is None:
+            return
+        
+        staves = parent_page.get_children_of_type(ControlType.STAFF)
+
+        # Check if rect collides with any of the staves on parent_page
+        for staff in staves:
+            if staff.rect.collidepoint(rect.x, rect.y):
+                staff_builder = self.get_child_item_builder("staff")
+                clef = staff_builder.build_staff_clef(staff, 
+                                            input_dict['params_input']['params'])
+                staff.set_clef(clef)
+               

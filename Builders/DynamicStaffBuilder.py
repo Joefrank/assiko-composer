@@ -9,12 +9,15 @@ import gc
 from Builders.CommonBuilder import CommonBuilder
 from Builders.Params.BuildStaffItemParams import StaffItemBuildParams
 from DataClasses.ButtonConfigData import STAFF_ACTION_BUTTON_CONFIG, ActionButtonConfig, ActionButtonGroupConfig, ActionButtonPosition, ActionIdentifiers
+from DataClasses.Config import ScreenConfig
 from DataClasses.Config.ScreenConfig import VERTICAL_POSITION_BOTTOM, VERTICAL_POSITION_TOP, StaffConfig
 from DataClasses.ControlData import ControlType
+from Helpers.ScreeHelper import ScreenHelper
 from Model.Control import Control
 from Model.Buttons.ButtonIcons.ActionButton import ActionButton
 from Model.Containers.ScorePage import ScorePage
 from Model.Geometry.Position import Position
+from Model.Score.Clef import Clef
 from Model.Score.CollateralBoundary import CollateralBoundary
 from Model.Score.GrandStaff import GrandStaff
 from Model.Score.Interval import Interval
@@ -22,7 +25,7 @@ from Model.Score.Rect import Rect
 from Model.Score.Staff import Staff
 from Model.Score.StaffLine import StaffLine
 from Renderers.StaffRenderer import StaffRenderer
-
+from DataClasses.Config.MusicConfig import supported_clef_settings
 
 class DynamicStaffBuilder(CommonBuilder):
 
@@ -300,6 +303,12 @@ class DynamicStaffBuilder(CommonBuilder):
         staff_with = container_width * staff_width_percentage / 100
         all_staves_x_offset = int((container_width - staff_with) // 2) 
         return staff_with, Position(all_staves_x_offset, staff_original_y_offset)
+
+    def build_staff_clef(self, staff, clef_type):
+        clef_settings = supported_clef_settings[clef_type]
+        return Clef(clef_type, f"{staff.name}_{clef_type}", staff, 
+                    clef_settings, (230, 100, 100))
+   
     
     
     

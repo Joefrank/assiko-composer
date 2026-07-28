@@ -86,7 +86,19 @@ class Control:
 
     def get_children(self):
         return self.children
-    
+
+    def get_children_of_type(self, control_type:ControlType):
+        if len(self.children) == 0:
+            return []
+        
+        return [child for child in self.children if child.type ==control_type]
+
+    def get_children_of_instance(self, target_type):
+        if len(self.children) == 0:
+            return []
+        
+        return [child for child in self.children if isinstance(child, target_type)]
+
     def get_parent(self):
         return self.parent
     

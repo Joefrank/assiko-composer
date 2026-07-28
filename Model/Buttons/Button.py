@@ -12,12 +12,8 @@ class Button(Control):
     
     def __init__(self, config: ButtonConfig):
         rect = pygame.Rect(config.position[0], config.position[1], config.toolbar.button_width, config.toolbar.button_height)
-        super().__init__(rect, ControlType.TOOLBARITEM, config.action)  
-       
-    # def __init__(self, screen, name, rect, text, tooltip, font, font_details, border_radius=0, text_position=TextPosition.CENTER,
-    #              text_color=ButtonConfig.TEXT_DEFAULT_COLOR, bg_color=ButtonConfig.BTN_DEFAULT_COLOR, hover_text_color=ButtonConfig.TEXT_DEFAULT_COLOR, 
-    #              hover_bg_color=ButtonConfig.BTN_DEFAULT_HOVER, is_draggable=False, action=None):
-    #     super().__init__(rect, ControlType.TOOLBARITEM, name)   
+        super().__init__(rect, ControlType.TOOLBARITEM, config.action)       
+     
         self.screen = config.screen
         self.is_draggable = config.draggable_icons
         self.text = config.icon
@@ -38,7 +34,8 @@ class Button(Control):
         self.current_dragged_symbol = None
         self.set_z_index(ControlZIndex.LEVEL3)
         self.is_resizable = True 
-        self.text_position = config.toolbar.button_text_center       
+        self.text_position = config.toolbar.button_text_center 
+        self.action_params = config.action_params      
        
 
     def draw(self):
@@ -97,11 +94,11 @@ class Button(Control):
         return False  # Event not handled
 
     def on_left_mouse_up(self, event):
-        # Notify state of symbol drop if it's draggable.
-        print(f"button mouse up")
+        # Notify state of symbol drop if it's draggable.        
         if self.current_dragged_symbol and self.app_state:
+            input_params = {"params":self.action_params, "drop_action":self.parent.drop_action}
             self.app_state.save_dropped_symbol(self.current_dragged_symbol, 
-                                               self.action, self.parent.drop_action)        
+                                               self.action, input_params)        
             self.dragged_symbols.remove(self.current_dragged_symbol)
             self.current_dragged_symbol = None
             

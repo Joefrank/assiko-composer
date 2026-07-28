@@ -5,6 +5,7 @@ from DataClasses.ControlData import ControlType
 from Model.Dialogs.DialogModifyStruct import DialogModifyStruct
 from Model.Geometry.Position import Position
 from Model.Geometry.Line import Line
+from Model.Score.Clef import Clef
 from Model.Score.Note import Note
 from Model.Score.ScoreControl import ScoreControl
 from Model.Score.StaffBar import StaffBar
@@ -285,7 +286,7 @@ class Staff(ScoreControl):
             target_y = self.rect.y + offset_y
             clamped_y = max(min_y, min(max_y, target_y))
             actual_offset_y = clamped_y - self.rect.y
-
+       
         super().move_y(actual_offset_y)        
         for child in self.get_children():
             child.move_y(actual_offset_y)
@@ -418,6 +419,16 @@ class Staff(ScoreControl):
     def point_action_to_parent_grand_staff(self, grand_staff):
         for button in self.action_buttons:
             button.change_target_control(grand_staff)
+
+    def set_clef(self, new_clef):
+        self.clef = new_clef
+        existing_clef = self.get_children_of_instance(Clef)
+        if existing_clef:
+            self.children.remove(existing_clef)
+        self.children.append(new_clef)
+
+    def set_key_signature(self, key):
+        self.key_signature = key
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

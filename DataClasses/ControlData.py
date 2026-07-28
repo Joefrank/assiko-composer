@@ -16,6 +16,7 @@ class ControlType(Enum):
     SCORE_ITEM = auto()
     TEXT_INPUT = auto()
     STAFF = auto()
+    STAFF_ITEM = auto()
     GRAND_STAFF = auto()
     
 

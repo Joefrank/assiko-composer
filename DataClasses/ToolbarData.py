@@ -125,16 +125,6 @@ class CommonTimeSignatureToolbar(BaseToolbar):
     DROP_ACTION = "PositionTimeSignature"
 
 @dataclass
-class ClefToolbar(BaseToolbar):
-    NAME: str = "ClefToolbar"
-    ICONS =[
-                ("\uE050", "TREBLE CLEF", TREBLE_CLEF),
-                ("\uE062", "BASS CLEF", BASS_CLEF),
-                #("\uE05C", "C_CLEF")                
-            ]
-    DROP_ACTION = "PositionClef"
-
-@dataclass
 class KeySignatureToolbar(BaseToolbar):
     NAME: str = "KeySignatureToolbar"
     ICONS =[
@@ -170,6 +160,15 @@ class DynamicsToolbar(BaseToolbar):
         ("\uE53F", "diminuendo"),
     ]
     DROP_ACTION = "PositionDynamic"
+
+@dataclass
+class ClefToolbar(BaseToolbar):
+    NAME: str = "ClefToolbar"
+    ICONS =[
+                ("\uE050", "TREBLE CLEF", "PositionClef", TREBLE_CLEF),
+                ("\uE062", "BASS CLEF", "PositionClef", BASS_CLEF)
+            ]
+    DROP_ACTION = "PositionClef"
 
 @dataclass
 class StaffActionToolbar(BaseToolbar):

@@ -26,6 +26,7 @@ class ButtonConfig:
     position: tuple = (0,0)
     symbols: list = field(default_factory=list)
     action_value: Any = None
+    action_params: Any = None
     
 
 @dataclass

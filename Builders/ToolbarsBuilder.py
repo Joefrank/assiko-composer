@@ -104,11 +104,14 @@ class ToolbarBuilder:
         x = ToolbarDimensions.BUTTON_MARGIN  
         button_builder = ButtonBuildersFactory().get_button_builder(button_type)
         buttons =[]  
-        for icon, action, *action_value in icons:
-            payload = action_value[0] if action_value else None  
+        for item in icons: #, action, drop_action, action_and_params
+            icon, action = item[:2]
+            action_value = item[2] if len(item) >= 3 else None
+            action_params = item[3] if len(item) >= 4 else None
+
             button_config = ButtonConfig(self.screen, toolbar, action, icon, font, font_details, border_radius, text_color,
                              bg_color, hover_text_color, hover_bg_color, toolbar.buttons_draggable, 
-                             (x, button_top_padding), action_value=payload)         
+                             (x, button_top_padding), action_value=action_value, action_params=action_params)         
             button = button_builder.create_button(button_config)
             button.set_parent(toolbar, offset_x=x, offset_y=button_top_padding)       
             toolbar.add_button(button)

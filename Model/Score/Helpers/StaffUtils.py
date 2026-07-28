@@ -16,8 +16,8 @@ class StaffUtils:
 
     @staticmethod
     def resolve_position_with_margins(position, margins):       
-        x = position.x + margins[0] - margins[2]
-        y = position.y + margins[1] - margins[3]  
+        x = position[0] + margins[0] - margins[2]
+        y = position[1] + margins[1] - margins[3]  
         return Position(x, y)
 
     @staticmethod
