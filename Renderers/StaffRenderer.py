@@ -278,13 +278,7 @@ class StaffRenderer(BaseRenderer):
     def draw_staff_clef(self, staff):
         if staff.clef is None:
             return staff.top_position
-        
-        # actual_position = self._to_staff_space_position(
-        #                         Position(staff.clef.rect.x, staff.clef.rect.y)
-        #                     )
-
-        #staff.clef.rect.y -= staff.parent_page.parent.scroll_y
-
+      
         staff.clef.draw(self.screen)
 
         return StaffUtils.resolve_position_with_margins(staff.rect.topleft, 

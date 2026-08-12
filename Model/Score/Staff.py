@@ -422,7 +422,7 @@ class Staff(ScoreControl):
 
     def set_clef(self, new_clef):
         self.clef = new_clef
-        existing_clefs = [child for child in self.children if isinstance(child, Clef)]
+        existing_clefs = self.get_children_of_instance(Clef)
 
         for existing_clef in existing_clefs:
             if existing_clef in self.children:

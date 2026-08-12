@@ -39,8 +39,10 @@ class Clef(Control):
         print("Clef overwritten.")
         pass
 
+    def get_type(self):
+        return self.clef_type
+    
     def draw(self, scrollable_screen): 
-
         clef_position = StaffUtils.resolve_position_with_margins(self.parent.rect.topleft, 
                                                                  self.margins)
 

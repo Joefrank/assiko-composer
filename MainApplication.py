@@ -1,3 +1,6 @@
+import os
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+
 import pygame
 from Builders.MainWindowBuilder import MainWindowBuilder
 from Renderers.MainWindowRenderer import MainWindowRenderer
