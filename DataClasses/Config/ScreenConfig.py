@@ -80,6 +80,8 @@ class StaffConfig:
     STAFF_ITEM_THRESHOLD: int = 2
     STACCATO_SYMBOL_SIZE: int = 40
     NOTE_PROXIMITY_THRESHOLD: int = 40
+    STAFF_MODULATION_FONT_SIZE: int = 30
+    STAFF_TIME_SIGNATURE_FONT_SIZE: int = 35
 
 @dataclass
 class ScoreConfig:

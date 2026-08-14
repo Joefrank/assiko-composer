@@ -128,13 +128,13 @@ class CommonTimeSignatureToolbar(BaseToolbar):
 class KeySignatureToolbar(BaseToolbar):
     NAME: str = "KeySignatureToolbar"
     ICONS =[
-                (("\uE262",1), "G MAJOR", "G"),
-                (("\uE262",2), "D MAJOR", "D"),
-                (("\uE262",3), "A MAJOR", "A"),
-                (("\uE262",4), "E MAJOR", "E"),
-                (("\uE262",5), "B MAJOR", "B"),
-                (("\uE262",6), "F# MAJOR", "F#"),
-                (("\uE262",7), "C# MAJOR", "C#"),           
+                (("\uE262",1), "G MAJOR","PositionKeySignature", "G"),
+                (("\uE262",2), "D MAJOR", "PositionKeySignature", "D"),
+                (("\uE262",3), "A MAJOR", "PositionKeySignature", "A"),
+                (("\uE262",4), "E MAJOR", "PositionKeySignature", "E"),
+                (("\uE262",5), "B MAJOR", "PositionKeySignature", "B"),
+                (("\uE262",6), "F# MAJOR", "PositionKeySignature", "F#"),
+                (("\uE262",7), "C# MAJOR", "PositionKeySignature", "C#"),           
             ]
     BUTTON_TYPE = ButtonType.STAGGERED_SYMBOL_BUTTON
     DROP_ACTION = "PositionKeySignature"

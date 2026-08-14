@@ -41,6 +41,7 @@ class Staff(ScoreControl):
         self.clef = clef
         self.time_signature = time_signature
         self.key_signature = key_signature
+        self.key = None
         self.step_notes_rests_lyrics = []  # these are chords played in steps. It's a list of StaffStep
         self.dynamics = [] # use StaffDynamic as a list
         self.lyrics_lines = []  
@@ -432,6 +433,12 @@ class Staff(ScoreControl):
 
     def set_key_signature(self, key):
         self.key_signature = key
+
+    def set_key(self, key):
+        self.key = key
+
+    def get_key(self):
+        return self.key
 
     def __str__(self):
         lines_str = "-> ".join(str(line) for line in self.lines)

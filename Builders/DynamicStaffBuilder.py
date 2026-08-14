@@ -21,6 +21,7 @@ from Model.Score.Clef import Clef
 from Model.Score.CollateralBoundary import CollateralBoundary
 from Model.Score.GrandStaff import GrandStaff
 from Model.Score.Interval import Interval
+from Model.Score.KeySignature import KeySignature
 from Model.Score.Rect import Rect
 from Model.Score.Staff import Staff
 from Model.Score.StaffLine import StaffLine
@@ -306,9 +307,10 @@ class DynamicStaffBuilder(CommonBuilder):
 
     def build_staff_clef(self, staff, clef_type):
         clef_settings = supported_clef_settings[clef_type]
-        return Clef(clef_type, f"{staff.name}_{clef_type}", staff, 
-                    clef_settings, (230, 100, 100))
+        return Clef(clef_type, f"{staff.name}_{clef_type}", staff, clef_settings)
    
-    
+    def build_staff_key(self, staff, key_details):
+        clef_settings = supported_clef_settings[staff.clef.get_type()]
+        return KeySignature(key_details,f"{staff.name}_{key_details}",staff, clef_settings)
     
     

@@ -217,8 +217,10 @@ class MusicScore:
 
         if parent_page is None:
             return
-        
+
+        grand_staves = parent_page.get_children_of_type(ControlType.GRAND_STAFF)
         staves = parent_page.get_children_of_type(ControlType.STAFF)
+        staves.extend([staff for grand_staff in grand_staves for staff in grand_staff.staves])
 
         # Check if rect collides with any of the staves on parent_page
         for staff in staves:
@@ -227,4 +229,21 @@ class MusicScore:
                 clef = staff_builder.build_staff_clef(staff, 
                                             input_dict['params_input']['params'])
                 staff.set_clef(clef)
-               
+
+    def PositionKeySignature(self, input_dict, rect):
+        parent_page = input_dict["parent_page"]
+
+        if parent_page is None:
+            return
+        
+        staves = parent_page.get_children_of_type(ControlType.STAFF)
+        grand_staves = parent_page.get_children_of_type(ControlType.GRAND_STAFF)
+        staves.extend([staff for grand_staff in grand_staves for staff in grand_staff.staves])
+
+        for staff in staves:
+            if staff.rect.collidepoint(rect.x, rect.y):
+                staff_builder = self.get_child_item_builder("staff")
+                key = input_dict['params_input']['params']
+                staff.set_key(key)
+                key_signature = staff_builder.build_staff_key(staff, key)
+                staff.set_key_signature(key_signature)

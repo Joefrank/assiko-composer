@@ -80,6 +80,10 @@ class StaffRenderer(BaseRenderer):
         
         last_offset_x = self.draw_key_signature(staff, key_signature_position)
         last_offset_x += 30
+        
+        if not staff.time_signature:
+            return last_offset_x
+        
         _, _, end_offset = self.draw_time_signature(staff.time_signature, Position(last_offset_x, staff.top_position.y))  
         # Collaterals are every music symbols to be drawn on or around the staff. 
         end_offset += 30            
@@ -316,10 +320,10 @@ class StaffRenderer(BaseRenderer):
         if staff.key_signature is None:# normally return an error message ***
             return reference_position.x
         
-        clef_settings = supported_clef_settings[staff.clef]
+        clef_settings = supported_clef_settings[staff.clef.clef_type]
         signature_patterns =clef_settings["signature_position_pattern"]
-        signature_details = signature_patterns[staff.key_signature]
-        modulation_name, modulation_details = StaffUtils.find_key_signature_modulation(staff.key_signature, supported_modulations)
+        signature_details = signature_patterns[staff.get_key()]
+        modulation_name, modulation_details = StaffUtils.find_key_signature_modulation(staff.get_key(), supported_modulations)
         modulation_font_code = modulation_details["font_code"]
         modulation_font_size =  modulation_details["font_size"]
         modulation_item_index = 1
