@@ -25,8 +25,9 @@ class ButtonConfig:
     draggable_icons: bool = False
     position: tuple = (0,0)
     symbols: list = field(default_factory=list)
-    action_value: Any = None
+    tooltip: str | None = None
     action_params: Any = None
+    drop_action: Any = None # used for drag and drop actions, if any
     
 
 @dataclass

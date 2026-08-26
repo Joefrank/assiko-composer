@@ -7,6 +7,7 @@ from DataClasses.ToolbarData import TOOLBAR_MATRIX, ToolbarDimensions, ToolbarGr
 from EventHandlers.MainWindowEventHandler import MainWindowEventHandler
 from Factories.ButtonBuildersFactory import ButtonBuildersFactory
 from Helpers.ScreeHelper import ScreenHelper
+from Model.Buttons.ButtonIcon import ButtonIcon
 from Model.Containers.Grid import Grid
 from Model.Toolbars.StaggeredButtonToolbar import StaggeredButtonToolbar
 from Model.Toolbars.Toolbar import Toolbar
@@ -98,20 +99,24 @@ class ToolbarBuilder:
         return toolbar
     
     """Create buttons for toolbar."""
-    def setup_buttons(self, toolbar, icons:list[tuple[str, str]], font, font_details, toolbar_height, # pass height of toolbar here
+    def setup_buttons(self, toolbar, icons:list[ButtonIcon], font, font_details, toolbar_height, # pass height of toolbar here
                     text_color, bg_color, hover_text_color, hover_bg_color, border_radius=0, button_type=ButtonType.BUTTON):
         button_top_padding = (toolbar_height - toolbar.button_height) // 2
         x = ToolbarDimensions.BUTTON_MARGIN  
         button_builder = ButtonBuildersFactory().get_button_builder(button_type)
         buttons =[]  
+        
         for item in icons: #, action, drop_action, action_and_params
-            icon, action = item[:2]
-            action_value = item[2] if len(item) >= 3 else None
-            action_params = item[3] if len(item) >= 4 else None
+          
+            if toolbar.drop_action is None and toolbar.buttons_draggable:
+                drop_action = item.action
+            else:
+                drop_action = toolbar.drop_action
 
-            button_config = ButtonConfig(self.screen, toolbar, action, icon, font, font_details, border_radius, text_color,
+            button_config = ButtonConfig(self.screen, toolbar, item.action, item.symbol, font, font_details, border_radius, text_color,
                              bg_color, hover_text_color, hover_bg_color, toolbar.buttons_draggable, 
-                             (x, button_top_padding), action_value=action_value, action_params=action_params)         
+                             (x, button_top_padding), action_params=item.action_params,
+                             tooltip=item.tooltip, drop_action=drop_action)         
             button = button_builder.create_button(button_config)
             button.set_parent(toolbar, offset_x=x, offset_y=button_top_padding)       
             toolbar.add_button(button)

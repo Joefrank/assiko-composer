@@ -15,10 +15,10 @@ class Button(Control):
         super().__init__(rect, ControlType.TOOLBARITEM, config.action)       
      
         self.screen = config.screen
-        self.is_draggable = config.draggable_icons
+        self.is_draggable = config.draggable_icons  and len(config.icon) > 0
         self.text = config.icon
-        self.tooltip = config.action
-        self.action = config.action if config.action_value is None else config.action_value
+        self.tooltip = config.tooltip
+        self.action = config.drop_action if self.is_draggable and config.drop_action else config.action
         self.font = config.font
         self.font_details = config.font_details
         self.border_radius = config.border_radius
@@ -83,10 +83,10 @@ class Button(Control):
                 self.current_dragged_symbol = self.rect.copy()
                 self.dragged_symbols.append(self.current_dragged_symbol)
                 # offset keeps the cursor from snapping to top-left
-                self.offset = (
-                    self.rect.x - event.pos[0],
-                    self.rect.y - event.pos[1]
-                )
+                #self.offset = (0,0
+                    # self.rect.x - event.pos[0],
+                    # self.rect.y - event.pos[1]
+               # )
             else:# Mouse click
                 method = getattr(self.activator, self.action)
                 method()
@@ -106,8 +106,8 @@ class Button(Control):
         
     def on_mouse_motion(self, event):  
         if self.is_draggable and self.dragging:
-            self.current_dragged_symbol.x = event.pos[0] + self.offset[0]
-            self.current_dragged_symbol.y = event.pos[1] + self.offset[1]     
+            self.current_dragged_symbol.x = event.pos[0] #+ self.offset[0]
+            self.current_dragged_symbol.y = event.pos[1] #+ self.offset[1]     
         return self.handle_hover(event.pos)
 
     def handle_hover(self, mouse_pos):       

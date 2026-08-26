@@ -243,7 +243,7 @@ class MusicScore:
         for staff in staves:
             if staff.rect.collidepoint(rect.x, rect.y):
                 staff_builder = self.get_child_item_builder("staff")
-                key = input_dict['params_input']['params']
+                key = input_dict['params_input']['params']['key_signature']
                 staff.set_key(key)
                 key_signature = staff_builder.build_staff_key(staff, key)
                 staff.set_key_signature(key_signature)

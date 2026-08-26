@@ -434,6 +434,9 @@ class Staff(ScoreControl):
     def set_key_signature(self, key):
         self.key_signature = key
 
+    def get_key_signature(self):
+        return self.key_signature
+    
     def set_key(self, key):
         self.key = key
 

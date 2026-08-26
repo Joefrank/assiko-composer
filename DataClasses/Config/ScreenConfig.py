@@ -82,6 +82,9 @@ class StaffConfig:
     NOTE_PROXIMITY_THRESHOLD: int = 40
     STAFF_MODULATION_FONT_SIZE: int = 30
     STAFF_TIME_SIGNATURE_FONT_SIZE: int = 35
+    STAFF_ITEM_LINE = 0
+    STAFF_ITEM_INTERVAL = 1
+    MODULATION_SPACING = 6
 
 @dataclass
 class ScoreConfig:

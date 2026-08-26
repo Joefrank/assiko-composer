@@ -21,10 +21,7 @@ class StaffRenderer(BaseRenderer):
    
     def __init__(self, state):
         super().__init__(state) 
-        self.start_time = datetime.now().time()        
-        self.MODULATION_SPACING = 6
-        self.STAFF_ITEM_LINE = 0
-        self.STAFF_ITEM_INTERVAL = 1
+        self.start_time = datetime.now().time()
         self.music_score = None
         self.piano_notes = None 
         self.sound_player = state.sound_player
@@ -316,40 +313,16 @@ class StaffRenderer(BaseRenderer):
         Draws the key signature of the staff
     """
     def draw_key_signature(self, staff, reference_position):
-     
-        if staff.key_signature is None:# normally return an error message ***
+
+        key_signature = staff.get_key_signature()
+
+        if key_signature is None:# normally return an error message ***
             return reference_position.x
+
+        key_signature.set_reference_position(reference_position)
+        bounding_box = key_signature.draw(self.screen)
         
-        clef_settings = supported_clef_settings[staff.clef.clef_type]
-        signature_patterns =clef_settings["signature_position_pattern"]
-        signature_details = signature_patterns[staff.get_key()]
-        modulation_name, modulation_details = StaffUtils.find_key_signature_modulation(staff.get_key(), supported_modulations)
-        modulation_font_code = modulation_details["font_code"]
-        modulation_font_size =  modulation_details["font_size"]
-        modulation_item_index = 1
-        last_modulation_x_offset = 0 # needed to position next item (time signature)
-        
-        for pattern in signature_details:
-            signature_item_positioning = next(iter(pattern.values()))
-            staff_item_type = signature_item_positioning[0] # line/interval
-            staff_item_position = None
-
-            if staff_item_type == self.STAFF_ITEM_LINE: # line
-                staff_item_position = StaffUtils.get_signature_item_coordinates_for_line(StaffConfig.STAFF_LINE_GAP, modulation_item_index,
-                                                                modulation_font_size, staff.lines, signature_item_positioning[1], 
-                                                                self.MODULATION_SPACING, reference_position.x)
-            elif staff_item_type == self.STAFF_ITEM_INTERVAL: # interval
-                staff_item_position = StaffUtils.get_signature_item_coordinates_for_interval(StaffConfig.STAFF_LINE_GAP, modulation_item_index,
-                                                                                   modulation_font_size, staff.lines,
-                                                                                   staff.intervals, signature_item_positioning[1], self.MODULATION_SPACING, reference_position.x)
-
-            signature_position = (staff_item_position.x, staff_item_position.y)
-            self.draw_modulation(modulation_font_code, StaffConfig.STAFF_MODULATION_FONT_SIZE,
-                                 signature_position)
-            modulation_item_index += 1
-            last_modulation_x_offset = staff_item_position.x
-
-        return 90 if len(signature_details) < 1 else last_modulation_x_offset
+        return bounding_box[2] #90 if len(signature_details) < 1 else last_modulation_x_offset
     
     """
         Displays modulation at specific position # or b on line or interval

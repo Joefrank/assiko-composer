@@ -18,6 +18,15 @@ Bugs:
 
 Next to do:
 
+*** Work out spacing for staff first 3 items (clef, signature, time signature)
+** Add translations for toolbar buttons
+** Create tooltip functionality
+** Create dialog for alerts
+*  Business rules around adding/dropping icons (maybe later when staff icons are done)
+** When extend staff and clef is present, repeat key signature.
+* use toolbar activator to accomplish drop actions
+
+- Add Barriton key support (later)
 
 - add expand/reduce buttons on left of grand staff gaps
 - Grand staff is not able to be dragged again when dragged and dropped below visible port

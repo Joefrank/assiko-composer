@@ -306,8 +306,9 @@ class DynamicStaffBuilder(CommonBuilder):
         return staff_with, Position(all_staves_x_offset, staff_original_y_offset)
 
     def build_staff_clef(self, staff, clef_type):
-        clef_settings = supported_clef_settings[clef_type]
-        return Clef(clef_type, f"{staff.name}_{clef_type}", staff, clef_settings)
+        clef_name = clef_type["clef"]
+        clef_settings = supported_clef_settings[clef_name]
+        return Clef(clef_name, f"{staff.name}_{clef_type}", staff, clef_settings)
    
     def build_staff_key(self, staff, key_details):
         clef_settings = supported_clef_settings[staff.clef.get_type()]

@@ -1,17 +1,17 @@
 
 class ToolbarActivator:
 
-    def Previous(self):
+    def Previous_Score(self):
         print("Moving to previous")
 
-    def Play(self):
+    def Play_Score(self):
         print("Playing")
 
-    def Pause(self):
+    def Pause_Score(self):
         print("Paused")
 
-    def Stop(self):
-        print("Stopping")      
+    def Stop_Score(self):
+        print("Stopping")
 
-    def Next(self):
+    def Next_Score(self):
         print("Moving to next")
